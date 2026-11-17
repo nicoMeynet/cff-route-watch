@@ -71,6 +71,37 @@ change pushed to `main` is online within a minute or two.
 - **Best alternative:** when your train is cancelled, misses its change or is very late, the
   page suggests the train that gets you there soonest, with a **Switch to this train** button.
 
+## Official SBB data (optional)
+
+The data source above (transport.opendata.ch) has no cancellation flag, and often no live data at
+all for regional trains such as the RE33. With your own **free key** for the official SBB API
+(OJP 2.0 on [opentransportdata.swiss](https://opentransportdata.swiss/)), the page also shows:
+
+- **live delays at every stop**, taken from SBB;
+- **Cancelled**: SBB flags the train as cancelled;
+- **Skips Lancy-Pont-Rouge** (or another station where you get on, change or get off): the train
+  will not stop there, for example when it terminates early;
+- **No live data**: a train that left a few minutes ago has no live data at all in SBB's feed,
+  while the trains around it do. It may be disrupted;
+- **SBB messages** for each train (ℹ️), for example "very high occupancy, boarding not
+  guaranteed" or an alternative train to take. They are shown in your language when SBB provides
+  it, otherwise in German with "(DE)".
+
+To set it up:
+
+1. Create a free account on the [API Manager](https://api-manager.opentransportdata.swiss/),
+   subscribe to **OJP 2.0** and create an API key.
+2. In Settings, paste it in **SBB key (OJP 2.0, optional)** and click **Test the key**.
+
+The key is **kept in this browser only**: it is never put in the settings link, never written in
+the page and only sent to opentransportdata.swiss. Everyone who uses the page enters their own
+key. Without a key, the page works as before. The status line shows "SBB data ✓" when the SBB
+data was received.
+
+Trains are matched between the two sources by line, boarding station and scheduled departure
+time, not by train number: transport.opendata.ch doesn't always give the same train number as
+its own departure board or as SBB.
+
 ## Alerts and notifications
 
 Click **🔔 Alerts** to turn on the beep and desktop notifications. You're notified again only
@@ -125,3 +156,8 @@ only: they are not part of the link.
 The page sends two requests per refresh (one every 60 s), plus a departure-board check only when
 a train disappears. The API has no fixed limit per client, but asks apps not to repeat the same
 query every few seconds. Each open copy of the page sends its own requests.
+
+With an SBB key, it also sends **one OJP request per refresh** (about 60 per hour; the free plan
+allows about 50 per minute). SBB messages are large because they list every affected stop, so
+their texts are only downloaded every 10 minutes, or as soon as a new message appears. In
+between, a request weighs about 20 KB.

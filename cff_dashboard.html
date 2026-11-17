@@ -96,6 +96,11 @@
   .late { color: var(--warn); } .vlate { color: var(--bad); }
   .empty { padding: 30px; text-align: center; color: var(--muted); }
   .io { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 8px; margin-top: 14px; }
+  .keyfield { grid-column: 1 / -1; }
+  .keyrow { display: flex; gap: 8px; } .keyrow input { flex: 1; min-width: 0; }
+  .sbbmsg { margin: 6px 0 0; padding: 0; list-style: none; display: grid; gap: 4px; font-size: 13px; }
+  .sbbmsg li { color: var(--text); } .sbbmsg li b { color: var(--pin); }
+  .sbb-ico { margin-left: 6px; cursor: help; }
   .linkfield { flex: 1 1 320px; } .linkfield input { width: 100%; font-size: 13px; }
   .field { display: grid; gap: 4px; font-size: 13px; color: var(--muted); }
   .search { position: relative; display: block; }
@@ -206,7 +211,12 @@
       <label><span data-i18n="longTrip"></span> <input id="sLong" type="text" inputmode="numeric" placeholder="1:45" pattern="\d{1,2}:\d{2}" size="5"></label>
       <label><span data-i18n="veryLongTrip"></span> <input id="sVeryLong" type="text" inputmode="numeric" placeholder="2:30" pattern="\d{1,2}:\d{2}" size="5"></label>
       <label><span data-i18n="interval"></span> <input id="sInterval" type="number" min="30" max="900" step="30"></label>
+      <div class="field keyfield"><span data-i18n="ojpKey"></span>
+        <span class="keyrow"><input id="sOjpKey" type="password" autocomplete="off" spellcheck="false" data-i18n-ph="ojpKeyPh">
+          <button id="ojpTestBtn" type="button" data-i18n="ojpTest"></button></span>
+        <span id="ojpMsg" class="io-msg" role="status"></span></div>
     </div>
+    <div class="hint" data-i18n="ojpHint"></div>
     <div class="io">
       <div class="field linkfield"><span data-i18n="linkLabel"></span> <input id="linkOut" readonly></div>
       <button id="copyLinkBtn" data-i18n="copyLink"></button>
@@ -233,7 +243,7 @@ const I18N = {
     switchAt: "Mornings B → A, switch to A → B at", minDelay: "Alert if late ≥ (min)", minChange: "Min. time to change trains (min)",
     maxTransfers: "Max changes", any: "Any", interval: "Refresh every (s)", longTrip: "Warn if trip longer than (h:mm)", veryLongTrip: "Red warning if longer than (h:mm)", linkLabel: "Link with these settings", copyLink: "🔗 Copy link", copied: "Link copied.", copyFail: "Select the link and copy it (Ctrl+C).", linkHint: "Your settings are saved in the link: bookmark it, or send it to someone so they get the same settings. The page address updates whenever you change a setting. For other people to open it, the page must be online (e.g. GitHub Pages); a link to a file on your computer only works for you.", searchPh: "Search a station…", searchHint: "Type at least 2 letters", noStation: "No station found", longTitle: "Long trip: more than {t} in total", stopsTitle: "Stops ({n})", remainLabel: "Time left", remainArr: "arrival in {st} at {t}", nextStop: "next stop: {st} at {t}", showEarlier: "⋯ show {n} earlier stops", showEarlier1: "⋯ show 1 earlier stop", hideEarlier: "⋯ hide earlier stops", posNotYet: "not departed yet: leaves {st} at {t}", posAt: "now at {st}", posBetween: "now between {a} and {b}", posArrived: "arrived at {st}", posEstimated: "Position estimated from the timetable and live delays (no GPS data).", changeTo: "change → {x}",
     dataHint: "Data: transport.opendata.ch (SBB realtime). The API has no explicit “cancelled” flag, so the page: (1) notices trains that disappear from the results, (2) remembers the trains that usually run on this route and flags one missing today, and (3) checks the departure board at your station to tell a <b>cancelled</b> train from a <b>connection that no longer works</b>.",
-    stCancelled: "Cancelled", stDropped: "Connection lost", stUnverified: "Likely cancelled", stEnroute: "Disrupted",
+    ojpKey: "SBB key (OJP 2.0, optional)", ojpKeyPh: "Paste your key from api-manager.opentransportdata.swiss", ojpTest: "Test the key", ojpOk: "The key works: {n} trips, {m} SBB messages.", ojpBad: "Key refused by SBB (HTTP {c}).", ojpNet: "SBB data unreachable ({e}).", ojpNoKey: "Enter a key first.", ojpHint: "With your own free key from opentransportdata.swiss, the page also shows official SBB data: cancelled trains, stops that won’t be served, and SBB messages per train. The key stays in this browser: it is never put in the link and is only sent to opentransportdata.swiss.", stNotServed: "Skips {st}", stNoLive: "No live data", exSbbCancelled: "SBB: this train is cancelled", exSbbSkips: "SBB: this train will not stop at {st}", exNoLive: "no live data for this train since it left, while the other trains have some: it may be disrupted. Check the announcements or the SBB app", sbbOk: "SBB data ✓", sbbErr: "SBB data unavailable", stCancelled: "Cancelled", stDropped: "Connection lost", stUnverified: "Likely cancelled", stEnroute: "Disrupted",
     stMissed: "Change missed", stRisk: "Change at risk", stOnTime: "On time", stScheduled: "Scheduled",
     whyUsual: "usually runs at this time but is missing today", whyVanished: "disappeared from the timetable",
     exCancelled: "{why}, and it is no longer on the departure board: cancelled",
@@ -273,7 +283,7 @@ const I18N = {
     switchAt: "Le matin B → A, passer à A → B à", minDelay: "Alerte si retard ≥ (min)", minChange: "Temps minimal de changement (min)",
     maxTransfers: "Changements max.", any: "Indifférent", interval: "Actualiser toutes les (s)", longTrip: "Avertir si trajet plus long que (h:mm)", veryLongTrip: "Avertissement rouge si plus long que (h:mm)", linkLabel: "Lien avec ces réglages", copyLink: "🔗 Copier le lien", copied: "Lien copié.", copyFail: "Sélectionnez le lien et copiez-le (Ctrl+C).", linkHint: "Vos réglages sont enregistrés dans le lien : ajoutez-le à vos favoris ou envoyez-le à quelqu’un pour qu’il ait les mêmes réglages. L’adresse de la page se met à jour à chaque changement de réglage. Pour que d’autres personnes puissent l’ouvrir, la page doit être en ligne (p. ex. GitHub Pages) ; un lien vers un fichier de votre ordinateur ne fonctionne que pour vous.", searchPh: "Rechercher une gare…", searchHint: "Tapez au moins 2 lettres", noStation: "Aucune gare trouvée", longTitle: "Trajet long : plus de {t} au total", stopsTitle: "Arrêts ({n})", remainLabel: "Temps restant", remainArr: "arrivée à {st} à {t}", nextStop: "prochain arrêt : {st} à {t}", showEarlier: "⋯ afficher les {n} arrêts précédents", showEarlier1: "⋯ afficher l’arrêt précédent", hideEarlier: "⋯ masquer les arrêts précédents", posNotYet: "pas encore parti : départ de {st} à {t}", posAt: "actuellement à {st}", posBetween: "actuellement entre {a} et {b}", posArrived: "arrivé à {st}", posEstimated: "Position estimée d’après l’horaire et les retards en temps réel (pas de données GPS).", changeTo: "changement → {x}",
     dataHint: "Données : transport.opendata.ch (temps réel CFF). L’API n’indique pas explicitement les suppressions, donc la page : (1) repère les trains qui disparaissent des résultats, (2) mémorise les trains qui circulent habituellement sur ce trajet et signale celui qui manque aujourd’hui, et (3) consulte le tableau des départs de votre gare pour distinguer un train <b>supprimé</b> d’une <b>correspondance qui ne fonctionne plus</b>.",
-    stCancelled: "Supprimé", stDropped: "Correspondance perdue", stUnverified: "Probablement supprimé", stEnroute: "Perturbé",
+    ojpKey: "Clé CFF (OJP 2.0, facultative)", ojpKeyPh: "Collez votre clé de api-manager.opentransportdata.swiss", ojpTest: "Tester la clé", ojpOk: "La clé fonctionne : {n} trajets, {m} messages CFF.", ojpBad: "Clé refusée par les CFF (HTTP {c}).", ojpNet: "Données CFF injoignables ({e}).", ojpNoKey: "Saisissez d’abord une clé.", ojpHint: "Avec votre propre clé gratuite de opentransportdata.swiss, la page affiche aussi les données officielles des CFF : trains supprimés, arrêts qui ne seront pas desservis et messages CFF par train. La clé reste dans ce navigateur : elle n’est jamais mise dans le lien et n’est envoyée qu’à opentransportdata.swiss.", stNotServed: "Ne dessert pas {st}", stNoLive: "Pas de temps réel", exSbbCancelled: "CFF : ce train est supprimé", exSbbSkips: "CFF : ce train ne s’arrêtera pas à {st}", exNoLive: "aucune donnée en temps réel pour ce train depuis son départ, alors que les autres trains en ont : il est peut-être perturbé. Écoutez les annonces ou consultez l’app CFF", sbbOk: "données CFF ✓", sbbErr: "données CFF indisponibles", stCancelled: "Supprimé", stDropped: "Correspondance perdue", stUnverified: "Probablement supprimé", stEnroute: "Perturbé",
     stMissed: "Changement manqué", stRisk: "Changement compromis", stOnTime: "À l’heure", stScheduled: "Horaire prévu",
     whyUsual: "circule habituellement à cette heure mais manque aujourd’hui", whyVanished: "a disparu de l’horaire",
     exCancelled: "{why} et n’est plus au tableau des départs : supprimé",
@@ -313,7 +323,7 @@ const I18N = {
     switchAt: "Morgens B → A, Wechsel zu A → B um", minDelay: "Alarm ab Verspätung ≥ (Min.)", minChange: "Minimale Umsteigezeit (Min.)",
     maxTransfers: "Max. Umstiege", any: "Beliebig", interval: "Aktualisieren alle (s)", longTrip: "Warnen, wenn Fahrt länger als (h:mm)", veryLongTrip: "Rote Warnung, wenn länger als (h:mm)", linkLabel: "Link mit diesen Einstellungen", copyLink: "🔗 Link kopieren", copied: "Link kopiert.", copyFail: "Link markieren und kopieren (Ctrl+C).", linkHint: "Ihre Einstellungen sind im Link gespeichert: Setzen Sie ein Lesezeichen oder senden Sie ihn jemandem, der dann dieselben Einstellungen hat. Die Adresse der Seite wird bei jeder Änderung aktualisiert. Damit andere ihn öffnen können, muss die Seite online sein (z. B. GitHub Pages); ein Link auf eine Datei auf Ihrem Computer funktioniert nur bei Ihnen.", searchPh: "Bahnhof suchen…", searchHint: "Mindestens 2 Buchstaben eingeben", noStation: "Keine Haltestelle gefunden", longTitle: "Lange Fahrt: mehr als {t} insgesamt", stopsTitle: "Halte ({n})", remainLabel: "Restzeit", remainArr: "Ankunft in {st} um {t}", nextStop: "nächster Halt: {st} um {t}", showEarlier: "⋯ {n} frühere Halte anzeigen", showEarlier1: "⋯ 1 früheren Halt anzeigen", hideEarlier: "⋯ frühere Halte ausblenden", posNotYet: "noch nicht abgefahren: Abfahrt in {st} um {t}", posAt: "jetzt in {st}", posBetween: "jetzt zwischen {a} und {b}", posArrived: "angekommen in {st}", posEstimated: "Position geschätzt aus Fahrplan und Echtzeit-Verspätungen (keine GPS-Daten).", changeTo: "umsteigen → {x}",
     dataHint: "Daten: transport.opendata.ch (SBB-Echtzeit). Die API kennzeichnet Ausfälle nicht ausdrücklich, daher (1) erkennt die Seite Züge, die aus den Ergebnissen verschwinden, (2) merkt sie sich die Züge, die auf dieser Strecke üblicherweise fahren, und meldet einen heute fehlenden, und (3) prüft sie die Abfahrtstafel Ihres Bahnhofs, um einen <b>ausgefallenen</b> Zug von einer <b>nicht mehr funktionierenden Verbindung</b> zu unterscheiden.",
-    stCancelled: "Fällt aus", stDropped: "Verbindung verloren", stUnverified: "Fällt wohl aus", stEnroute: "Gestört",
+    ojpKey: "SBB-Schlüssel (OJP 2.0, optional)", ojpKeyPh: "Schlüssel von api-manager.opentransportdata.swiss einfügen", ojpTest: "Schlüssel testen", ojpOk: "Der Schlüssel funktioniert: {n} Fahrten, {m} SBB-Meldungen.", ojpBad: "Schlüssel von der SBB abgelehnt (HTTP {c}).", ojpNet: "SBB-Daten nicht erreichbar ({e}).", ojpNoKey: "Zuerst einen Schlüssel eingeben.", ojpHint: "Mit Ihrem eigenen kostenlosen Schlüssel von opentransportdata.swiss zeigt die Seite auch offizielle SBB-Daten: ausfallende Züge, nicht bediente Halte und SBB-Meldungen pro Zug. Der Schlüssel bleibt in diesem Browser: Er kommt nie in den Link und wird nur an opentransportdata.swiss gesendet.", stNotServed: "Hält nicht in {st}", stNoLive: "Keine Echtzeit", exSbbCancelled: "SBB: Dieser Zug fällt aus", exSbbSkips: "SBB: Dieser Zug hält nicht in {st}", exNoLive: "seit der Abfahrt keine Echtzeitdaten für diesen Zug, während andere Züge welche haben: Er ist möglicherweise gestört. Achten Sie auf Durchsagen oder die SBB-App", sbbOk: "SBB-Daten ✓", sbbErr: "SBB-Daten nicht verfügbar", stCancelled: "Fällt aus", stDropped: "Verbindung verloren", stUnverified: "Fällt wohl aus", stEnroute: "Gestört",
     stMissed: "Anschluss verpasst", stRisk: "Anschluss gefährdet", stOnTime: "Pünktlich", stScheduled: "Planmässig",
     whyUsual: "fährt normalerweise um diese Zeit, fehlt aber heute", whyVanished: "ist aus dem Fahrplan verschwunden",
     exCancelled: "{why} und steht nicht mehr auf der Abfahrtstafel: fällt aus",
@@ -487,7 +497,12 @@ function normalize(c) {
     hasRealtime: !!(depRt || arrRt || c.from.delay != null),
     change,
     cap1: worst("capacity1st"), cap2: worst("capacity2nd"),
-    firstLeg: first ? { name: first.name, stationId: first.stationId, depRaw: first.depRaw } : null,
+    firstLeg: first ? { name: first.name, line: first.label.replace(/\s+/g, ""), stationId: first.stationId, depRaw: first.depRaw } : null,
+    legNames: legs.map(l => l.name).filter(Boolean),
+    // train numbers from the connection search are not reliable (they can differ from the departure board
+    // and from SBB data), so trains are matched by line + boarding station + scheduled departure time
+    legKeys: legs.filter(l => l.dep).map(l => ({ line: l.label.replace(/\s+/g, ""), from: l.fromName, dep: l.dep.toISOString() })),
+    fromId: c.from.station?.id || null, toId: c.to.station?.id || null,
     headsign: (c.sections || []).find(s => s.journey)?.journey?.to || "",
     stops: buildStops(c, depDelay),
   };
@@ -599,7 +614,8 @@ async function verifyGone(c) {
       const res = await fetch(`${BASE}/stationboard?${p}`, { cache: "no-store" });
       if (res.ok) {
         const board = (await res.json()).stationboard || [];
-        const listed = board.some(e => e.name === c.firstLeg.name && e.stop?.departure === c.firstLeg.depRaw);
+        const listed = board.some(e => e.stop?.departure === c.firstLeg.depRaw
+          && (e.name === c.firstLeg.name || (c.firstLeg.line && `${e.category || ""}${e.number || ""}`.replace(/\s+/g, "") === c.firstLeg.line)));
         // listed = the train still runs, but this connection is no longer offered (a later leg or the change broke)
         kind = listed ? "dropped" : "cancelled";
       }
@@ -651,7 +667,7 @@ async function detectGone(list, now) {
     candidates.push({
       key: `usual__${p}`, dep: dep.toISOString(), arr: arr.toISOString(), products: u.products,
       depDelay: 0, arrDelay: 0, maxDelay: 0, transfers: u.transfers, platform: u.platform,
-      firstLeg: u.firstLeg ? { name: u.firstLeg.name, stationId: u.firstLeg.stationId, depRaw } : null,
+      firstLeg: u.firstLeg ? { name: u.firstLeg.name, line: u.firstLeg.line, stationId: u.firstLeg.stationId, depRaw } : null,
       gone: true, source: "usual",
     });
     if (!(u.missed || []).includes(day)) { u.missed = [...(u.missed || []), day].slice(-5); }
@@ -667,7 +683,7 @@ async function detectGone(list, now) {
     const fl = c.firstLeg?.depRaw?.match(/T(\d{2}:\d{2}):\d{2}([+-]\d{4})$/);
     Object.assign(u, {
       time: hhmm(d), arr: hhmm(new Date(c.arr)), products: c.products, transfers: c.transfers, platform: c.platform,
-      firstLeg: c.firstLeg && fl ? { name: c.firstLeg.name, stationId: c.firstLeg.stationId, depTime: fl[1], tz: fl[2] } : null,
+      firstLeg: c.firstLeg && fl ? { name: c.firstLeg.name, line: c.firstLeg.line, stationId: c.firstLeg.stationId, depTime: fl[1], tz: fl[2] } : null,
     });
     usual[p] = u;
   }
@@ -714,6 +730,14 @@ async function refresh() {
     // hidden by "Direct only" and later than the last direct train: say so at the end of the list
     const lastShown = current.length ? new Date(current[current.length - 1].dep) : now;
     hiddenLater = list.filter(c => !shown(c) && new Date(c.dep) > lastShown && new Date(c.dep) > now);
+    // official SBB data (optional, needs the user's own key): cancellations, skipped stops, messages
+    await applyOjp(list, from);
+    // a train that left a few minutes ago and still has no live data, while trains around it have some
+    // (only with SBB data: transport.opendata.ch often has no live data for any regional train)
+    const livePeers = list.filter(c => departed(c, now) && c.sbb?.live).length;
+    for (const c of list) {
+      c.noLive = !!c.sbb && !c.sbb.live && livePeers > 0 && depRtMs(c) < now.getTime() - 3 * 60000 && !arrived(c, now);
+    }
     lastFetch = new Date();
     fetchErr = null;
   } catch (e) {
@@ -731,15 +755,19 @@ async function refresh() {
 // --- status logic -------------------------------------------------------------
 const bigDelay = () => Math.max(cfg.minDelay * 3, 15);
 function level(c) {
-  if (c.gone) return "bad";
+  if (c.gone || c.sbb?.cancelled || c.sbb?.skips?.length) return "bad";
+  if (c.noLive) return "warn";
   if (c.change?.state === "missed" || c.maxDelay >= bigDelay()) return "bad";
   if (c.change?.state === "risk" || c.maxDelay >= cfg.minDelay) return "warn";
   return "ok";
 }
 function statusText(c) {
   if (c.gone) return t({ cancelled: "stCancelled", dropped: "stDropped", unverified: "stUnverified", enroute: "stEnroute" }[c.goneKind] || "stUnverified");
+  if (c.sbb?.cancelled) return t("stCancelled");
+  if (c.sbb?.skips?.length) return t("stNotServed", { st: c.sbb.skips[0] });
   if (c.change?.state === "missed") return t("stMissed");
   if (c.change?.state === "risk") return t("stRisk");
+  if (c.noLive && !c.maxDelay) return t("stNoLive");
   if (c.maxDelay > 0) return `+${t("nMin", { n: c.maxDelay })}`;
   return c.hasRealtime ? t("stOnTime") : t("stScheduled");
 }
@@ -750,6 +778,9 @@ function explain(c) {
     return t(key, { why, to: R().to });
   }
   const parts = [];
+  if (c.sbb?.cancelled) parts.push(t("exSbbCancelled"));
+  if (c.sbb?.skips?.length) parts.push(t("exSbbSkips", { st: c.sbb.skips.join(", ") }));
+  if (c.noLive) parts.push(t("exNoLive"));
   if (c.change) {
     const v = { at: c.change.at, next: c.change.next, left: c.change.left, planned: c.change.planned };
     parts.push(t(c.change.state === "missed" ? "exMissed" : "exRisk", v));
@@ -854,6 +885,7 @@ function render() {
         <div class="times">${mine.depDelay ? `<s>${hhmm(dep)}</s>${hhmm(depRt)}` : hhmm(dep)} → ${mine.arrDelay ? `<s>${hhmm(arr)}</s>${hhmm(arrRt)}` : hhmm(arr)}</div>
         <div class="meta">${mine.products.map(p => `<span class="prod">${esc(p)}</span>`).join("")} ${mine.headsign && !mine.transfers ? esc(t("towards", { x: mine.headsign })) + " · " : ""}${esc(transfersText(mine.transfers))}${plat ? " · " + plat : ""}${durationHtml(mine)}${occHtml(mine)}</div>
         ${why ? `<div class="why">${esc(why)}</div>` : ""}
+        ${sbbMsgsHtml(mine)}
       </div>
       <div>
         <div class="big">${esc(statusText(mine))}</div>
@@ -891,7 +923,7 @@ function render() {
     return `<div class="row ${departed(c, now) && c.key !== pinnedKey ? "past" : ""} ${c.gone ? "gone" : ""} ${c.key === pinnedKey ? "pinned" : ""}" data-key="${esc(c.key)}" title="${esc(explain(c) || t("pinTitle"))}">
       <div class="pin">${c.key === pinnedKey ? "📌" : "○"}</div>
       <div class="t">${hhmm(dep)} → ${hhmm(arr)}${c.maxDelay ? `<span class="rt ${rtCls}">${hhmm(addMin(c.dep, c.depDelay))} → ${hhmm(addMin(c.arr, c.arrDelay))}</span>` : ""}</div>
-      <div>${c.products.map(p => `<span class="prod">${esc(p)}</span>`).join("")}${occHtml(c)}
+      <div>${c.products.map(p => `<span class="prod">${esc(p)}</span>`).join("")}${occHtml(c)}${c.sbb?.msgs?.length ? `<span class="sbb-ico" title="${esc(c.sbb.msgs.map(msgText).join("\n\n"))}">ℹ️</span>` : ""}
         <div class="sub">${onWay ? `<b>${esc(t("rowOnWay", { t: hhmm(new Date(arrRtMs(c))) }))}</b> · ` : arrived(c, now) ? `<b>${esc(t("arrived"))}</b> · ` : ""}${esc(transfersText(c.transfers))}${platHtml}${durationHtml(c)}${changeHtml}</div></div>
       <span class="chip ${lv}">${esc(statusText(c))}</span>
     </div>`;
@@ -952,7 +984,8 @@ function updateStatusLine() {
   const secs = Math.max(0, Math.round((nextAt - Date.now()) / 1000));
   const base = inFlight ? t("refreshing") : lastFetch ? t("updated", { t: `${hhmm(lastFetch)}:${pad(lastFetch.getSeconds())}`, n: secs }) : t("loading");
   el.className = fetchErr ? "err" : "";
-  el.textContent = fetchErr ? `${t(fetchErr.key, { e: fetchErr.e })} ${t("lastKnown")} ${base}` : base;
+  const sbbState = ojpState ? " · " + (ojpState.ok ? t("sbbOk") : t("sbbErr")) : "";
+  el.textContent = (fetchErr ? `${t(fetchErr.key, { e: fetchErr.e })} ${t("lastKnown")} ${base}` : base) + sbbState;
 }
 
 // --- keep data fresh after sleep / background / network loss --------------------------
@@ -995,7 +1028,7 @@ function maybeNotify() {
     const lv = level(c);
     if (lv === "ok") continue;
     // notify again only when the situation gets worse
-    const tag = `${c.key}|${c.gone ? c.goneKind : ""}|${c.change?.state || ""}|${Math.floor(c.maxDelay / 5)}`;
+    const tag = `${c.key}|${c.gone ? c.goneKind : ""}|${c.change?.state || ""}|${Math.floor(c.maxDelay / 5)}|${c.sbb?.cancelled ? "X" : ""}${(c.sbb?.skips || []).join(",")}|${c.noLive ? "nl" : ""}`;
     if (notified.has(tag)) continue;
     notified.add(tag); save("cff.notified", [...notified].slice(-200));
     const title = `${lv === "bad" ? "⛔" : "⚠️"} ${hhmm(new Date(c.dep))} ${c.products.join(", ")}: ${statusText(c)}`;
@@ -1169,6 +1202,163 @@ function setupStationSearch(id, key) {
 }
 setupStationSearch("sFrom", "from");
 setupStationSearch("sTo", "to");
+
+// --- official SBB data: OJP 2.0 on opentransportdata.swiss (optional, with the user's own key) ------
+// The key is kept in this browser only (never in the settings link, never in the page code).
+const OJP_URL = "https://api.opentransportdata.swiss/ojp20";
+const OJP_NS = "http://www.vdv.de/ojp", SIRI_NS = "http://www.siri.org.uk/siri";
+let ojpState = null; // null = no key; { ok: true } or { ok: false, code / e }
+// SBB message texts are large (they list every affected stop): fetch them every 10 min or when a new one appears
+let ojpMsgs = {}, ojpMsgsAt = 0, ojpMsgsRoute = "";
+const getOjpKey = () => { try { return (localStorage.getItem("cff.ojpKey") || "").trim(); } catch { return ""; } };
+const xmlEsc = v => String(v).replace(/[<>&"']/g, ch => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;", "'": "&apos;" }[ch]));
+function ojpTripXml(fromId, toId, start, withMsgs) {
+  const ts = new Date().toISOString();
+  return `<?xml version="1.0" encoding="utf-8"?>
+<OJP xmlns="${OJP_NS}" xmlns:siri="${SIRI_NS}" version="2.0"><OJPRequest><siri:ServiceRequest>
+<siri:RequestTimestamp>${ts}</siri:RequestTimestamp><siri:RequestorRef>cff-route-watch</siri:RequestorRef>
+<OJPTripRequest><siri:RequestTimestamp>${ts}</siri:RequestTimestamp>
+<Origin><PlaceRef><StopPlaceRef>${xmlEsc(fromId)}</StopPlaceRef></PlaceRef><DepArrTime>${start.toISOString()}</DepArrTime></Origin>
+<Destination><PlaceRef><StopPlaceRef>${xmlEsc(toId)}</StopPlaceRef></PlaceRef></Destination>
+<Params><NumberOfResults>16</NumberOfResults><IncludeIntermediateStops>true</IncludeIntermediateStops><UseRealtimeData>full</UseRealtimeData>${withMsgs ? "" : "<IncludeSituationsContext>false</IncludeSituationsContext>"}</Params>
+</OJPTripRequest></siri:ServiceRequest></OJPRequest></OJP>`;
+}
+async function ojpFetch(key, fromId, toId, start, withMsgs = true) {
+  const ctrl = new AbortController(), timeout = setTimeout(() => ctrl.abort(), 12000);
+  try {
+    const res = await fetch(OJP_URL, { method: "POST", signal: ctrl.signal, cache: "no-store",
+      headers: { "Authorization": `Bearer ${key}`, "Content-Type": "application/xml" }, body: ojpTripXml(fromId, toId, start, withMsgs) });
+    if (!res.ok) return { ok: false, code: res.status };
+    return { ok: true, data: parseOjp(await res.text()) };
+  } catch (e) { return { ok: false, e: e.name === "AbortError" ? "timeout" : e.message }; }
+  finally { clearTimeout(timeout); }
+}
+// Per train number: cancelled? which stops will not be served? which SBB messages?
+function parseOjp(xmlText) {
+  const doc = new DOMParser().parseFromString(xmlText, "application/xml");
+  const kids = (el, name) => el ? [...el.children].filter(k => k.localName === name) : [];
+  const kid = (el, name) => kids(el, name)[0] || null;
+  const txt = el => (el?.textContent || "").trim();
+  const sits = {};
+  for (const ps of doc.getElementsByTagNameNS(OJP_NS, "PtSituation")) {
+    const num = txt(ps.getElementsByTagNameNS(SIRI_NS, "SituationNumber")[0]);
+    const byLang = {};
+    for (const tag of ["DescriptionText", "SummaryText"]) {
+      for (const d of ps.getElementsByTagNameNS(SIRI_NS, tag)) {
+        const l = (d.getAttributeNS("http://www.w3.org/XML/1998/namespace", "lang") || d.getAttribute("xml:lang") || "").toLowerCase();
+        const v = txt(d);
+        if (v && v !== "Information" && !byLang[l]) byLang[l] = v;
+      }
+      if (Object.keys(byLang).length) break;
+    }
+    if (num) sits[num] = byLang; // kept even without text, so it is not downloaded again
+  }
+  const trains = {};
+  for (const tl of doc.getElementsByTagNameNS(OJP_NS, "TimedLeg")) {
+    const svc = kid(tl, "Service");
+    const line = txt(kid(kid(svc, "PublishedServiceName"), "Text")).replace(/\s+/g, "");
+    const id = txt(kid(svc, "JourneyRef")) || `${line}|${txt(kid(svc, "TrainNumber"))}`;
+    if (!line) continue;
+    const info = trains[id] || (trains[id] = { line, cancelled: false, notServed: new Set(), sits: new Set(), calls: new Map(), hasEst: false });
+    if (txt(kid(svc, "Cancelled")) === "true") info.cancelled = true;
+    for (const part of ["LegBoard", "LegIntermediate", "LegAlight"]) {
+      for (const call of kids(tl, part)) {
+        const name = txt(kid(kid(call, "StopPointName"), "Text"));
+        const flag = call.getElementsByTagNameNS(OJP_NS, "NotServicedStop")[0];
+        if (txt(flag) === "true") info.notServed.add(name);
+        // timetabled + estimated (live) times at this stop
+        const t2 = (box, k) => txt(kid(kid(call, box), k)) || null;
+        const cl = { arrT: t2("ServiceArrival", "TimetabledTime"), arrE: t2("ServiceArrival", "EstimatedTime"),
+          depT: t2("ServiceDeparture", "TimetabledTime"), depE: t2("ServiceDeparture", "EstimatedTime") };
+        if (cl.arrE || cl.depE) info.hasEst = true;
+        const prev = info.calls.get(normName(name)) || {};
+        info.calls.set(normName(name), { ...prev, ...Object.fromEntries(Object.entries(cl).filter(([, v]) => v)) });
+      }
+    }
+    for (const r of tl.getElementsByTagNameNS(OJP_NS, "SituationFullRef")) {
+      const n = txt(r.getElementsByTagNameNS(SIRI_NS, "SituationNumber")[0]);
+      if (n) info.sits.add(n);
+    }
+  }
+  // index: "RE33|aigle|2026-11-17T09:26" -> journey (every stop where it departs)
+  const index = {};
+  for (const info of Object.values(trains)) {
+    for (const [stop, cl] of info.calls) if (cl.depT) index[`${info.line}|${stop}|${new Date(cl.depT).toISOString().slice(0, 16)}`] = info;
+  }
+  return { trains, index, sits, trips: doc.getElementsByTagNameNS(OJP_NS, "TripResult").length };
+}
+const normName = v => String(v || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").trim();
+function msgText(byLang) {
+  const own = byLang[lang];
+  if (own) return own;
+  const [l, v] = byLang.de ? ["de", byLang.de] : Object.entries(byLang)[0];
+  return `${v} (${l.toUpperCase()})`;
+}
+async function applyOjp(list, start) {
+  const key = getOjpKey();
+  if (!key) { ojpState = null; for (const c of list) c.sbb = null; return; }
+  const ref = list.find(c => c.fromId && c.toId);
+  if (!ref) return;
+  const withMsgs = Date.now() - ojpMsgsAt > 10 * 60000 || ojpMsgsRoute !== routeId();
+  const res = await ojpFetch(key, ref.fromId, ref.toId, start, withMsgs);
+  ojpState = res.ok ? { ok: true } : { ok: false, code: res.code, e: res.e };
+  if (!res.ok) return; // keep the page working with the other data source
+  if (withMsgs) { ojpMsgs = res.data.sits; ojpMsgsAt = Date.now(); ojpMsgsRoute = routeId(); }
+  const { trains, index } = res.data, sits = ojpMsgs;
+  const refs = Object.values(trains).flatMap(i => [...i.sits]);
+  if (refs.some(n => !(n in sits))) ojpMsgsAt = 0; // a message we don't have the text of yet: get it next time
+  for (const c of list) {
+    const infos = (c.legKeys || []).map(k => index[`${k.line}|${normName(k.from)}|${k.dep.slice(0, 16)}`]).filter(Boolean);
+    if (!infos.length) { c.sbb = null; continue; }
+    // stops that matter to you: where you get on, change trains and get off
+    const keyStops = new Set((c.stops || []).filter((st, i, a) => i === 0 || i === a.length - 1 || st.changeTo).map(st => normName(st.name)));
+    const notServed = [...new Set(infos.flatMap(i => [...i.notServed]))];
+    const msgs = [...new Set(infos.flatMap(i => [...i.sits]))].map(n => sits[n]).filter(m => m && Object.keys(m).length);
+    c.sbb = { cancelled: infos.some(i => i.cancelled), skips: notServed.filter(n => keyStops.has(normName(n))), msgs,
+      live: infos.length > 0 && infos.every(i => i.hasEst) };
+    // live delays from SBB: transport.opendata.ch often has none for regional trains
+    const late = (tt, est) => lateMin(tt ? new Date(tt) : null, est ? new Date(est) : null);
+    for (const st of c.stops || []) {
+      for (const i of infos) {
+        const cl = i.calls.get(normName(st.name));
+        if (!cl) continue;
+        if (cl.arrE) st.arrD = late(cl.arrT, cl.arrE);
+        if (cl.depE) st.depD = late(cl.depT, cl.depE);
+      }
+    }
+    if (c.sbb.live && c.stops?.length) {
+      const first = c.stops[0], last = c.stops[c.stops.length - 1];
+      c.depDelay = Math.max(c.depDelay, first.depD || 0);
+      c.arrDelay = Math.max(c.arrDelay, last.arrD || 0);
+      c.maxDelay = Math.max(c.maxDelay, c.depDelay, c.arrDelay, ...c.stops.map(st => Math.max(st.arrD || 0, st.depD || 0)));
+      c.hasRealtime = true;
+    }
+  }
+}
+function sbbMsgsHtml(c) {
+  const msgs = c.sbb?.msgs || [];
+  if (!msgs.length) return "";
+  return `<ul class="sbbmsg">${msgs.slice(0, 3).map(m => { const v = msgText(m); return `<li title="${esc(v)}"><b>ℹ️ ${esc(t("logo"))}</b> ${esc(v.length > 260 ? v.slice(0, 257) + "…" : v)}</li>`; }).join("")}</ul>`;
+}
+$("sOjpKey").value = getOjpKey();
+$("sOjpKey").onchange = () => {
+  try { localStorage.setItem("cff.ojpKey", $("sOjpKey").value.trim()); } catch {}
+  $("ojpMsg").textContent = ""; refresh();
+};
+$("ojpTestBtn").onclick = async () => {
+  const key = $("sOjpKey").value.trim(), msg = (k, v, err) => { $("ojpMsg").textContent = t(k, v); $("ojpMsg").className = "io-msg" + (err ? " err" : ""); };
+  if (!key) return msg("ojpNoKey", {}, true);
+  try { localStorage.setItem("cff.ojpKey", key); } catch {}
+  const ref = current.find(c => c.fromId && c.toId);
+  if (!ref) return msg("ojpNet", { e: "no trains" }, true);
+  $("ojpTestBtn").disabled = true;
+  const res = await ojpFetch(key, ref.fromId, ref.toId, new Date(Date.now() - 30 * 60000));
+  $("ojpTestBtn").disabled = false;
+  if (res.ok) msg("ojpOk", { n: res.data.trips, m: Object.keys(res.data.sits).length });
+  else if (res.code) msg("ojpBad", { c: res.code }, true);
+  else msg("ojpNet", { e: res.e }, true);
+  refresh();
+};
 
 applyLang();
 updateUrl();
