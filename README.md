@@ -26,8 +26,9 @@ change pushed to `main` is online within a minute or two.
 ## What it shows
 
 - **Direction chosen automatically:** before 12:00 Aigle → Lancy-Pont-Rouge, from 12:00
-  Lancy-Pont-Rouge → Aigle. Two buttons at the top let you override it until the next
-  automatic switch (noon or midnight).
+  Lancy-Pont-Rouge → Aigle. Two buttons at the top, the morning direction on the left and the
+  afternoon one on the right, let you override it until the next automatic switch (noon or
+  midnight).
 - **Top card:** your train, or the next one, with a big colour-coded status: green on time,
   amber late (≥ 5 min), red very late (≥ 15 min) or cancelled. It shows live times next to the
   crossed-out scheduled ones, platform changes and a countdown.
@@ -43,13 +44,14 @@ change pushed to `main` is online within a minute or two.
   departed yet, at a station, or between two stations with a progress bar. The position is
   *estimated* from the timetable and live delays (the API has no GPS data) and moves every
   20 seconds.
-- **Trip line:** under each time in the list, the trip is drawn as a line, spaced by the
+- **Trip line:** on the top card (larger) and under each time in the list, the trip is drawn as a line, spaced by the
   timetable, with a dot where you get on, **one dot per change of train** and one where you get
   off. Each train is one coloured part of the line. Green: fine. Amber: late or tight change.
   Red: a problem there (train cancelled, stop not served, change missed, very late). Grey: no
-  longer reachable. A thin grey part is the wait at a change, a dotted part a walk between two
-  stations, and 🚆 shows where a train on the way is now. Hover a dot to see the station, the
-  time and the time left to change.
+  longer reachable. Between two trains, a thin grey part with **⏱ 4′** is the wait at the
+  station, and a dotted part with **🚶 5′** a walk to another station, with the minutes left to
+  change (live). 🚆 shows where a train on the way is now. The top card has a small legend.
+  Hover a dot or a ⏱/🚶 label for the station, the time and the details.
 - **Already on the way:** other trains that have left but not arrived are folded at the top of
   the list. The folded header turns amber or red when one of them has a problem.
 - **Direct only** (on by default): hides trains with a change. When the last direct train of
