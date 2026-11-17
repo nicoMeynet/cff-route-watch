@@ -49,7 +49,7 @@ change pushed to `main` is online within a minute or two.
   off. Each train is one coloured part of the line. Green: fine. Amber: late or tight change.
   Red: a problem there (train cancelled, stop not served, change missed, very late). Grey: no
   longer reachable. Between two trains, a thin grey part with **⏱ 4′** is the wait at the
-  station (amber when it is longer than 20 min, set in Settings), and a dotted part with **🚶 5′** a walk to another station, with the minutes left to
+  station (amber when it is longer than 20 min, set in Settings), and a dotted part with **🚶 5′** a walk to another station (amber above 10 min), with the minutes left to
   change (live). 🚆 shows where a train on the way is now. The top card has a small legend.
   Hover a dot or a ⏱/🚶 label for the station, the time and the details.
 - **Already on the way:** other trains that have left but not arrived are folded at the top of
@@ -147,6 +147,7 @@ and Enter. Escape keeps the current station.
 | Alerts (desktop notifications) | on | not in the link (kept in this browser) |
 | Min. time to change trains (min) | 2 | `change=2` |
 | Wait at a station in orange above (min) | 20 | `wait=20` |
+| Walk between stations in orange above (min) | 10 | `walk=10` |
 | Max changes | 0 (Direct only) | `changes=0` (or `any`, `1`, `2`) |
 | Warn if trip longer than (h:mm) | 1:45 (amber) | `long=1:45` |
 | Red warning if longer than (h:mm) | 2:30 | `vlong=2:30` |
