@@ -125,6 +125,14 @@
   .t .rt { display: block; font-size: 13px; font-weight: 500; }
   .sub { color: var(--muted); font-size: 13px; }
   .prod { display: inline-block; border: 1px solid var(--line); border-radius: 5px; padding: 0 6px; margin-right: 4px; font-size: 12px; font-weight: 600; color: var(--text); }
+  .chipwrap { display: inline-flex; align-items: center; gap: 4px; justify-self: end; }
+  .quip-btn { border: 0; background: none; padding: 0 2px; color: var(--muted); font-size: 15px; line-height: 1; cursor: pointer; }
+  .quip-btn:hover { color: var(--pin); border: 0; }
+  .hero .big .quip-btn { font-size: 18px; vertical-align: middle; }
+  .quip { position: fixed; z-index: 50; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line);
+    background: var(--card); color: var(--text); font-size: 13px; font-style: italic; box-shadow: 0 6px 24px rgba(0,0,0,.25); }
+  .quip[hidden] { display: none; }
+  .quip::before { content: "⚛️ "; font-style: normal; }
   .chip { border-radius: 999px; padding: 3px 10px; font-size: 13px; font-weight: 600; white-space: nowrap; }
   .prod.warn { border-color: var(--warn); color: var(--warn); }
   .prod.bad { border-color: var(--bad); color: var(--bad); background: var(--bad-bg); }
@@ -219,7 +227,7 @@
     .hero { grid-template-columns: 1fr; }
     .hero .big, .hero .countdown { text-align: left; }
     .row { grid-template-columns: 18px 84px 1fr; }
-    .row .chip { grid-column: 2 / -1; justify-self: start; }
+    .row .chip, .row .chipwrap { grid-column: 2 / -1; justify-self: start; }
   }
   .lang { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
   .lang button { border: 0; border-radius: 0; padding: 6px 9px; font-size: 13px; font-weight: 600; color: var(--muted); }
@@ -285,6 +293,7 @@
     <div class="hint" data-i18n="linkHint"></div>
     <div class="hint" data-i18n-html="dataHint"></div>
   </details>
+  <div id="quip" class="quip" role="status" hidden></div>
   <footer class="copyright">© 2026 Nicolas Meynet</footer>
 </div>
 
@@ -309,7 +318,7 @@ const I18N = {
     exDropped: "{why}; the first train still runs, but the connection to {to} no longer works (later train cancelled or change impossible)",
     exUnverified: "{why}: likely cancelled (departure board could not be checked)",
     exEnroute: "is no longer shown as reaching {to}: it may have been stopped or cancelled during the trip. Listen to the announcements on board or check the SBB app for onward options",
-    exMissed: "the {prev} is too late: the change at {at} for the {next} will be missed", stLegCancelled: "{x} cancelled", exLegGone: "{why}: the {x} is no longer on the departure board, it is cancelled", exStuck: "; the trains before it run, so you would be stuck at {at}", exSbbLegCancelled: "SBB: the {x} is cancelled", exSbbLegSkips: "SBB: the {x} will not stop at {st}", exUnreach: "no longer reachable: {x}", walkTitle: "walk from {a} to {b}: {n} min to change", waitTitle: "wait at {a}: {n} min", lgTrain: "train", lgChange: "get on / change / get off", lgWait: "wait at the station", lgWalk: "walk to another station", lgOk: "fine", lgLate: "late", lgBad: "problem", lgOff: "not reachable", legsTitle: "Your trains", legUnreach: "Not reachable", legChange: "change at {at}", legChangeLeft: "{n} min to change", legChangeMissed: "change missed ({n} min)", legChangeTight: "tight: {n} min (planned {p})",
+    exMissed: "the {prev} is too late: the change at {at} for the {next} will be missed", stLegCancelled: "{x} cancelled", exLegGone: "{why}: the {x} is no longer on the departure board, it is cancelled", exStuck: "; the trains before it run, so you would be stuck at {at}", exSbbLegCancelled: "SBB: the {x} is cancelled", exSbbLegSkips: "SBB: the {x} will not stop at {st}", exUnreach: "no longer reachable: {x}", walkTitle: "walk from {a} to {b}: {n} min to change", waitTitle: "wait at {a}: {n} min", lgTrain: "train", lgChange: "get on / change / get off", lgWait: "wait at the station", lgWalk: "walk to another station", lgOk: "fine", lgLate: "late", lgBad: "problem", lgOff: "not reachable", quipInfo: "Quantum info", legsTitle: "Your trains", legUnreach: "Not reachable", legChange: "change at {at}", legChangeLeft: "{n} min to change", legChangeMissed: "change missed ({n} min)", legChangeTight: "tight: {n} min (planned {p})",
     exRisk: "only {left} min left to change at {at} for the {next} (planned {planned} min)",
     exLate: "{n} min late", exArrival: " (arrival {t})",
     altPlatform: ", platform {p}", altArrives: ", arrives {t}", altLost: " ({n} min later than planned)",
@@ -348,7 +357,7 @@ const I18N = {
     exDropped: "{why} ; le premier train circule, mais la correspondance vers {to} ne fonctionne plus (train suivant supprimé ou changement impossible)",
     exUnverified: "{why} : probablement supprimé (tableau des départs non vérifiable)",
     exEnroute: "n’est plus indiqué comme arrivant à {to} : il a peut-être été arrêté ou supprimé en cours de route. Écoutez les annonces à bord ou consultez l’app CFF pour la suite du trajet",
-    exMissed: "le {prev} est trop en retard : le changement à {at} pour le {next} sera manqué", stLegCancelled: "{x} supprimé", exLegGone: "{why} : le {x} n’est plus au tableau des départs, il est supprimé", exStuck: " ; les trains d’avant circulent : vous resteriez bloqué à {at}", exSbbLegCancelled: "CFF : le {x} est supprimé", exSbbLegSkips: "CFF : le {x} ne s’arrêtera pas à {st}", exUnreach: "plus atteignables : {x}", walkTitle: "à pied de {a} à {b} : {n} min pour changer", waitTitle: "attente à {a} : {n} min", lgTrain: "train", lgChange: "départ / changement / arrivée", lgWait: "attente en gare", lgWalk: "à pied vers une autre gare", lgOk: "OK", lgLate: "retard", lgBad: "problème", lgOff: "plus atteignable", legsTitle: "Vos trains", legUnreach: "Plus atteignable", legChange: "changement à {at}", legChangeLeft: "{n} min pour changer", legChangeMissed: "changement manqué ({n} min)", legChangeTight: "juste : {n} min (prévu {p})",
+    exMissed: "le {prev} est trop en retard : le changement à {at} pour le {next} sera manqué", stLegCancelled: "{x} supprimé", exLegGone: "{why} : le {x} n’est plus au tableau des départs, il est supprimé", exStuck: " ; les trains d’avant circulent : vous resteriez bloqué à {at}", exSbbLegCancelled: "CFF : le {x} est supprimé", exSbbLegSkips: "CFF : le {x} ne s’arrêtera pas à {st}", exUnreach: "plus atteignables : {x}", walkTitle: "à pied de {a} à {b} : {n} min pour changer", waitTitle: "attente à {a} : {n} min", lgTrain: "train", lgChange: "départ / changement / arrivée", lgWait: "attente en gare", lgWalk: "à pied vers une autre gare", lgOk: "OK", lgLate: "retard", lgBad: "problème", lgOff: "plus atteignable", quipInfo: "Info quantique", legsTitle: "Vos trains", legUnreach: "Plus atteignable", legChange: "changement à {at}", legChangeLeft: "{n} min pour changer", legChangeMissed: "changement manqué ({n} min)", legChangeTight: "juste : {n} min (prévu {p})",
     exRisk: "plus que {left} min pour changer à {at} pour le {next} (prévu {planned} min)",
     exLate: "{n} min de retard", exArrival: " (arrivée {t})",
     altPlatform: ", voie {p}", altArrives: ", arrivée {t}", altLost: " ({n} min plus tard que prévu)",
@@ -387,7 +396,7 @@ const I18N = {
     exDropped: "{why}; der erste Zug fährt noch, aber die Verbindung nach {to} klappt nicht mehr (Anschlusszug fällt aus oder Umsteigen unmöglich)",
     exUnverified: "{why}: fällt wohl aus (Abfahrtstafel konnte nicht geprüft werden)",
     exEnroute: "wird nicht mehr mit Ankunft in {to} angezeigt: Er wurde möglicherweise unterwegs angehalten oder gestrichen. Achten Sie auf die Durchsagen im Zug oder prüfen Sie die SBB-App für die Weiterreise",
-    exMissed: "der {prev} ist zu spät: Der Anschluss in {at} auf den {next} wird verpasst", stLegCancelled: "{x} fällt aus", exLegGone: "{why}: Der {x} steht nicht mehr auf der Abfahrtstafel, er fällt aus", exStuck: "; die Züge davor fahren, Sie würden in {at} festsitzen", exSbbLegCancelled: "SBB: Der {x} fällt aus", exSbbLegSkips: "SBB: Der {x} hält nicht in {st}", exUnreach: "nicht mehr erreichbar: {x}", walkTitle: "zu Fuss von {a} nach {b}: {n} Min. zum Umsteigen", waitTitle: "Wartezeit in {a}: {n} Min.", lgTrain: "Zug", lgChange: "Abfahrt / Umsteigen / Ankunft", lgWait: "Wartezeit im Bahnhof", lgWalk: "zu Fuss zu einer anderen Haltestelle", lgOk: "OK", lgLate: "Verspätung", lgBad: "Problem", lgOff: "nicht erreichbar", legsTitle: "Ihre Züge", legUnreach: "Nicht erreichbar", legChange: "Umsteigen in {at}", legChangeLeft: "{n} Min. zum Umsteigen", legChangeMissed: "Anschluss verpasst ({n} Min.)", legChangeTight: "knapp: {n} Min. (geplant {p})",
+    exMissed: "der {prev} ist zu spät: Der Anschluss in {at} auf den {next} wird verpasst", stLegCancelled: "{x} fällt aus", exLegGone: "{why}: Der {x} steht nicht mehr auf der Abfahrtstafel, er fällt aus", exStuck: "; die Züge davor fahren, Sie würden in {at} festsitzen", exSbbLegCancelled: "SBB: Der {x} fällt aus", exSbbLegSkips: "SBB: Der {x} hält nicht in {st}", exUnreach: "nicht mehr erreichbar: {x}", walkTitle: "zu Fuss von {a} nach {b}: {n} Min. zum Umsteigen", waitTitle: "Wartezeit in {a}: {n} Min.", lgTrain: "Zug", lgChange: "Abfahrt / Umsteigen / Ankunft", lgWait: "Wartezeit im Bahnhof", lgWalk: "zu Fuss zu einer anderen Haltestelle", lgOk: "OK", lgLate: "Verspätung", lgBad: "Problem", lgOff: "nicht erreichbar", quipInfo: "Quanten-Info", legsTitle: "Ihre Züge", legUnreach: "Nicht erreichbar", legChange: "Umsteigen in {at}", legChangeLeft: "{n} Min. zum Umsteigen", legChangeMissed: "Anschluss verpasst ({n} Min.)", legChangeTight: "knapp: {n} Min. (geplant {p})",
     exRisk: "nur noch {left} Min. zum Umsteigen in {at} auf den {next} (geplant {planned} Min.)",
     exLate: "{n} Min. Verspätung", exArrival: " (Ankunft {t})",
     altPlatform: ", Gleis {p}", altArrives: ", Ankunft {t}", altLost: " ({n} Min. später als geplant)",
@@ -987,6 +996,16 @@ function legStateText(s) {
     || (d ? `+${t("nMin", { n: d })}` : t("stOnTime"));
 }
 // the trains of a trip with changes, one by one, and each change between them
+// long waits at a station and long walks between stations (above the limits in Settings),
+// among the changes you can still make
+function longGaps(c) {
+  return legStates(c).flatMap((s, i) => {
+    const ch = s.change, next = c.legs?.[i + 1];
+    if (!ch || !next || ch.state !== "ok" || s.state === "unreach") return [];
+    const walk = normName(s.leg.to) !== normName(next.from);
+    return ch.left > Number(walk ? cfg.longWalk : cfg.longWait) ? [{ walk, at: s.leg.to, to: next.from, mins: ch.left }] : [];
+  });
+}
 function legsHtml(c) {
   if (!(c.legs?.length > 1)) return "";
   const tm = (iso, d) => iso ? (d ? `<s>${hhmm(new Date(iso))}</s> <b class="${d >= bigDelay() ? "vlate" : "late"}">${hhmm(addMin(iso, d))}</b>` : hhmm(new Date(iso))) : "";
@@ -1085,6 +1104,96 @@ function trackHtml(c, now, big = false) {
     + (big ? `<div class="tlegend"><span><i class="lg-train"></i>${esc(t("lgTrain"))}</span><span><i class="lg-dot"></i>${esc(t("lgChange"))}</span><span>⏱ ${esc(t("lgWait"))}</span><span>🚶 ${esc(t("lgWalk"))}</span><span><i class="lg-train ok"></i>${esc(t("lgOk"))} <i class="lg-train warn"></i>${esc(t("lgLate"))} <i class="lg-train bad"></i>${esc(t("lgBad"))} <i class="lg-train off"></i>${esc(t("lgOff"))}</span></div>` : "");
 }
 
+// Fun "quantum" lines shown with the ⓘ button next to a status. The status itself stays serious.
+const QUIPS = {
+  en: {
+    ontime: ["Wave function collapsed: the train is exactly where we expected it.", "Measured and confirmed: no quantum weirdness on this one."],
+    scheduled: ["Quantum timetable: on time and delayed simultaneously.", "The train is both on time and late… until it arrives. 🐱⚛️"],
+    late: ["Quantum delay detected. Please do not observe the train.", "Small fluctuations in the space-time of the timetable."],
+    vlate: ["Arrival time is currently in superposition.", "The arrival time has entered a highly excited state."],
+    risk: ["Your connection is in an uncertain entangled state.", "Entanglement under stress: your change may or may not survive."],
+    missed: ["Connection decoherence: the two trains are no longer entangled.", "The change collapsed into the state “next train”."],
+    cancelled: ["The train made a quantum leap… to nowhere.", "Probability of this train existing today: 0."],
+    skips: ["Quantum tunnelling: the train passes through your station without stopping.", "Your station is outside this train’s probability cloud."],
+    nolive: ["The train exists. Its arrival time is probabilistic.", "No measurement available: the train is in an unobserved state."],
+    disrupted: ["Schrödinger’s train: it has both arrived and not arrived until you check the platform.", "The train’s state is unknown until someone opens the box."],
+    enroute: ["Train status follows Heisenberg: the more precisely we know where it is, the less we know when it will arrive.", "Position estimated, momentum uncertain. Enjoy the ride."],
+    likely: ["The train is probably in a parallel universe.", "In most universes, this train runs. Not in this one."],
+    dropped: ["The trains still exist, but they are no longer entangled with each other.", "Your connection lost its coherence somewhere along the line."],
+  },
+  fr: {
+    ontime: ["Fonction d’onde effondrée : le train est bien là où on l’attendait.", "Mesure effectuée : aucune bizarrerie quantique sur celui-ci."],
+    scheduled: ["Le train est à la fois à l’heure et en retard… jusqu’à ce qu’il arrive. 🐱⚛️", "Horaire quantique : à l’heure et en retard simultanément."],
+    late: ["Retard quantique détecté. Merci de ne pas observer le train.", "Petites fluctuations dans l’espace-temps de l’horaire."],
+    vlate: ["L’heure d’arrivée est actuellement en superposition.", "L’heure d’arrivée est passée dans un état très excité."],
+    risk: ["Votre correspondance est en état d’intrication incertaine.", "Intrication sous tension : votre changement survivra peut-être."],
+    missed: ["Décohérence de la correspondance : les deux trains ne sont plus intriqués.", "Le changement s’est effondré dans l’état « train suivant »."],
+    cancelled: ["Le train a effectué un saut quantique… vers aucune destination.", "Probabilité que ce train existe aujourd’hui : 0."],
+    skips: ["Effet tunnel : le train traverse votre gare sans s’y arrêter.", "Votre gare est hors du nuage de probabilité de ce train."],
+    nolive: ["Le train existe. Son heure d’arrivée est probabiliste.", "Aucune mesure disponible : le train est dans un état non observé."],
+    disrupted: ["Train de Schrödinger : il est à la fois arrivé et pas arrivé tant que vous n’avez pas vérifié le quai.", "L’état du train reste inconnu tant que personne n’ouvre la boîte."],
+    enroute: ["Le train suit Heisenberg : plus on sait précisément où il est, moins on sait quand il arrivera.", "Position estimée, quantité de mouvement incertaine. Bon voyage."],
+    likely: ["Le train est probablement dans un univers parallèle.", "Dans la plupart des univers, ce train circule. Pas dans celui-ci."],
+    dropped: ["Les trains existent encore, mais ils ne sont plus intriqués entre eux.", "Votre correspondance a perdu sa cohérence en cours de route."],
+  },
+  de: {
+    ontime: ["Wellenfunktion kollabiert: Der Zug ist genau dort, wo wir ihn erwartet haben.", "Gemessen und bestätigt: keine Quanten-Seltsamkeit bei diesem Zug."],
+    scheduled: ["Quanten-Fahrplan: pünktlich und verspätet zugleich.", "Der Zug ist pünktlich und verspätet… bis er ankommt. 🐱⚛️"],
+    late: ["Quantenverspätung erkannt. Bitte den Zug nicht beobachten.", "Kleine Fluktuationen in der Raumzeit des Fahrplans."],
+    vlate: ["Die Ankunftszeit befindet sich derzeit in Superposition.", "Die Ankunftszeit ist in einen hoch angeregten Zustand übergegangen."],
+    risk: ["Ihr Anschluss ist in einem unsicheren verschränkten Zustand.", "Verschränkung unter Spannung: Ihr Umstieg klappt vielleicht."],
+    missed: ["Dekohärenz des Anschlusses: Die beiden Züge sind nicht mehr verschränkt.", "Der Umstieg ist in den Zustand „nächster Zug“ kollabiert."],
+    cancelled: ["Der Zug hat einen Quantensprung gemacht… ins Nirgendwo.", "Wahrscheinlichkeit, dass dieser Zug heute existiert: 0."],
+    skips: ["Tunneleffekt: Der Zug durchquert Ihren Bahnhof, ohne zu halten.", "Ihr Bahnhof liegt ausserhalb der Wahrscheinlichkeitswolke dieses Zuges."],
+    nolive: ["Der Zug existiert. Seine Ankunftszeit ist probabilistisch.", "Keine Messung verfügbar: Der Zug ist in einem unbeobachteten Zustand."],
+    disrupted: ["Schrödingers Zug: angekommen und nicht angekommen, bis Sie am Gleis nachsehen.", "Der Zustand des Zuges bleibt unbekannt, bis jemand die Kiste öffnet."],
+    enroute: ["Der Zug folgt Heisenberg: Je genauer wir wissen, wo er ist, desto weniger wissen wir, wann er ankommt.", "Ort geschätzt, Impuls unscharf. Gute Fahrt."],
+    likely: ["Der Zug ist wahrscheinlich in einem Paralleluniversum.", "In den meisten Universen fährt dieser Zug. In diesem nicht."],
+    dropped: ["Die Züge existieren noch, sind aber nicht mehr miteinander verschränkt.", "Ihr Anschluss hat unterwegs seine Kohärenz verloren."],
+  },
+};
+// which fun line goes with this train's status (same logic as statusText)
+function quipKey(c, now = new Date()) {
+  if (c.gone) return { cancelled: "cancelled", dropped: "dropped", unverified: "likely", enroute: "disrupted" }[c.goneKind] || "likely";
+  const bl = brokenLeg(c);
+  if (bl?.state === "cancelled" || c.sbb?.cancelled) return "cancelled";
+  if (bl?.state === "skips" || c.sbb?.skips?.length) return "skips";
+  if (c.change?.state === "missed") return "missed";
+  if (c.change?.state === "risk") return "risk";
+  if (c.noLive && !c.maxDelay) return "nolive";
+  if (c.maxDelay >= bigDelay()) return "vlate";
+  if (c.maxDelay >= cfg.minDelay) return "late";
+  if (enRoute(c, now)) return "enroute";
+  return c.hasRealtime ? "ontime" : "scheduled";
+}
+// the same train keeps the same line (no flicker at every refresh)
+function quipText(c) {
+  const list = (QUIPS[lang] || QUIPS.en)[quipKey(c)] || [];
+  let h = 0; for (const ch of c.key) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+  return list[h % list.length] || "";
+}
+const quipBtn = c => { const q = quipText(c); return q ? `<button type="button" class="quip-btn" data-quip="${esc(q)}" aria-label="${esc(t("quipInfo"))}" title="${esc(t("quipInfo"))}">ⓘ</button>` : ""; };
+// one small bubble for the whole page, opened next to the ⓘ that was clicked
+let quipFor = null;
+function showQuip(btn) {
+  const pop = $("quip");
+  if (!pop.hidden && quipFor === btn) { pop.hidden = true; return; } // a 2nd click on the same ⓘ closes it
+  pop.textContent = btn.dataset.quip; quipFor = btn; pop.hidden = false;
+  const b = btn.getBoundingClientRect(), w = Math.min(320, window.innerWidth - 32);
+  pop.style.width = w + "px";
+  pop.style.left = Math.max(16, Math.min(window.innerWidth - w - 16, b.right - w)) + "px";
+  const below = b.bottom + 8, h = pop.offsetHeight;
+  pop.style.top = (below + h > window.innerHeight - 8 ? Math.max(8, b.top - h - 8) : below) + "px";
+}
+// capture phase: the ⓘ in a list row must not also pin that train
+document.addEventListener("click", e => {
+  const btn = e.target.closest(".quip-btn");
+  if (btn) { e.stopPropagation(); showQuip(btn); return; }
+  if (!e.target.closest("#quip")) $("quip").hidden = true;
+}, true);
+document.addEventListener("keydown", e => { if (e.key === "Escape") $("quip").hidden = true; });
+window.addEventListener("scroll", () => { $("quip").hidden = true; }, { passive: true });
+
 // --- rendering ------------------------------------------------------------------
 function render() {
   paintDir();
@@ -1140,7 +1249,7 @@ function render() {
         ${sbbMsgsHtml(mine)}
       </div>
       <div>
-        <div class="big">${esc(statusText(mine))}</div>
+        <div class="big">${esc(statusText(mine))} ${quipBtn(mine)}</div>
         <div class="countdown">${mine.gone || onBoard ? "" : esc(mins > 0 ? t("departsIn", { n: mins }) : mins > -2 ? t("departingNow")
           : t("arrivesIn", { n: Math.max(0, Math.round((arrRt - now) / 60000)) }))}</div>
       </div>
@@ -1173,13 +1282,14 @@ function render() {
     const onWay = enRoute(c, now);
     const platHtml = c.platform ? " · " + (platChange
       ? `<b class="late">${esc(t("pl", { p: c.rtPlatform }))}</b> <s>${esc(c.platform)}</s>` : esc(t("pl", { p: c.platform }))) : "";
+    const gapsHtml = longGaps(c).map(g => ` · <b class="late" title="${esc(t(g.walk ? "walkTitle" : "waitTitle", { a: g.at, b: g.to, n: g.mins }))}">${g.walk ? "🚶" : "⏱"} ${esc(g.mins >= 60 ? fmtDur(g.mins) : t("nMin", { n: g.mins }))} ${esc(g.at)}</b>`).join("");
     const changeHtml = c.change ? ` · <b class="${c.change.state === "missed" ? "vlate" : "late"}">${esc(t("changeAt", { at: c.change.at, x: c.change.state === "missed" ? t("missed") : t("nMin", { n: c.change.left }) }))}</b>` : "";
     return `<div class="row ${departed(c, now) && c.key !== pinnedKey ? "past" : ""} ${c.gone ? "gone" : ""} ${c.key === pinnedKey ? "pinned" : ""}" data-key="${esc(c.key)}" title="${esc(explain(c) || t("pinTitle"))}">
       <div class="pin">${c.key === pinnedKey ? "📌" : "○"}</div>
       <div class="t">${hhmm(dep)} → ${hhmm(arr)}${c.maxDelay ? `<span class="rt ${rtCls}">${hhmm(addMin(c.dep, c.depDelay))} → ${hhmm(addMin(c.arr, c.arrDelay))}</span>` : ""}</div>
       <div>${prodsHtml(c)}${occHtml(c)}${c.sbb?.msgs?.length ? `<span class="sbb-ico" title="${esc(c.sbb.msgs.map(msgText).join("\n\n"))}">ℹ️</span>` : ""}
-        <div class="sub">${onWay ? `<b>${esc(t("rowOnWay", { t: hhmm(new Date(arrRtMs(c))) }))}</b> · ` : arrived(c, now) ? `<b>${esc(t("arrived"))}</b> · ` : ""}${esc(transfersText(c.transfers))}${platHtml}${durationHtml(c)}${changeHtml}</div></div>
-      <span class="chip ${lv}">${esc(statusText(c))}</span>
+        <div class="sub">${onWay ? `<b>${esc(t("rowOnWay", { t: hhmm(new Date(arrRtMs(c))) }))}</b> · ` : arrived(c, now) ? `<b>${esc(t("arrived"))}</b> · ` : ""}${esc(transfersText(c.transfers))}${platHtml}${durationHtml(c)}${changeHtml}${gapsHtml}</div></div>
+      <span class="chipwrap">${quipBtn(c)}<span class="chip ${lv}">${esc(statusText(c))}</span></span>
       ${trackHtml(c, now)}
     </div>`;
   };

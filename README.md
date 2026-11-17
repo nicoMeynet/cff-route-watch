@@ -52,6 +52,8 @@ change pushed to `main` is online within a minute or two.
   station (amber when it is longer than 20 min, set in Settings), and a dotted part with **🚶 5′** a walk to another station (amber above 10 min), with the minutes left to
   change (live). 🚆 shows where a train on the way is now. The top card has a small legend.
   Hover a dot or a ⏱/🚶 label for the station, the time and the details.
+  In the list, each long wait or walk is also written in amber next to the trip details,
+  for example "⏱ 25 min Bern".
 - **Already on the way:** other trains that have left but not arrived are folded at the top of
   the list. The folded header turns amber or red when one of them has a problem.
 - **Direct only** (on by default): hides trains with a change. When the last direct train of
@@ -60,6 +62,10 @@ change pushed to `main` is online within a minute or two.
   and trips longer than 2:30 a red one.
 - **Occupancy:** 1st/2nd class bars (green low, amber medium, red high), shown only when the
   API provides the data. At the moment it usually doesn't.
+- **Quantum info (ⓘ):** next to each status, an ⓘ button shows a light-hearted "quantum" line
+  that matches it, for example "Arrival time is currently in superposition." for a big delay, or
+  "Schrödinger's train" for a train disrupted on the way. The status itself and the
+  notifications stay serious.
 - **Languages:** English, French and German (EN · FR · DE switch). On first opening, the page
   uses your browser's language.
 
