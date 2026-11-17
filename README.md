@@ -4,7 +4,8 @@ Watches the train connections between **Lancy-Pont-Rouge** and **Aigle** using t
 [Swiss public transport API](https://transport.opendata.ch/) and tells you when your train is
 **very late or cancelled**.
 
-Everything is in one file, `cff_dashboard.html`: no install, no Python, no server.
+Everything is in one file, `cff_dashboard.html`: no install, no Python, no server. A few small
+files next to it make it an installable app: `manifest.webmanifest`, `sw.js` and `icons/`.
 
 **Open it online: https://nicomeynet.github.io/cff-route-watch/**
 
@@ -19,6 +20,24 @@ in Settings and copy the link (see [Settings in the link](#settings-in-the-link)
 You can also download `cff_dashboard.html` and double-click it. Opened as a local file, the
 browser may block desktop pop-up notifications: you still get the on-page alerts and a
 ⚠️ in the tab title. The online version doesn't have this limit.
+
+### Install it as an app (Windows, Mac, phone)
+
+The online page can be installed as an app: its own window without the address bar, a 🚆 icon in
+the Start menu and the taskbar, and Windows notifications.
+
+- **Edge:** click **📲 Install the app** at the top of the page, or menu **⋯ → Apps → Install
+  this site as an app**. To have it start with Windows, open `edge://apps`, right-click
+  **CFF Route Watch** and choose **Start app when you sign in to your device**.
+- **Chrome:** the install icon at the right of the address bar, or menu **⋮ → Cast, save and
+  share → Install page as app**.
+- **iPhone (Safari):** Share → **Add to Home Screen**. **Android (Chrome):** menu → **Install
+  app**.
+
+The app is the same page as the website: it keeps your settings and your SBB key, and each update
+pushed online is used the next time it opens. Like the browser tab, it only checks your trains
+while it is open (it can stay minimised). If the network is down, it still opens with the last
+saved copy of the page. Clicking a notification brings the app back to the front.
 
 The online page is published with GitHub Pages from the `main` branch of this repository: any
 change pushed to `main` is online within a minute or two.

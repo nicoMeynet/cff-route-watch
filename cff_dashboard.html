@@ -4,7 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>CFF Route Watch</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚆</text></svg>">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="theme-color" content="#eb0000">
 <style>
   :root {
     --bg: #f4f5f7; --card: #ffffff; --text: #1c1f24; --muted: #6b7280; --line: #e5e7eb;
@@ -244,6 +247,7 @@
       <button data-lang="en">EN</button><button data-lang="fr">FR</button><button data-lang="de">DE</button>
     </div>
     <button id="directBtn"></button>
+    <button id="installBtn" hidden></button>
     <button id="refreshBtn" data-i18n="refresh"></button>
   </header>
   <div class="dir" id="dirToggle" role="tablist">
@@ -318,7 +322,7 @@ const I18N = {
     exDropped: "{why}; the first train still runs, but the connection to {to} no longer works (later train cancelled or change impossible)",
     exUnverified: "{why}: likely cancelled (departure board could not be checked)",
     exEnroute: "is no longer shown as reaching {to}: it may have been stopped or cancelled during the trip. Listen to the announcements on board or check the SBB app for onward options",
-    exMissed: "the {prev} is too late: the change at {at} for the {next} will be missed", stLegCancelled: "{x} cancelled", exLegGone: "{why}: the {x} is no longer on the departure board, it is cancelled", exStuck: "; the trains before it run, so you would be stuck at {at}", exSbbLegCancelled: "SBB: the {x} is cancelled", exSbbLegSkips: "SBB: the {x} will not stop at {st}", exUnreach: "no longer reachable: {x}", walkTitle: "walk from {a} to {b}: {n} min to change", waitTitle: "wait at {a}: {n} min", lgTrain: "train", lgChange: "get on / change / get off", lgWait: "wait at the station", lgWalk: "walk to another station", lgOk: "fine", lgLate: "late", lgBad: "problem", lgOff: "not reachable", quipInfo: "Quantum info", legsTitle: "Your trains", legUnreach: "Not reachable", legChange: "change at {at}", legChangeLeft: "{n} min to change", legChangeMissed: "change missed ({n} min)", legChangeTight: "tight: {n} min (planned {p})",
+    exMissed: "the {prev} is too late: the change at {at} for the {next} will be missed", stLegCancelled: "{x} cancelled", exLegGone: "{why}: the {x} is no longer on the departure board, it is cancelled", exStuck: "; the trains before it run, so you would be stuck at {at}", exSbbLegCancelled: "SBB: the {x} is cancelled", exSbbLegSkips: "SBB: the {x} will not stop at {st}", exUnreach: "no longer reachable: {x}", walkTitle: "walk from {a} to {b}: {n} min to change", waitTitle: "wait at {a}: {n} min", lgTrain: "train", lgChange: "get on / change / get off", lgWait: "wait at the station", lgWalk: "walk to another station", lgOk: "fine", lgLate: "late", lgBad: "problem", lgOff: "not reachable", quipInfo: "Quantum info", installApp: "📲 Install the app", installTitle: "Install this page as an app (Start menu, taskbar, own window)", legsTitle: "Your trains", legUnreach: "Not reachable", legChange: "change at {at}", legChangeLeft: "{n} min to change", legChangeMissed: "change missed ({n} min)", legChangeTight: "tight: {n} min (planned {p})",
     exRisk: "only {left} min left to change at {at} for the {next} (planned {planned} min)",
     exLate: "{n} min late", exArrival: " (arrival {t})",
     altPlatform: ", platform {p}", altArrives: ", arrives {t}", altLost: " ({n} min later than planned)",
@@ -357,7 +361,7 @@ const I18N = {
     exDropped: "{why} ; le premier train circule, mais la correspondance vers {to} ne fonctionne plus (train suivant supprimé ou changement impossible)",
     exUnverified: "{why} : probablement supprimé (tableau des départs non vérifiable)",
     exEnroute: "n’est plus indiqué comme arrivant à {to} : il a peut-être été arrêté ou supprimé en cours de route. Écoutez les annonces à bord ou consultez l’app CFF pour la suite du trajet",
-    exMissed: "le {prev} est trop en retard : le changement à {at} pour le {next} sera manqué", stLegCancelled: "{x} supprimé", exLegGone: "{why} : le {x} n’est plus au tableau des départs, il est supprimé", exStuck: " ; les trains d’avant circulent : vous resteriez bloqué à {at}", exSbbLegCancelled: "CFF : le {x} est supprimé", exSbbLegSkips: "CFF : le {x} ne s’arrêtera pas à {st}", exUnreach: "plus atteignables : {x}", walkTitle: "à pied de {a} à {b} : {n} min pour changer", waitTitle: "attente à {a} : {n} min", lgTrain: "train", lgChange: "départ / changement / arrivée", lgWait: "attente en gare", lgWalk: "à pied vers une autre gare", lgOk: "OK", lgLate: "retard", lgBad: "problème", lgOff: "plus atteignable", quipInfo: "Info quantique", legsTitle: "Vos trains", legUnreach: "Plus atteignable", legChange: "changement à {at}", legChangeLeft: "{n} min pour changer", legChangeMissed: "changement manqué ({n} min)", legChangeTight: "juste : {n} min (prévu {p})",
+    exMissed: "le {prev} est trop en retard : le changement à {at} pour le {next} sera manqué", stLegCancelled: "{x} supprimé", exLegGone: "{why} : le {x} n’est plus au tableau des départs, il est supprimé", exStuck: " ; les trains d’avant circulent : vous resteriez bloqué à {at}", exSbbLegCancelled: "CFF : le {x} est supprimé", exSbbLegSkips: "CFF : le {x} ne s’arrêtera pas à {st}", exUnreach: "plus atteignables : {x}", walkTitle: "à pied de {a} à {b} : {n} min pour changer", waitTitle: "attente à {a} : {n} min", lgTrain: "train", lgChange: "départ / changement / arrivée", lgWait: "attente en gare", lgWalk: "à pied vers une autre gare", lgOk: "OK", lgLate: "retard", lgBad: "problème", lgOff: "plus atteignable", quipInfo: "Info quantique", installApp: "📲 Installer l’app", installTitle: "Installer cette page comme une application (menu Démarrer, barre des tâches, fenêtre à part)", legsTitle: "Vos trains", legUnreach: "Plus atteignable", legChange: "changement à {at}", legChangeLeft: "{n} min pour changer", legChangeMissed: "changement manqué ({n} min)", legChangeTight: "juste : {n} min (prévu {p})",
     exRisk: "plus que {left} min pour changer à {at} pour le {next} (prévu {planned} min)",
     exLate: "{n} min de retard", exArrival: " (arrivée {t})",
     altPlatform: ", voie {p}", altArrives: ", arrivée {t}", altLost: " ({n} min plus tard que prévu)",
@@ -396,7 +400,7 @@ const I18N = {
     exDropped: "{why}; der erste Zug fährt noch, aber die Verbindung nach {to} klappt nicht mehr (Anschlusszug fällt aus oder Umsteigen unmöglich)",
     exUnverified: "{why}: fällt wohl aus (Abfahrtstafel konnte nicht geprüft werden)",
     exEnroute: "wird nicht mehr mit Ankunft in {to} angezeigt: Er wurde möglicherweise unterwegs angehalten oder gestrichen. Achten Sie auf die Durchsagen im Zug oder prüfen Sie die SBB-App für die Weiterreise",
-    exMissed: "der {prev} ist zu spät: Der Anschluss in {at} auf den {next} wird verpasst", stLegCancelled: "{x} fällt aus", exLegGone: "{why}: Der {x} steht nicht mehr auf der Abfahrtstafel, er fällt aus", exStuck: "; die Züge davor fahren, Sie würden in {at} festsitzen", exSbbLegCancelled: "SBB: Der {x} fällt aus", exSbbLegSkips: "SBB: Der {x} hält nicht in {st}", exUnreach: "nicht mehr erreichbar: {x}", walkTitle: "zu Fuss von {a} nach {b}: {n} Min. zum Umsteigen", waitTitle: "Wartezeit in {a}: {n} Min.", lgTrain: "Zug", lgChange: "Abfahrt / Umsteigen / Ankunft", lgWait: "Wartezeit im Bahnhof", lgWalk: "zu Fuss zu einer anderen Haltestelle", lgOk: "OK", lgLate: "Verspätung", lgBad: "Problem", lgOff: "nicht erreichbar", quipInfo: "Quanten-Info", legsTitle: "Ihre Züge", legUnreach: "Nicht erreichbar", legChange: "Umsteigen in {at}", legChangeLeft: "{n} Min. zum Umsteigen", legChangeMissed: "Anschluss verpasst ({n} Min.)", legChangeTight: "knapp: {n} Min. (geplant {p})",
+    exMissed: "der {prev} ist zu spät: Der Anschluss in {at} auf den {next} wird verpasst", stLegCancelled: "{x} fällt aus", exLegGone: "{why}: Der {x} steht nicht mehr auf der Abfahrtstafel, er fällt aus", exStuck: "; die Züge davor fahren, Sie würden in {at} festsitzen", exSbbLegCancelled: "SBB: Der {x} fällt aus", exSbbLegSkips: "SBB: Der {x} hält nicht in {st}", exUnreach: "nicht mehr erreichbar: {x}", walkTitle: "zu Fuss von {a} nach {b}: {n} Min. zum Umsteigen", waitTitle: "Wartezeit in {a}: {n} Min.", lgTrain: "Zug", lgChange: "Abfahrt / Umsteigen / Ankunft", lgWait: "Wartezeit im Bahnhof", lgWalk: "zu Fuss zu einer anderen Haltestelle", lgOk: "OK", lgLate: "Verspätung", lgBad: "Problem", lgOff: "nicht erreichbar", quipInfo: "Quanten-Info", installApp: "📲 App installieren", installTitle: "Diese Seite als App installieren (Startmenü, Taskleiste, eigenes Fenster)", legsTitle: "Ihre Züge", legUnreach: "Nicht erreichbar", legChange: "Umsteigen in {at}", legChangeLeft: "{n} Min. zum Umsteigen", legChangeMissed: "Anschluss verpasst ({n} Min.)", legChangeTight: "knapp: {n} Min. (geplant {p})",
     exRisk: "nur noch {left} Min. zum Umsteigen in {at} auf den {next} (geplant {planned} Min.)",
     exLate: "{n} Min. Verspätung", exArrival: " (Ankunft {t})",
     altPlatform: ", Gleis {p}", altArrives: ", Ankunft {t}", altLost: " ({n} Min. später als geplant)",
@@ -1388,7 +1392,10 @@ function maybeNotify() {
     const title = `${lv === "bad" ? "⛔" : "⚠️"} ${hhmm(new Date(c.dep))} ${c.products.join(", ")}: ${statusText(c)}`;
     if ("Notification" in window && Notification.permission === "granted") {
       const alt = bestAlternative(c, all, new Date());
-      new Notification(title, { body: explain(c) + (alt ? `\n${t("takeInstead", { x: altText(alt, c) })}` : ""), tag: c.key, requireInteraction: lv === "bad" });
+      const opts = { body: explain(c) + (alt ? `\n${t("takeInstead", { x: altText(alt, c) })}` : ""), tag: c.key, requireInteraction: lv === "bad", icon: "icons/icon-192.png" };
+      // through the service worker when there is one: a click on the notification brings the app back
+      if (navigator.serviceWorker?.controller) navigator.serviceWorker.ready.then(reg => reg.showNotification(title, opts)).catch(() => new Notification(title, opts));
+      else new Notification(title, opts);
     }
   }
 }
@@ -1422,6 +1429,7 @@ function applyLang() {
   $("appName").textContent = t("appName");
   for (const b of $("langToggle").querySelectorAll("button")) b.setAttribute("aria-pressed", String(b.dataset.lang === lang));
   paintNotifBtn(); paintDirectBtn(); render(); maybeNotify();
+  paintInstallBtn();
 }
 $("langToggle").onclick = e => {
   const b = e.target.closest("button[data-lang]"); if (!b) return;
@@ -1736,6 +1744,27 @@ $("ojpTestBtn").onclick = async () => {
 
 applyLang();
 updateUrl();
+
+// --- installable app (PWA) --------------------------------------------------------
+// Works online (https) and on localhost. Edge / Chrome then offer to install the page as an app;
+// the "Install the app" button appears when the browser allows it.
+if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost" || location.hostname === "127.0.0.1")) {
+  navigator.serviceWorker.register("sw.js").catch(() => {});
+}
+var installPrompt = null; // var + function: applyLang() above may call paintInstallBtn() before this line runs
+function paintInstallBtn() {
+  $("installBtn").hidden = !installPrompt;
+  $("installBtn").textContent = t("installApp");
+  $("installBtn").title = t("installTitle");
+}
+window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); installPrompt = e; paintInstallBtn(); });
+window.addEventListener("appinstalled", () => { installPrompt = null; paintInstallBtn(); });
+$("installBtn").onclick = async () => {
+  if (!installPrompt) return;
+  installPrompt.prompt();
+  try { await installPrompt.userChoice; } catch {}
+  installPrompt = null; paintInstallBtn();
+};
 refresh();
 </script>
 </body>
