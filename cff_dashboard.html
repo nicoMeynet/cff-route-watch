@@ -1,0 +1,1178 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CFF Route Watch</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚆</text></svg>">
+<style>
+  :root {
+    --bg: #f4f5f7; --card: #ffffff; --text: #1c1f24; --muted: #6b7280; --line: #e5e7eb;
+    --ok: #15803d; --ok-bg: #dcfce7;
+    --warn: #b45309; --warn-bg: #fef3c7;
+    --bad: #b91c1c; --bad-bg: #fee2e2;
+    --accent: #eb0000; --pin: #2563eb;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #111317; --card: #1b1e24; --text: #e8eaed; --muted: #9aa0a6; --line: #2c3038;
+      --ok: #4ade80; --ok-bg: #12301f;
+      --warn: #fbbf24; --warn-bg: #3a2c0d;
+      --bad: #f87171; --bad-bg: #3b1515;
+      --pin: #60a5fa;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+    font: 15px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 20px 16px 60px; }
+  header { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+  header h1 { font-size: 20px; margin: 0; display: flex; align-items: center; gap: 8px; }
+  header h1 .logo { background: var(--accent); color: #fff; border-radius: 6px; padding: 2px 7px; font-size: 13px; letter-spacing: .5px; }
+  .route { color: var(--muted); }
+  .spacer { flex: 1; }
+  button { font: inherit; border: 1px solid var(--line); background: var(--card); color: var(--text);
+    border-radius: 8px; padding: 6px 12px; cursor: pointer; }
+  button:hover { border-color: var(--muted); }
+  button.on { background: var(--pin); color: #fff; border-color: var(--pin); }
+  .status-line { font-size: 13px; color: var(--muted); }
+  .status-line .err { color: var(--bad); }
+  .dir { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; margin-bottom: 10px;
+    background: var(--card); border: 1px solid var(--line); border-radius: 12px; }
+  .dir button { border: 0; border-radius: 9px; padding: 10px 12px; font-weight: 600; font-size: 15px; background: transparent; color: var(--muted); }
+  .dir button[aria-selected="true"] { background: var(--accent); color: #fff; }
+  .dir button:hover:not([aria-selected="true"]) { color: var(--text); background: color-mix(in srgb, var(--line) 50%, transparent); }
+
+  .hero { border-radius: 14px; padding: 22px 24px; margin-bottom: 16px; background: var(--card);
+    border: 2px solid var(--line); display: grid; grid-template-columns: 1fr auto; gap: 8px 20px; align-items: center; }
+  .hero.ok { border-color: var(--ok); }
+  .hero.warn { border-color: var(--warn); background: var(--warn-bg); }
+  .hero.bad { border-color: var(--bad); background: var(--bad-bg); }
+  .hero .kicker { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+  .hero .times { font-size: 34px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .hero .times s { color: var(--muted); font-weight: 400; font-size: 24px; margin-right: 6px; }
+  .hero .meta { color: var(--muted); }
+  .hero .why { margin-top: 6px; font-weight: 500; }
+  .hero.warn .why { color: var(--warn); } .hero.bad .why { color: var(--bad); }
+  .hero .big { font-size: 28px; font-weight: 800; text-align: right; }
+  .hero.ok .big { color: var(--ok); } .hero.warn .big { color: var(--warn); } .hero.bad .big { color: var(--bad); }
+  .hero .countdown { text-align: right; color: var(--muted); }
+  .hero .remain { grid-column: 1 / -1; margin-top: 4px; padding: 12px 14px; border-radius: 10px; background: var(--card); border: 1px solid var(--line); }
+  .hero .rline { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; margin-top: 2px; }
+  .hero .rbig { font-size: 32px; font-weight: 800; font-variant-numeric: tabular-nums; color: var(--text); }
+  .hero .rinfo { color: var(--muted); }
+  .hero .rbar { height: 6px; border-radius: 3px; background: var(--line); margin-top: 8px; overflow: hidden; }
+  .hero .rbar i { display: block; height: 100%; background: var(--pin); border-radius: 3px; }
+  .hero .alt { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+    margin-top: 6px; padding: 12px 14px; border-radius: 10px; background: var(--card); border: 2px solid var(--ok); }
+  .hero .alt b { font-size: 17px; }
+  .hero .alt button { background: var(--ok); color: var(--card); border-color: var(--ok); font-weight: 600; }
+  .hero .alt.none { border: 1px dashed var(--line); color: var(--muted); }
+
+  .alerts { margin-bottom: 16px; display: grid; gap: 8px; }
+  .alert { border-radius: 10px; padding: 10px 14px; font-weight: 500; }
+  .alert.bad { background: var(--bad-bg); color: var(--bad); }
+  .alert.warn { background: var(--warn-bg); color: var(--warn); }
+  .alert.info { background: var(--card); color: var(--muted); border: 1px dashed var(--line); }
+
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+  .row { display: grid; grid-template-columns: 22px 120px 1fr auto; gap: 12px; align-items: center;
+    padding: 12px 16px; border-top: 1px solid var(--line); cursor: pointer; }
+  .row:first-child { border-top: 0; }
+  .row:hover { background: color-mix(in srgb, var(--line) 35%, transparent); }
+  .row.past { opacity: .45; }
+  .row.gone .t, .row.gone .sub { text-decoration: line-through; }
+  .row .pin { color: var(--muted); font-size: 16px; text-align: center; }
+  .row.pinned .pin { color: var(--pin); }
+  .row.pinned { box-shadow: inset 4px 0 0 var(--pin); }
+  .t { font-variant-numeric: tabular-nums; font-weight: 600; font-size: 17px; }
+  .t .rt { display: block; font-size: 13px; font-weight: 500; }
+  .sub { color: var(--muted); font-size: 13px; }
+  .prod { display: inline-block; border: 1px solid var(--line); border-radius: 5px; padding: 0 6px; margin-right: 4px; font-size: 12px; font-weight: 600; color: var(--text); }
+  .chip { border-radius: 999px; padding: 3px 10px; font-size: 13px; font-weight: 600; white-space: nowrap; }
+  .chip.ok { background: var(--ok-bg); color: var(--ok); }
+  .chip.warn { background: var(--warn-bg); color: var(--warn); }
+  .chip.bad { background: var(--bad-bg); color: var(--bad); }
+  .late { color: var(--warn); } .vlate { color: var(--bad); }
+  .empty { padding: 30px; text-align: center; color: var(--muted); }
+  .io { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 8px; margin-top: 14px; }
+  .linkfield { flex: 1 1 320px; } .linkfield input { width: 100%; font-size: 13px; }
+  .field { display: grid; gap: 4px; font-size: 13px; color: var(--muted); }
+  .search { position: relative; display: block; }
+  .search input { width: 100%; }
+  .suggest { position: absolute; left: 0; min-width: max(100%, 280px); max-width: calc(100vw - 32px); top: calc(100% + 4px); z-index: 20; list-style: none; margin: 0; padding: 4px;
+    background: var(--card); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 6px 20px rgba(0,0,0,.2); max-height: 300px; overflow: auto; }
+  .suggest li { display: flex; gap: 8px; align-items: center; padding: 7px 8px; border-radius: 6px; cursor: pointer; color: var(--text); font-size: 14px; }
+  .suggest li.on, .suggest li:hover { background: color-mix(in srgb, var(--pin) 18%, transparent); }
+  .suggest li.none { color: var(--muted); cursor: default; background: none; }
+  .io-msg { font-size: 13px; color: var(--ok); }
+  .io-msg.err { color: var(--bad); }
+  .long { color: var(--warn); font-weight: 600; white-space: nowrap; }
+  .long.vlong { color: var(--bad); }
+  details.stops { grid-column: 1 / -1; margin-top: 6px; background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; }
+  details.stops summary { cursor: pointer; font-weight: 600; font-size: 14px; color: var(--muted); }
+  details.stops summary b { color: var(--text); }
+  details.stops ol { list-style: none; margin: 10px 0 4px; padding: 0; }
+  .stop { display: grid; grid-template-columns: 26px 1fr auto 64px; gap: 8px; align-items: center; min-height: 26px; position: relative; font-size: 14px; font-variant-numeric: tabular-nums; }
+  .stop .dot { justify-self: center; width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--muted); background: var(--card); z-index: 1; display: grid; place-items: center; font-size: 15px; }
+  .stop::before { content: ""; position: absolute; left: 12px; top: 0; bottom: 0; width: 2px; background: var(--line); }
+  .stop:first-child::before { top: 50%; } .stop:last-child::before { bottom: 50%; }
+  .stop.end .sname { font-weight: 700; }
+  .stop.passed { color: var(--muted); }
+  .stop.passed .dot { background: var(--muted); }
+  .stop.here .dot, .stop.moving .dot { width: 24px; height: 24px; border: 0; background: transparent; font-size: 18px; }
+  .stop.here .sname { font-weight: 700; }
+  .stop .stime { white-space: nowrap; } .stop .splat { color: var(--muted); font-size: 12px; text-align: right; }
+  .stop.earlier button { border: 0; background: none; padding: 0; color: var(--pin); font-size: 13px; font-weight: 600; cursor: pointer; }
+  .stop.earlier .dot { border-style: dotted; }
+  .stop .chg { font-size: 12px; font-weight: 600; color: var(--pin); margin-left: 4px; }
+  .stop .bar { display: block; height: 4px; border-radius: 2px; background: var(--line); max-width: 220px; }
+  .stop .bar i { display: block; height: 100%; border-radius: 2px; background: var(--pin); }
+  .more { padding: 12px 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: 14px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+  .more button { font-size: 13px; padding: 4px 10px; }
+  details.onway { border-bottom: 1px solid var(--line); }
+  details.onway summary { padding: 12px 16px; cursor: pointer; color: var(--muted); font-size: 14px; font-weight: 600; }
+  details.onway summary:hover { color: var(--text); }
+  details.onway.warn summary { background: var(--warn-bg); color: var(--warn); }
+  details.onway.bad summary { background: var(--bad-bg); color: var(--bad); }
+  details.onway[open] summary { border-bottom: 1px solid var(--line); }
+  details.onway .row:first-of-type { border-top: 0; }
+
+  /* occupancy: 3 little bars per class */
+  .occ { display: inline-flex; align-items: center; gap: 3px; margin-left: 8px; font-size: 12px; color: var(--muted); white-space: nowrap; }
+  .occ .bars { display: inline-flex; gap: 1px; align-items: flex-end; }
+  .occ .bars i { width: 4px; background: var(--line); border-radius: 1px; }
+  .occ .bars i:nth-child(1) { height: 6px; } .occ .bars i:nth-child(2) { height: 9px; } .occ .bars i:nth-child(3) { height: 12px; }
+  .occ.l1 .bars i:nth-child(-n+1) { background: var(--ok); }
+  .occ.l2 .bars i:nth-child(-n+2) { background: var(--warn); }
+  .occ.l3 .bars i:nth-child(-n+3) { background: var(--bad); }
+
+  details.settings { margin-top: 18px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 12px 16px; }
+  details.settings summary { cursor: pointer; font-weight: 600; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-top: 12px; }
+  label { display: grid; gap: 4px; font-size: 13px; color: var(--muted); }
+  input, select { font: inherit; padding: 6px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--text); }
+  .hint { font-size: 12px; color: var(--muted); margin-top: 10px; }
+  .copyright { margin-top: 24px; text-align: center; font-size: 12px; color: var(--muted); }
+
+  @media (max-width: 560px) {
+    .hero { grid-template-columns: 1fr; }
+    .hero .big, .hero .countdown { text-align: left; }
+    .row { grid-template-columns: 18px 84px 1fr; }
+    .row .chip { grid-column: 2 / -1; justify-self: start; }
+  }
+  .lang { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+  .lang button { border: 0; border-radius: 0; padding: 6px 9px; font-size: 13px; font-weight: 600; color: var(--muted); }
+  .lang button + button { border-left: 1px solid var(--line); }
+  .lang button[aria-pressed="true"] { background: var(--text); color: var(--card); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1><span class="logo" id="logo">CFF</span> <span id="appName">Route Watch</span></h1>
+    <span class="spacer"></span>
+    <div class="lang" id="langToggle" role="group" aria-label="Language">
+      <button data-lang="en">EN</button><button data-lang="fr">FR</button><button data-lang="de">DE</button>
+    </div>
+    <button id="directBtn"></button>
+    <button id="notifBtn"></button>
+    <button id="refreshBtn" data-i18n="refresh"></button>
+  </header>
+  <div class="dir" id="dirToggle" role="tablist">
+    <button data-dir="out" role="tab"></button>
+    <button data-dir="back" role="tab"></button>
+  </div>
+  <div class="status-line"><span class="route" id="routeLabel"></span> · <span id="statusLine"></span></div>
+
+  <section id="hero" class="hero" style="margin-top:12px"></section>
+  <section id="alerts" class="alerts"></section>
+  <section class="card" id="list"></section>
+  <div class="hint" data-i18n-html="hint"></div>
+
+  <details class="settings">
+    <summary data-i18n="settings"></summary>
+    <div class="grid">
+      <div class="field"><span data-i18n="stA"></span>
+        <span class="search"><input id="sFrom" autocomplete="off" spellcheck="false" data-i18n-ph="searchPh"><ul class="suggest" id="sFromList" hidden></ul></span></div>
+      <div class="field"><span data-i18n="stB"></span>
+        <span class="search"><input id="sTo" autocomplete="off" spellcheck="false" data-i18n-ph="searchPh"><ul class="suggest" id="sToList" hidden></ul></span></div>
+      <label><span data-i18n="switchAt"></span> <input id="sSwitch" type="time"></label>
+      <label><span data-i18n="minDelay"></span> <input id="sMin" type="number" min="1" max="60"></label>
+      <label><span data-i18n="minChange"></span> <input id="sChange" type="number" min="0" max="15"></label>
+      <label><span data-i18n="maxTransfers"></span>
+        <select id="sTransfers"><option value="" data-i18n="any"></option><option>0</option><option>1</option><option>2</option></select>
+      </label>
+      <label><span data-i18n="longTrip"></span> <input id="sLong" type="text" inputmode="numeric" placeholder="1:45" pattern="\d{1,2}:\d{2}" size="5"></label>
+      <label><span data-i18n="veryLongTrip"></span> <input id="sVeryLong" type="text" inputmode="numeric" placeholder="2:30" pattern="\d{1,2}:\d{2}" size="5"></label>
+      <label><span data-i18n="interval"></span> <input id="sInterval" type="number" min="30" max="900" step="30"></label>
+    </div>
+    <div class="io">
+      <div class="field linkfield"><span data-i18n="linkLabel"></span> <input id="linkOut" readonly></div>
+      <button id="copyLinkBtn" data-i18n="copyLink"></button>
+      <span id="ioMsg" class="io-msg" role="status"></span>
+    </div>
+    <div class="hint" data-i18n="linkHint"></div>
+    <div class="hint" data-i18n-html="dataHint"></div>
+  </details>
+  <footer class="copyright">© 2026 Nicolas Meynet</footer>
+</div>
+
+<script>
+// --- translations -------------------------------------------------------------------
+const I18N = {
+  en: {
+    logo: "SBB", appName: "Route Watch",
+    directOnly: "Direct only", directTitle: "Show only trains without a change",
+    alertsOff: "🔕 Alerts off", alertsOn: "🔔 Alerts on", alertsSound: "🔔 Alerts on (sound only)",
+    alertsTitle: "Desktop notification + sound when your train is late or cancelled",
+    alertsBlocked: "Desktop notifications are blocked for this page (common when opened as a local file). You'll still get a beep and a ⚠️ in the tab title.",
+    refresh: "↻ Refresh", loading: "Loading…", loadingConn: "Loading connections…", refreshing: "Refreshing…",
+    hint: "Click a connection to pin it as <b>your train</b>. Alerts then focus on that train, and it stays monitored after departure until it reaches your destination. Other trains already on the way are folded at the top of the list (highlighted if one has a problem). Bars show the expected occupancy per class (green low · amber medium · red high).",
+    settings: "Settings", stA: "Station A (e.g. work)", stB: "Station B (e.g. home)",
+    switchAt: "Mornings B → A, switch to A → B at", minDelay: "Alert if late ≥ (min)", minChange: "Min. time to change trains (min)",
+    maxTransfers: "Max changes", any: "Any", interval: "Refresh every (s)", longTrip: "Warn if trip longer than (h:mm)", veryLongTrip: "Red warning if longer than (h:mm)", linkLabel: "Link with these settings", copyLink: "🔗 Copy link", copied: "Link copied.", copyFail: "Select the link and copy it (Ctrl+C).", linkHint: "Your settings are saved in the link: bookmark it, or send it to someone so they get the same settings. The page address updates whenever you change a setting. For other people to open it, the page must be online (e.g. GitHub Pages); a link to a file on your computer only works for you.", searchPh: "Search a station…", searchHint: "Type at least 2 letters", noStation: "No station found", longTitle: "Long trip: more than {t} in total", stopsTitle: "Stops ({n})", remainLabel: "Time left", remainArr: "arrival in {st} at {t}", nextStop: "next stop: {st} at {t}", showEarlier: "⋯ show {n} earlier stops", showEarlier1: "⋯ show 1 earlier stop", hideEarlier: "⋯ hide earlier stops", posNotYet: "not departed yet: leaves {st} at {t}", posAt: "now at {st}", posBetween: "now between {a} and {b}", posArrived: "arrived at {st}", posEstimated: "Position estimated from the timetable and live delays (no GPS data).", changeTo: "change → {x}",
+    dataHint: "Data: transport.opendata.ch (SBB realtime). The API has no explicit “cancelled” flag, so the page: (1) notices trains that disappear from the results, (2) remembers the trains that usually run on this route and flags one missing today, and (3) checks the departure board at your station to tell a <b>cancelled</b> train from a <b>connection that no longer works</b>.",
+    stCancelled: "Cancelled", stDropped: "Connection lost", stUnverified: "Likely cancelled", stEnroute: "Disrupted",
+    stMissed: "Change missed", stRisk: "Change at risk", stOnTime: "On time", stScheduled: "Scheduled",
+    whyUsual: "usually runs at this time but is missing today", whyVanished: "disappeared from the timetable",
+    exCancelled: "{why}, and it is no longer on the departure board: cancelled",
+    exDropped: "{why}; the first train still runs, but the connection to {to} no longer works (later train cancelled or change impossible)",
+    exUnverified: "{why}: likely cancelled (departure board could not be checked)",
+    exEnroute: "is no longer shown as reaching {to}: it may have been stopped or cancelled during the trip. Listen to the announcements on board or check the SBB app for onward options",
+    exMissed: "first train too late: the change at {at} for the {next} will be missed",
+    exRisk: "only {left} min left to change at {at} for the {next} (planned {planned} min)",
+    exLate: "{n} min late", exArrival: " (arrival {t})",
+    altPlatform: ", platform {p}", altArrives: ", arrives {t}", altLost: " ({n} min later than planned)",
+    nextTrain: "Next train", yourTrain: "📌 Your train", onTheWay: "🚆 on the way",
+    noConn: "No connection found.", noDirectAfter: "No direct train after {t}.", noDirectNow: "No direct train for now.", laterWithChange: "Later trains need a change ({x}…).", showWithChange: "Show trains with a change", noMoreDep: "No upcoming departure found.",
+    platform: "Platform {p}", platformWas: "(was {p})", towards: "to {x}",
+    transfers1: "1 change", transfersN: "{n} changes", direct: "direct",
+    altKicker: "Best alternative · leaves in {n} min", altSwitch: "📌 Switch to this train",
+    altNone: "No other connection in the list gets you there; press Refresh or check the SBB app.",
+    departsIn: "departs in {n} min", departingNow: "departing now", arrivesIn: "arrives in {n} min",
+    stale: "⏱ Data is {n} min old — check your connection or press Refresh.",
+    takeInstead: "Take instead: {x}", pinTitle: "Click to pin as your train",
+    rowOnWay: "🚆 on the way · arrives {t}", arrived: "arrived", pl: "pl. {p}",
+    changeAt: "change at {at}: {x}", missed: "missed", nMin: "{n} min",
+    onWayHeader: "🚆 Already on the way ({n})", withIssues: "{n} with issues: {x}", allFine: "all fine",
+    manualUntil: "your choice until {t}, then automatic", autoSwitch: "automatic: switches to {r} at {t}",
+    updated: "Updated {t} · next refresh in {n}s", offline: "You are offline.", apiErr: "Could not reach the timetable API ({e}).",
+    lastKnown: "Showing last known data.",
+    occ1: "low", occ2: "medium", occ3: "high", occTitle: "{cls} class: {lvl} occupancy", cls1: "1st", cls2: "2nd",
+  },
+  fr: {
+    logo: "CFF", appName: "Suivi de trajet",
+    directOnly: "Directs uniquement", directTitle: "Afficher uniquement les trains sans changement",
+    alertsOff: "🔕 Alertes désactivées", alertsOn: "🔔 Alertes activées", alertsSound: "🔔 Alertes activées (son seul)",
+    alertsTitle: "Notification et son quand votre train est en retard ou supprimé",
+    alertsBlocked: "Les notifications sont bloquées pour cette page (fréquent quand elle est ouverte comme fichier local). Vous aurez quand même un bip et un ⚠️ dans le titre de l’onglet.",
+    refresh: "↻ Actualiser", loading: "Chargement…", loadingConn: "Chargement des trains…", refreshing: "Actualisation…",
+    hint: "Cliquez sur un train pour l’épingler comme <b>votre train</b>. Les alertes se concentrent alors sur ce train, et il reste suivi après le départ jusqu’à votre destination. Les autres trains déjà en route sont regroupés en haut de la liste (mis en évidence en cas de problème). Les barres indiquent l’occupation prévue par classe (vert faible · orange moyenne · rouge forte).",
+    settings: "Réglages", stA: "Gare A (p. ex. travail)", stB: "Gare B (p. ex. domicile)",
+    switchAt: "Le matin B → A, passer à A → B à", minDelay: "Alerte si retard ≥ (min)", minChange: "Temps minimal de changement (min)",
+    maxTransfers: "Changements max.", any: "Indifférent", interval: "Actualiser toutes les (s)", longTrip: "Avertir si trajet plus long que (h:mm)", veryLongTrip: "Avertissement rouge si plus long que (h:mm)", linkLabel: "Lien avec ces réglages", copyLink: "🔗 Copier le lien", copied: "Lien copié.", copyFail: "Sélectionnez le lien et copiez-le (Ctrl+C).", linkHint: "Vos réglages sont enregistrés dans le lien : ajoutez-le à vos favoris ou envoyez-le à quelqu’un pour qu’il ait les mêmes réglages. L’adresse de la page se met à jour à chaque changement de réglage. Pour que d’autres personnes puissent l’ouvrir, la page doit être en ligne (p. ex. GitHub Pages) ; un lien vers un fichier de votre ordinateur ne fonctionne que pour vous.", searchPh: "Rechercher une gare…", searchHint: "Tapez au moins 2 lettres", noStation: "Aucune gare trouvée", longTitle: "Trajet long : plus de {t} au total", stopsTitle: "Arrêts ({n})", remainLabel: "Temps restant", remainArr: "arrivée à {st} à {t}", nextStop: "prochain arrêt : {st} à {t}", showEarlier: "⋯ afficher les {n} arrêts précédents", showEarlier1: "⋯ afficher l’arrêt précédent", hideEarlier: "⋯ masquer les arrêts précédents", posNotYet: "pas encore parti : départ de {st} à {t}", posAt: "actuellement à {st}", posBetween: "actuellement entre {a} et {b}", posArrived: "arrivé à {st}", posEstimated: "Position estimée d’après l’horaire et les retards en temps réel (pas de données GPS).", changeTo: "changement → {x}",
+    dataHint: "Données : transport.opendata.ch (temps réel CFF). L’API n’indique pas explicitement les suppressions, donc la page : (1) repère les trains qui disparaissent des résultats, (2) mémorise les trains qui circulent habituellement sur ce trajet et signale celui qui manque aujourd’hui, et (3) consulte le tableau des départs de votre gare pour distinguer un train <b>supprimé</b> d’une <b>correspondance qui ne fonctionne plus</b>.",
+    stCancelled: "Supprimé", stDropped: "Correspondance perdue", stUnverified: "Probablement supprimé", stEnroute: "Perturbé",
+    stMissed: "Changement manqué", stRisk: "Changement compromis", stOnTime: "À l’heure", stScheduled: "Horaire prévu",
+    whyUsual: "circule habituellement à cette heure mais manque aujourd’hui", whyVanished: "a disparu de l’horaire",
+    exCancelled: "{why} et n’est plus au tableau des départs : supprimé",
+    exDropped: "{why} ; le premier train circule, mais la correspondance vers {to} ne fonctionne plus (train suivant supprimé ou changement impossible)",
+    exUnverified: "{why} : probablement supprimé (tableau des départs non vérifiable)",
+    exEnroute: "n’est plus indiqué comme arrivant à {to} : il a peut-être été arrêté ou supprimé en cours de route. Écoutez les annonces à bord ou consultez l’app CFF pour la suite du trajet",
+    exMissed: "premier train trop en retard : le changement à {at} pour le {next} sera manqué",
+    exRisk: "plus que {left} min pour changer à {at} pour le {next} (prévu {planned} min)",
+    exLate: "{n} min de retard", exArrival: " (arrivée {t})",
+    altPlatform: ", voie {p}", altArrives: ", arrivée {t}", altLost: " ({n} min plus tard que prévu)",
+    nextTrain: "Prochain train", yourTrain: "📌 Votre train", onTheWay: "🚆 en route",
+    noConn: "Aucun train trouvé.", noDirectAfter: "Plus de train direct après {t}.", noDirectNow: "Pas de train direct pour le moment.", laterWithChange: "Les trains suivants ont un changement ({x}…).", showWithChange: "Afficher les trains avec changement", noMoreDep: "Aucun prochain départ trouvé.",
+    platform: "Voie {p}", platformWas: "(au lieu de {p})", towards: "direction {x}",
+    transfers1: "1 changement", transfersN: "{n} changements", direct: "direct",
+    altKicker: "Meilleure alternative · part dans {n} min", altSwitch: "📌 Prendre ce train",
+    altNone: "Aucun autre train de la liste ne vous y amène ; actualisez ou consultez l’app CFF.",
+    departsIn: "part dans {n} min", departingNow: "départ imminent", arrivesIn: "arrive dans {n} min",
+    stale: "⏱ Données vieilles de {n} min — vérifiez votre connexion ou actualisez.",
+    takeInstead: "Prenez plutôt : {x}", pinTitle: "Cliquez pour en faire votre train",
+    rowOnWay: "🚆 en route · arrivée {t}", arrived: "arrivé", pl: "voie {p}",
+    changeAt: "changement à {at} : {x}", missed: "manqué", nMin: "{n} min",
+    onWayHeader: "🚆 Déjà en route ({n})", withIssues: "{n} avec problème : {x}", allFine: "tout va bien",
+    manualUntil: "votre choix jusqu’à {t}, puis automatique", autoSwitch: "automatique : passe à {r} à {t}",
+    updated: "Mis à jour à {t} · prochaine actualisation dans {n} s", offline: "Vous êtes hors ligne.", apiErr: "Impossible de joindre l’API des horaires ({e}).",
+    lastKnown: "Affichage des dernières données connues.",
+    occ1: "faible", occ2: "moyenne", occ3: "forte", occTitle: "{cls} classe : occupation {lvl}", cls1: "1re", cls2: "2e",
+  },
+  de: {
+    logo: "SBB", appName: "Streckenwächter",
+    directOnly: "Nur direkt", directTitle: "Nur Züge ohne Umsteigen anzeigen",
+    alertsOff: "🔕 Alarme aus", alertsOn: "🔔 Alarme an", alertsSound: "🔔 Alarme an (nur Ton)",
+    alertsTitle: "Benachrichtigung und Ton, wenn Ihr Zug verspätet ist oder ausfällt",
+    alertsBlocked: "Desktop-Benachrichtigungen sind für diese Seite blockiert (häufig bei lokal geöffneten Dateien). Sie erhalten trotzdem einen Signalton und ein ⚠️ im Tab-Titel.",
+    refresh: "↻ Aktualisieren", loading: "Wird geladen…", loadingConn: "Verbindungen werden geladen…", refreshing: "Wird aktualisiert…",
+    hint: "Klicken Sie auf eine Verbindung, um sie als <b>Ihren Zug</b> anzuheften. Die Alarme betreffen dann diesen Zug, und er wird nach der Abfahrt bis zum Ziel weiter überwacht. Andere bereits fahrende Züge sind oben in der Liste zusammengeklappt (hervorgehoben bei Problemen). Die Balken zeigen die erwartete Auslastung pro Klasse (grün gering · orange mittel · rot hoch).",
+    settings: "Einstellungen", stA: "Bahnhof A (z. B. Arbeit)", stB: "Bahnhof B (z. B. Zuhause)",
+    switchAt: "Morgens B → A, Wechsel zu A → B um", minDelay: "Alarm ab Verspätung ≥ (Min.)", minChange: "Minimale Umsteigezeit (Min.)",
+    maxTransfers: "Max. Umstiege", any: "Beliebig", interval: "Aktualisieren alle (s)", longTrip: "Warnen, wenn Fahrt länger als (h:mm)", veryLongTrip: "Rote Warnung, wenn länger als (h:mm)", linkLabel: "Link mit diesen Einstellungen", copyLink: "🔗 Link kopieren", copied: "Link kopiert.", copyFail: "Link markieren und kopieren (Ctrl+C).", linkHint: "Ihre Einstellungen sind im Link gespeichert: Setzen Sie ein Lesezeichen oder senden Sie ihn jemandem, der dann dieselben Einstellungen hat. Die Adresse der Seite wird bei jeder Änderung aktualisiert. Damit andere ihn öffnen können, muss die Seite online sein (z. B. GitHub Pages); ein Link auf eine Datei auf Ihrem Computer funktioniert nur bei Ihnen.", searchPh: "Bahnhof suchen…", searchHint: "Mindestens 2 Buchstaben eingeben", noStation: "Keine Haltestelle gefunden", longTitle: "Lange Fahrt: mehr als {t} insgesamt", stopsTitle: "Halte ({n})", remainLabel: "Restzeit", remainArr: "Ankunft in {st} um {t}", nextStop: "nächster Halt: {st} um {t}", showEarlier: "⋯ {n} frühere Halte anzeigen", showEarlier1: "⋯ 1 früheren Halt anzeigen", hideEarlier: "⋯ frühere Halte ausblenden", posNotYet: "noch nicht abgefahren: Abfahrt in {st} um {t}", posAt: "jetzt in {st}", posBetween: "jetzt zwischen {a} und {b}", posArrived: "angekommen in {st}", posEstimated: "Position geschätzt aus Fahrplan und Echtzeit-Verspätungen (keine GPS-Daten).", changeTo: "umsteigen → {x}",
+    dataHint: "Daten: transport.opendata.ch (SBB-Echtzeit). Die API kennzeichnet Ausfälle nicht ausdrücklich, daher (1) erkennt die Seite Züge, die aus den Ergebnissen verschwinden, (2) merkt sie sich die Züge, die auf dieser Strecke üblicherweise fahren, und meldet einen heute fehlenden, und (3) prüft sie die Abfahrtstafel Ihres Bahnhofs, um einen <b>ausgefallenen</b> Zug von einer <b>nicht mehr funktionierenden Verbindung</b> zu unterscheiden.",
+    stCancelled: "Fällt aus", stDropped: "Verbindung verloren", stUnverified: "Fällt wohl aus", stEnroute: "Gestört",
+    stMissed: "Anschluss verpasst", stRisk: "Anschluss gefährdet", stOnTime: "Pünktlich", stScheduled: "Planmässig",
+    whyUsual: "fährt normalerweise um diese Zeit, fehlt aber heute", whyVanished: "ist aus dem Fahrplan verschwunden",
+    exCancelled: "{why} und steht nicht mehr auf der Abfahrtstafel: fällt aus",
+    exDropped: "{why}; der erste Zug fährt noch, aber die Verbindung nach {to} klappt nicht mehr (Anschlusszug fällt aus oder Umsteigen unmöglich)",
+    exUnverified: "{why}: fällt wohl aus (Abfahrtstafel konnte nicht geprüft werden)",
+    exEnroute: "wird nicht mehr mit Ankunft in {to} angezeigt: Er wurde möglicherweise unterwegs angehalten oder gestrichen. Achten Sie auf die Durchsagen im Zug oder prüfen Sie die SBB-App für die Weiterreise",
+    exMissed: "erster Zug zu spät: Der Anschluss in {at} auf den {next} wird verpasst",
+    exRisk: "nur noch {left} Min. zum Umsteigen in {at} auf den {next} (geplant {planned} Min.)",
+    exLate: "{n} Min. Verspätung", exArrival: " (Ankunft {t})",
+    altPlatform: ", Gleis {p}", altArrives: ", Ankunft {t}", altLost: " ({n} Min. später als geplant)",
+    nextTrain: "Nächster Zug", yourTrain: "📌 Ihr Zug", onTheWay: "🚆 unterwegs",
+    noConn: "Keine Verbindung gefunden.", noDirectAfter: "Kein direkter Zug nach {t}.", noDirectNow: "Momentan kein direkter Zug.", laterWithChange: "Spätere Züge mit Umsteigen ({x}…).", showWithChange: "Züge mit Umsteigen anzeigen", noMoreDep: "Keine weitere Abfahrt gefunden.",
+    platform: "Gleis {p}", platformWas: "(statt {p})", towards: "Richtung {x}",
+    transfers1: "1× umsteigen", transfersN: "{n}× umsteigen", direct: "direkt",
+    altKicker: "Beste Alternative · fährt in {n} Min.", altSwitch: "📌 Diesen Zug nehmen",
+    altNone: "Keine andere Verbindung in der Liste bringt Sie hin; aktualisieren Sie oder prüfen Sie die SBB-App.",
+    departsIn: "fährt in {n} Min.", departingNow: "fährt jetzt ab", arrivesIn: "Ankunft in {n} Min.",
+    stale: "⏱ Daten sind {n} Min. alt – prüfen Sie Ihre Verbindung oder aktualisieren Sie.",
+    takeInstead: "Nehmen Sie stattdessen: {x}", pinTitle: "Klicken, um als Ihren Zug anzuheften",
+    rowOnWay: "🚆 unterwegs · Ankunft {t}", arrived: "angekommen", pl: "Gl. {p}",
+    changeAt: "Umsteigen in {at}: {x}", missed: "verpasst", nMin: "{n} Min.",
+    onWayHeader: "🚆 Bereits unterwegs ({n})", withIssues: "{n} mit Problemen: {x}", allFine: "alles in Ordnung",
+    manualUntil: "Ihre Wahl bis {t}, dann automatisch", autoSwitch: "automatisch: wechselt um {t} zu {r}",
+    updated: "Aktualisiert {t} · nächste Aktualisierung in {n} s", offline: "Sie sind offline.", apiErr: "Fahrplan-API nicht erreichbar ({e}).",
+    lastKnown: "Letzte bekannte Daten werden angezeigt.",
+    occ1: "gering", occ2: "mittel", occ3: "hoch", occTitle: "{cls} Klasse: Auslastung {lvl}", cls1: "1.", cls2: "2.",
+  },
+};
+function detectLang() {
+  for (const l of navigator.languages || [navigator.language || "en"]) {
+    const code = String(l).slice(0, 2).toLowerCase();
+    if (I18N[code]) return code;
+  }
+  return "en";
+}
+let lang = "en";
+const t = (key, vars = {}) => String(I18N[lang][key] ?? I18N.en[key] ?? key).replace(/\{(\w+)\}/g, (_, k) => vars[k] ?? "");
+const transfersText = n => n ? (n === 1 ? t("transfers1") : t("transfersN", { n })) : t("direct");
+
+const BASE = "https://transport.opendata.ch/v1";
+const EN_ROUTE_LOOKBACK_MIN = 120; // also fetch trains that left up to 2 h ago, if not arrived yet
+const DEFAULTS = { from: "Lancy-Pont-Rouge", to: "Aigle", switchAt: "12:00", minDelay: 5, minChange: 2, maxTransfers: "0", interval: 60, longTrip: 105, veryLongTrip: 150 };
+
+function load(key, fallback) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; } catch { return fallback; } }
+function save(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch {} }
+
+let cfg = { ...DEFAULTS, ...load("cff.cfg", {}) };
+if ((cfg.v || 1) < 2) { cfg.maxTransfers = "0"; cfg.v = 2; save("cff.cfg", cfg); } // direct trains only is now the default
+// Settings can come from the page address (?from=…&to=…): such a link opens the page with exactly
+// those settings (missing ones = defaults), so it can be bookmarked or shared.
+const URL_KEYS = { from: "from", to: "to", switch: "switchAt", delay: "minDelay", change: "minChange", changes: "maxTransfers", refresh: "interval", long: "longTrip", vlong: "veryLongTrip" };
+function hmmToMin(v) { const m = String(v ?? "").trim().match(/^(\d{1,2})(?::|h)?(\d{2})?$/); return m ? Number(m[1]) * 60 + Number(m[2] || 0) : NaN; }
+function cleanSetting(k, raw) {
+  const v = String(raw ?? "").trim(), n = Number(v);
+  if (k === "from" || k === "to") return v && v.length <= 80 ? v : undefined;
+  if (k === "switchAt") { const m = v.match(/^(\d{1,2}):(\d{2})$/); return m && +m[1] < 24 && +m[2] < 60 ? `${m[1].padStart(2, "0")}:${m[2]}` : undefined; }
+  if (k === "minDelay") return Number.isInteger(n) && n >= 1 && n <= 60 ? n : undefined;
+  if (k === "minChange") return Number.isInteger(n) && n >= 0 && n <= 15 ? n : undefined;
+  if (k === "maxTransfers") return v === "any" || v === "" ? "" : ["0", "1", "2"].includes(v) ? v : undefined;
+  if (k === "interval") return Number.isInteger(n) && n >= 30 && n <= 900 ? n : undefined;
+  if (k === "longTrip" || k === "veryLongTrip") { const m = hmmToMin(v); return m >= 30 && m <= 600 ? m : undefined; }
+}
+try {
+  const q = new URLSearchParams(location.search);
+  if ([...q.keys()].some(k => k in URL_KEYS || k === "lang")) {
+    const next = { ...DEFAULTS, v: 2 };
+    for (const [param, k] of Object.entries(URL_KEYS)) {
+      const v = q.has(param) ? cleanSetting(k, q.get(param)) : undefined;
+      if (v !== undefined) next[k] = v;
+    }
+    if (I18N[q.get("lang")]) next.lang = q.get("lang");
+    cfg = next; save("cff.cfg", cfg);
+  }
+} catch {}
+lang = I18N[cfg.lang] ? cfg.lang : detectLang();
+let pinnedKey = load("cff.pinned", null);
+let notifyOn = load("cff.notify", false);
+let seen = {};    // today's connections already seen (key -> summary), per direction
+let usual = {};   // trains that usually run on this route (pattern -> history), per direction
+let again = false; // a refresh was requested while one was running
+let stopsOpen = true; // stop list of your train: unfolded by default
+let showAllStops = false; // false = only the last 2 passed stops + the next ones
+let onWayOpen = false; // "Already on the way" section: always starts folded, stays as you leave it until reload
+try { localStorage.removeItem("cff.onWayOpen"); } catch {}
+let current = [], gone = [], hiddenLater = [];
+let lastFetch = null, nextAt = 0, timer = null, inFlight = false, fetchErr = null;
+const verifyCache = {};              // key -> { kind, at }
+const notified = new Set(load("cff.notified", []));
+
+const $ = id => document.getElementById(id);
+const pad = n => String(n).padStart(2, "0");
+const hhmm = d => d ? `${pad(d.getHours())}:${pad(d.getMinutes())}` : "–";
+const dayStr = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const todayStr = () => dayStr(new Date());
+const dayType = d => ({ 0: "sun", 6: "sat" }[d.getDay()] || "wd");
+const parse = s => s ? new Date(s.replace(/([+-]\d{2})(\d{2})$/, "$1:$2")) : null;
+const addMin = (iso, m) => new Date(new Date(iso).getTime() + m * 60000);
+// ignore absurd prognosis values (the API sometimes returns junk times)
+const lateMin = (sched, rt) => { if (!sched || !rt) return 0; const m = Math.round((rt - sched) / 60000); return m > 0 && m < 360 ? m : 0; };
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+// Direction: "out" = A → B (from → to, afternoons), "back" = B → A (mornings).
+// Automatic by time of day; a manual choice lasts until the next automatic switch (switchAt or midnight).
+let override = load("cff.dirOverride", null);
+const autoDir = (now = new Date()) => hhmm(now) < cfg.switchAt ? "back" : "out";
+function nextBoundary(now = new Date()) {
+  const [h, m] = cfg.switchAt.split(":").map(Number);
+  const b = new Date(now); b.setHours(h, m, 0, 0);
+  if (b <= now) { b.setDate(b.getDate() + 1); b.setHours(0, 0, 0, 0); }
+  return b.getTime();
+}
+function dirNow() {
+  if (override && Date.now() < override.until) return override.dir;
+  return autoDir();
+}
+let curDir = dirNow();
+const R = () => curDir === "back"
+  ? { from: cfg.to, to: cfg.from }
+  : { from: cfg.from, to: cfg.to };
+const routeId = () => `${R().from}|${R().to}`;
+// migrate memory from the single-direction version of the page
+try {
+  const old = load("cff.usual", null);
+  if (old?._route && !localStorage.getItem(`cff.usual|${old._route}`)) save(`cff.usual|${old._route}`, old);
+  localStorage.removeItem("cff.usual"); localStorage.removeItem("cff.seen");
+} catch {}
+
+// --- data -------------------------------------------------------------------
+function normalize(c) {
+  const dep = parse(c.from.departure), arr = parse(c.to.arrival);
+  const depRt = parse(c.from.prognosis?.departure), arrRt = parse(c.to.prognosis?.arrival);
+  const legs = (c.sections || []).filter(s => s.journey).map(s => ({
+    name: s.journey.name, label: `${s.journey.category || ""} ${s.journey.number || ""}`.trim(),
+    stationId: s.departure.station?.id, depRaw: s.departure.departure,
+    fromName: s.departure.station?.name, toName: s.arrival.station?.name,
+    dep: parse(s.departure.departure), depRt: parse(s.departure.prognosis?.departure),
+    arr: parse(s.arrival.arrival), arrRt: parse(s.arrival.prognosis?.arrival),
+    cap1: s.journey.capacity1st ?? s.departure.prognosis?.capacity1st ?? null,
+    cap2: s.journey.capacity2nd ?? s.departure.prognosis?.capacity2nd ?? null,
+  }));
+
+  let legDelay = 0;
+  for (const l of legs) legDelay = Math.max(legDelay, lateMin(l.dep, l.depRt), lateMin(l.arr, l.arrRt));
+
+  // transfers: how much time is left to change trains, given live delays?
+  let change = null;
+  for (let i = 0; i < legs.length - 1; i++) {
+    const a = legs[i], b = legs[i + 1];
+    if (!a.arr || !b.dep) continue;
+    const planned = Math.round((b.dep - a.arr) / 60000);
+    const aLate = lateMin(a.arr, a.arrRt) || lateMin(a.dep, a.depRt);
+    const bLate = lateMin(b.dep, b.depRt);
+    const left = planned - aLate + bLate;
+    const state = left < 0 ? "missed" : (left < cfg.minChange && left < planned) ? "risk" : "ok";
+    if (state !== "ok" && (!change || left < change.left)) change = { at: a.toName, next: b.label, planned, left, state };
+  }
+
+  // occupancy: worst value across legs (that is what you will feel)
+  const worst = k => { const v = [c[k], ...legs.map(l => l[k === "capacity1st" ? "cap1" : "cap2"])].filter(x => x != null); return v.length ? Math.max(...v) : null; };
+
+  const depDelay = Math.max(lateMin(dep, depRt), c.from.delay > 0 && c.from.delay < 360 ? c.from.delay : 0);
+  const arrDelay = Math.max(lateMin(arr, arrRt), c.to.delay > 0 && c.to.delay < 360 ? c.to.delay : 0);
+  const first = legs[0];
+  return {
+    key: `${c.from.departure}__${(c.products || []).join("|")}`,
+    dep: dep?.toISOString(), arr: arr?.toISOString(),
+    depDelay, arrDelay, maxDelay: Math.max(depDelay, arrDelay, legDelay),
+    products: c.products || [],
+    platform: c.from.platform, rtPlatform: c.from.prognosis?.platform,
+    transfers: c.transfers ?? Math.max(legs.length - 1, 0),
+    duration: c.duration,
+    hasRealtime: !!(depRt || arrRt || c.from.delay != null),
+    change,
+    cap1: worst("capacity1st"), cap2: worst("capacity2nd"),
+    firstLeg: first ? { name: first.name, stationId: first.stationId, depRaw: first.depRaw } : null,
+    headsign: (c.sections || []).find(s => s.journey)?.journey?.to || "",
+    stops: buildStops(c, depDelay),
+  };
+}
+
+// All stops of the trip, in order, with live (estimated) times. A change station appears once,
+// with the arrival of one train and the departure of the next. Stations without live data take
+// the last known delay, so the estimate follows the train.
+function buildStops(c, startDelay) {
+  const stops = [];
+  let carry = startDelay || 0;
+  const legs = (c.sections || []).filter(s => s.journey);
+  legs.forEach((s, li) => {
+    const label = `${s.journey.category || ""} ${s.journey.number || ""}`.trim();
+    (s.journey.passList || []).forEach((p, pi) => {
+      const arr = parse(p.arrival), dep = parse(p.departure);
+      let arrD = lateMin(arr, parse(p.prognosis?.arrival)), depD = lateMin(dep, parse(p.prognosis?.departure));
+      const known = p.delay != null || p.prognosis?.arrival || p.prognosis?.departure;
+      if (p.delay > 0 && p.delay < 360) { arrD = Math.max(arrD, p.delay); depD = Math.max(depD, p.delay); }
+      if (known) carry = Math.max(arrD, depD); else { arrD = carry; depD = carry; }
+      const stop = {
+        name: p.station?.name || p.location?.name || "?",
+        arr: arr?.toISOString() || null, dep: dep?.toISOString() || null, arrD, depD,
+        platform: p.platform || null, rtPlatform: p.prognosis?.platform || null,
+      };
+      const prev = stops[stops.length - 1];
+      if (pi === 0 && li > 0 && prev && prev.name === stop.name) {
+        // change of train here: keep the arrival of the first train, the departure of the next
+        Object.assign(prev, { dep: stop.dep, depD: stop.depD, rtPlatform: stop.rtPlatform, platform: stop.platform, changeTo: label });
+      } else {
+        if (pi === 0 && li > 0) stop.changeTo = label; // change after a walk to another station
+        stops.push(stop);
+      }
+    });
+  });
+  return stops;
+}
+const stopArrMs = s => s.arr ? new Date(s.arr).getTime() + s.arrD * 60000 : null;
+const stopDepMs = s => s.dep ? new Date(s.dep).getTime() + s.depD * 60000 : null;
+// Where is the train now? Estimated from the stop times and the live delays (there is no GPS here).
+function position(c, now) {
+  const st = c.stops || [], n = now.getTime();
+  if (!st.length) return null;
+  if (n < stopDepMs(st[0])) return { kind: "before", i: 0 };
+  for (let i = 0; i < st.length; i++) {
+    const a = stopArrMs(st[i]), d = stopDepMs(st[i]);
+    if (a != null && n >= a && (d == null || n < d)) return d == null ? { kind: "arrived", i } : { kind: "at", i };
+    const next = st[i + 1];
+    if (d != null && next && n >= d && n < stopArrMs(next)) {
+      return { kind: "between", i, frac: (n - d) / Math.max(1, stopArrMs(next) - d) };
+    }
+  }
+  return { kind: "arrived", i: st.length - 1 };
+}
+function positionText(c, now) {
+  const pos = position(c, now); if (!pos) return "";
+  const st = c.stops;
+  if (pos.kind === "before") return t("posNotYet", { st: st[0].name, t: hhmm(new Date(stopDepMs(st[0]))) });
+  if (pos.kind === "at") return t("posAt", { st: st[pos.i].name });
+  if (pos.kind === "between") return t("posBetween", { a: st[pos.i].name, b: st[pos.i + 1].name });
+  return t("posArrived", { st: st[pos.i].name });
+}
+function stopsHtml(c, now) {
+  const st = c.stops || [];
+  if (st.length < 2) return "";
+  const pos = position(c, now);
+  const timeHtml = (iso, d) => iso ? (d ? `<s>${hhmm(new Date(iso))}</s> <b class="${d >= bigDelay() ? "vlate" : "late"}">${hhmm(addMin(iso, d))}</b>` : hhmm(new Date(iso))) : "";
+  const isPassed = i => !!pos && (pos.kind === "arrived" ? i <= pos.i : pos.kind === "before" ? false : i < pos.i || (pos.kind === "between" && i === pos.i));
+  // only the last 2 passed stops and what is ahead; the earlier ones can be unfolded
+  const passedCount = st.filter((_, i) => isPassed(i)).length;
+  const hidden = showAllStops ? 0 : Math.max(0, passedCount - 2);
+  const toggleRow = passedCount > 2
+    ? `<li class="stop earlier"><span class="dot"></span><span class="sname"><button type="button" id="stopsToggle">${esc(showAllStops ? t("hideEarlier") : t(passedCount - 2 === 1 ? "showEarlier1" : "showEarlier", { n: passedCount - 2 }))}</button></span><span class="stime"></span><span class="splat"></span></li>` : "";
+  const rows = toggleRow + st.map((s, i) => {
+    if (i < hidden) return "";
+    const passed = isPassed(i);
+    const here = pos && pos.kind === "at" && pos.i === i;
+    const first = i === 0, last = i === st.length - 1;
+    const times = first ? timeHtml(s.dep, s.depD) : last ? timeHtml(s.arr, s.arrD)
+      : s.changeTo || (s.arr && s.dep && new Date(s.dep) - new Date(s.arr) >= 120000)
+        ? `${timeHtml(s.arr, s.arrD)} – ${timeHtml(s.dep, s.depD)}` : timeHtml(s.dep || s.arr, s.dep ? s.depD : s.arrD);
+    const plat = s.rtPlatform && s.rtPlatform !== s.platform
+      ? `<b class="late">${esc(t("pl", { p: s.rtPlatform }))}</b>` : s.platform ? esc(t("pl", { p: s.platform })) : "";
+    const row = `<li class="stop ${passed ? "passed" : ""} ${here ? "here" : ""} ${first || last ? "end" : ""}">
+        <span class="dot">${here ? "🚆" : ""}</span>
+        <span class="sname">${esc(s.name)}${s.changeTo ? ` <span class="chg">${esc(t("changeTo", { x: s.changeTo }))}</span>` : ""}</span>
+        <span class="stime">${times}</span><span class="splat">${plat}</span></li>`;
+    const between = pos && pos.kind === "between" && pos.i === i
+      ? `<li class="stop moving"><span class="dot">🚆</span><span class="sname"><span class="bar"><i style="width:${Math.round(pos.frac * 100)}%"></i></span></span><span class="stime"></span><span class="splat"></span></li>` : "";
+    return row + between;
+  }).join("");
+  return `<details class="stops" ${stopsOpen ? "open" : ""}>
+      <summary>${esc(t("stopsTitle", { n: st.length }))} · <b>${esc(positionText(c, now))}</b></summary>
+      <ol>${rows}</ol>
+      <div class="sub">${esc(t("posEstimated"))}</div>
+    </details>`;
+}
+
+// Check the departure board at the first leg's station: is that train still listed?
+async function verifyGone(c) {
+  const hit = verifyCache[c.key];
+  if (hit && Date.now() - hit.at < 4 * 60000) return hit.kind;
+  let kind = "unverified";
+  if (c.firstLeg?.name && c.firstLeg.depRaw) {
+    try {
+      const tm = addMin(c.firstLeg.depRaw, -2);
+      const p = new URLSearchParams({ datetime: `${dayStr(tm)} ${hhmm(tm)}`, limit: 30 });
+      if (c.firstLeg.stationId) p.set("id", c.firstLeg.stationId); else p.set("station", R().from);
+      const res = await fetch(`${BASE}/stationboard?${p}`, { cache: "no-store" });
+      if (res.ok) {
+        const board = (await res.json()).stationboard || [];
+        const listed = board.some(e => e.name === c.firstLeg.name && e.stop?.departure === c.firstLeg.depRaw);
+        // listed = the train still runs, but this connection is no longer offered (a later leg or the change broke)
+        kind = listed ? "dropped" : "cancelled";
+      }
+    } catch {}
+  }
+  verifyCache[c.key] = { kind, at: Date.now() };
+  return kind;
+}
+
+function patternOf(c) { const d = new Date(c.dep); return `${dayType(d)}|${hhmm(d)}|${c.products.join("|")}`; }
+
+async function detectGone(list, now) {
+  const day = todayStr();
+  const rid = `${day}|${routeId()}`;
+  seen = load(`cff.seen|${routeId()}`, {});
+  usual = load(`cff.usual|${routeId()}`, {});
+  if (seen._route !== rid) seen = { _route: rid };
+  if (usual._route !== routeId()) usual = { _route: routeId() };
+
+  const keys = new Set(list.map(c => c.key));
+  const pats = new Set(list.map(patternOf));
+  const first = list[0] ? new Date(list[0].dep) : null;
+  const last = list.length ? new Date(list[list.length - 1].dep) : null;
+  const inWindow = d => first && last && d >= first && d <= last && (d - now) / 60000 > -10;
+  const candidates = [];
+
+  // (1) seen earlier today, now missing: before departure, or already on the way but not arrived yet
+  for (const [k, c] of Object.entries(seen)) {
+    if (k === "_route" || keys.has(k)) continue;
+    const d = new Date(c.dep);
+    if (!(first && last && d >= first && d <= last) || arrived(c, now, 2)) continue;
+    candidates.push({ ...c, gone: true, source: "vanished", wasEnRoute: departed(c, now) });
+  }
+
+  // (2) usually runs at this time on this kind of day, but not in today's results
+  const dt = dayType(now), cutoff = dayStr(new Date(now.getTime() - 21 * 864e5));
+  for (const [p, u] of Object.entries(usual)) {
+    if (p === "_route" || !p.startsWith(dt + "|") || pats.has(p)) continue;
+    const pastDays = u.days.filter(d => d !== day && d >= cutoff);
+    const missedDays = (u.missed || []).filter(d => d !== day);
+    if (pastDays.length < 2 || missedDays.length >= 2) continue; // not a regular train (any more)
+    const [h, m] = u.time.split(":").map(Number);
+    const dep = new Date(now); dep.setHours(h, m, 0, 0);
+    if (!inWindow(dep) || candidates.some(c => patternOf(c) === p)) continue;
+    const [ah, am] = u.arr.split(":").map(Number);
+    const arr = new Date(now); arr.setHours(ah, am, 0, 0);
+    // rebuild today's first-leg departure string, to look it up on the departure board
+    const depRaw = u.firstLeg?.depTime ? `${day}T${u.firstLeg.depTime}:00${u.firstLeg.tz}` : null;
+    candidates.push({
+      key: `usual__${p}`, dep: dep.toISOString(), arr: arr.toISOString(), products: u.products,
+      depDelay: 0, arrDelay: 0, maxDelay: 0, transfers: u.transfers, platform: u.platform,
+      firstLeg: u.firstLeg ? { name: u.firstLeg.name, stationId: u.firstLeg.stationId, depRaw } : null,
+      gone: true, source: "usual",
+    });
+    if (!(u.missed || []).includes(day)) { u.missed = [...(u.missed || []), day].slice(-5); }
+  }
+
+  // remember what runs today
+  for (const c of list) {
+    seen[c.key] = c;
+    const p = patternOf(c), d = new Date(c.dep);
+    const u = usual[p] || { days: [] };
+    if (!u.days.includes(day)) u.days = [...u.days, day].slice(-10);
+    u.missed = (u.missed || []).filter(x => x !== day);
+    const fl = c.firstLeg?.depRaw?.match(/T(\d{2}:\d{2}):\d{2}([+-]\d{4})$/);
+    Object.assign(u, {
+      time: hhmm(d), arr: hhmm(new Date(c.arr)), products: c.products, transfers: c.transfers, platform: c.platform,
+      firstLeg: c.firstLeg && fl ? { name: c.firstLeg.name, stationId: c.firstLeg.stationId, depTime: fl[1], tz: fl[2] } : null,
+    });
+    usual[p] = u;
+  }
+  save(`cff.seen|${routeId()}`, seen); save(`cff.usual|${routeId()}`, usual);
+
+  // a train already on its way is of course still on the departure board history: no point checking it
+  for (const c of candidates) c.goneKind = c.wasEnRoute ? "enroute" : await verifyGone(c);
+  // a "usually runs" train that is still on the departure board just isn't a good connection today: don't alarm
+  gone = candidates.filter(c => !(c.source === "usual" && c.goneKind === "dropped"));
+}
+
+async function refresh() {
+  if (inFlight) { again = true; return; }
+  inFlight = true;
+  clearTimeout(timer);
+  $("refreshBtn").disabled = true;
+  const now = new Date();
+  const r = R(), rid = routeId();
+  // No time limit: upcoming trains, plus trains that left recently, which are monitored until they arrive
+  // (a trip here takes ~1h30). Make sure the pinned train is always inside the window.
+  let from = new Date(now.getTime() - EN_ROUTE_LOOKBACK_MIN * 60000);
+  const pinnedDep = pinnedKey && parse(pinnedKey.split("__")[0]);
+  if (pinnedDep && pinnedDep < from) from = addMin(pinnedDep.toISOString(), -1);
+  const fetchFrom = async start => {
+    const p = new URLSearchParams({ from: r.from, to: r.to, date: dayStr(start), time: hhmm(start), limit: 16 });
+    const res = await fetch(`${BASE}/connections?${p}`, { cache: "no-store" });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return ((await res.json()).connections || []).map(normalize).filter(c => c.dep);
+  };
+  try {
+    // 1st request: trains on the way + the next ones. 2nd request: continues where the 1st one stopped
+    // (or from now), so the list also reaches ~4 h ahead — the API returns at most 16 connections per call.
+    const a = await fetchFrom(from);
+    const lastA = a.length ? new Date(a[a.length - 1].dep) : now;
+    const b = await fetchFrom(lastA < now ? lastA : now);
+    if (routeId() !== rid) throw new Error("direction changed"); // the follow-up refresh will load the new direction
+    const byKey = new Map([...a, ...b].map(c => [c.key, c]));
+    let list = [...byKey.values()].sort((x, y) => new Date(x.dep) - new Date(y.dep));
+    // learn from every connection, filter only what is shown (otherwise hidden trains would look "vanished")
+    await detectGone(list, now);
+    const shown = c => cfg.maxTransfers === "" || (c.transfers ?? 0) <= Number(cfg.maxTransfers);
+    current = list.filter(shown);
+    gone = gone.filter(shown);
+    // hidden by "Direct only" and later than the last direct train: say so at the end of the list
+    const lastShown = current.length ? new Date(current[current.length - 1].dep) : now;
+    hiddenLater = list.filter(c => !shown(c) && new Date(c.dep) > lastShown && new Date(c.dep) > now);
+    lastFetch = new Date();
+    fetchErr = null;
+  } catch (e) {
+    if (routeId() === rid) fetchErr = navigator.onLine === false ? { key: "offline" } : { key: "apiErr", e: e.message };
+  }
+  inFlight = false;
+  $("refreshBtn").disabled = false;
+  if (again) { again = false; return refresh(); }
+  render();
+  maybeNotify();
+  nextAt = Date.now() + cfg.interval * 1000;
+  timer = setTimeout(refresh, cfg.interval * 1000);
+}
+
+// --- status logic -------------------------------------------------------------
+const bigDelay = () => Math.max(cfg.minDelay * 3, 15);
+function level(c) {
+  if (c.gone) return "bad";
+  if (c.change?.state === "missed" || c.maxDelay >= bigDelay()) return "bad";
+  if (c.change?.state === "risk" || c.maxDelay >= cfg.minDelay) return "warn";
+  return "ok";
+}
+function statusText(c) {
+  if (c.gone) return t({ cancelled: "stCancelled", dropped: "stDropped", unverified: "stUnverified", enroute: "stEnroute" }[c.goneKind] || "stUnverified");
+  if (c.change?.state === "missed") return t("stMissed");
+  if (c.change?.state === "risk") return t("stRisk");
+  if (c.maxDelay > 0) return `+${t("nMin", { n: c.maxDelay })}`;
+  return c.hasRealtime ? t("stOnTime") : t("stScheduled");
+}
+function explain(c) {
+  if (c.gone) {
+    const why = t(c.source === "usual" ? "whyUsual" : "whyVanished");
+    const key = { cancelled: "exCancelled", dropped: "exDropped", unverified: "exUnverified", enroute: "exEnroute" }[c.goneKind] || "exUnverified";
+    return t(key, { why, to: R().to });
+  }
+  const parts = [];
+  if (c.change) {
+    const v = { at: c.change.at, next: c.change.next, left: c.change.left, planned: c.change.planned };
+    parts.push(t(c.change.state === "missed" ? "exMissed" : "exRisk", v));
+  }
+  if (c.maxDelay >= cfg.minDelay) parts.push(t("exLate", { n: c.maxDelay }) + (c.arrDelay ? t("exArrival", { t: hhmm(addMin(c.arr, c.arrDelay)) }) : ""));
+  return parts.join(" · ");
+}
+// When a train is cancelled, its change is missed or it is very late: the upcoming train that gets you
+// to the destination soonest (live times), skipping trains that are themselves in trouble.
+function bestAlternative(c, all, now) {
+  // once you are on board, other trains from your departure station are no help
+  if (level(c) !== "bad" || departed(c, now)) return null;
+  const mineArr = c.gone || c.change?.state === "missed" ? Infinity : addMin(c.arr, c.arrDelay).getTime();
+  const options = all.filter(o => o.key !== c.key && !o.gone && level(o) !== "bad"
+      && addMin(o.dep, o.depDelay).getTime() > now.getTime() + 60000
+      && addMin(o.arr, o.arrDelay).getTime() < mineArr)
+    .sort((a, b) => addMin(a.arr, a.arrDelay) - addMin(b.arr, b.arrDelay));
+  return options[0] || null;
+}
+function altText(o, c) {
+  const arr = addMin(o.arr, o.arrDelay);
+  const lost = c.gone || c.change?.state === "missed" ? Math.round((arr - new Date(c.arr)) / 60000) : null;
+  return `${hhmm(addMin(o.dep, o.depDelay))} ${o.products.join(" + ")}`
+    + (o.platform ? t("altPlatform", { p: o.rtPlatform || o.platform }) : "")
+    + t("altArrives", { t: hhmm(arr) })
+    + (lost > 0 ? t("altLost", { n: lost }) : "");
+}
+
+// live (delay-adjusted) times
+const depRtMs = c => new Date(c.dep).getTime() + (c.depDelay || 0) * 60000;
+const arrRtMs = c => new Date(c.arr).getTime() + (c.arrDelay || 0) * 60000;
+const departed = (c, now) => depRtMs(c) <= now.getTime();
+const arrived = (c, now, graceMin = 0) => arrRtMs(c) < now.getTime() - graceMin * 60000;
+const enRoute = (c, now) => departed(c, now) && !arrived(c, now);
+// total trip time with live delays; a small warning when it is longer than the threshold (default 1h45)
+const fmtDur = m => `${Math.floor(m / 60)}h${pad(m % 60)}`;
+function durationHtml(c) {
+  if (!c.dep || !c.arr) return "";
+  const m = Math.round((arrRtMs(c) - depRtMs(c)) / 60000);
+  if (!(m > 0)) return "";
+  // red above the second limit (default 2h30), amber above the first one (default 1h45)
+  const red = Number(cfg.veryLongTrip), amber = Number(cfg.longTrip);
+  if (m > red) return ` · <span class="long vlong" title="${esc(t("longTitle", { t: fmtDur(red) }))}">⏳ ${fmtDur(m)}</span>`;
+  if (m > amber) return ` · <span class="long" title="${esc(t("longTitle", { t: fmtDur(amber) }))}">⏳ ${fmtDur(m)}</span>`;
+  return ` · ${fmtDur(m)}`;
+}
+
+function occHtml(c) {
+  const one = (clsKey, v) => v ? `<span class="occ l${v}" title="${esc(t("occTitle", { cls: t(clsKey), lvl: t("occ" + v) }))}">${t(clsKey)}<span class="bars"><i></i><i></i><i></i></span></span>` : "";
+  return one("cls1", c.cap1) + one("cls2", c.cap2);
+}
+
+// --- rendering ------------------------------------------------------------------
+function render() {
+  paintDir();
+  const now = new Date();
+  // keep every train until it has reached the destination (+5 min), not just until it leaves
+  const all = [...current, ...gone].filter(c => !arrived(c, now, 5)).sort((a, b) => new Date(a.dep) - new Date(b.dep));
+
+  let mine = all.find(c => c.key === pinnedKey);
+  if (mine && arrived(mine, now, 2)) { mine = null; pinnedKey = null; save("cff.pinned", null); } // you're there: unpin
+  const isPinned = !!mine;
+  if (!mine) mine = all.find(c => !departed(c, now));
+  const hero = $("hero");
+  if (!mine) {
+    hero.className = "hero";
+    hero.innerHTML = `<div><div class="kicker">${t("nextTrain")}</div><div class="times">–</div><div class="meta">${esc(t("noConn"))}</div></div>`;
+  } else {
+    const lv = level(mine), dep = new Date(mine.dep), arr = new Date(mine.arr);
+    const depRt = addMin(mine.dep, mine.depDelay), arrRt = addMin(mine.arr, mine.arrDelay);
+    const mins = Math.round((depRt - now) / 60000);
+    const plat = mine.rtPlatform && mine.rtPlatform !== mine.platform
+      ? `<b class="late">${esc(t("platform", { p: mine.rtPlatform }))}</b> ${esc(t("platformWas", { p: mine.platform }))}`
+      : (mine.platform ? esc(t("platform", { p: mine.platform })) : "");
+    const why = lv !== "ok" ? explain(mine) : "";
+    const alt = bestAlternative(mine, all, now);
+    const altMins = alt ? Math.round((addMin(alt.dep, alt.depDelay) - now) / 60000) : 0;
+    const altHtml = alt ? `<div class="alt">
+        <div><div class="kicker">${esc(t("altKicker", { n: altMins }))}</div>
+        <b>${esc(altText(alt, mine))}</b> ${occHtml(alt)}</div>
+        <button data-pin="${esc(alt.key)}">${esc(t("altSwitch"))}</button></div>`
+      : lv === "bad" && !departed(mine, now) && (mine.gone || mine.change?.state === "missed") ? `<div class="alt none">${esc(t("altNone"))}</div>` : "";
+    // the train you are on: big "time left", live arrival, next stop and how far along the trip you are
+    const onBoard = isPinned && enRoute(mine, now) && !mine.gone;
+    let remainHtml = "";
+    if (onBoard) {
+      const left = Math.max(0, Math.ceil((arrRt - now) / 60000));
+      const frac = Math.min(1, Math.max(0, (now - depRt) / Math.max(1, arrRt - depRt)));
+      const pos = position(mine, now), st = mine.stops || [];
+      const nextStop = pos && (pos.kind === "between" || pos.kind === "at") && st[pos.i + 1] && pos.i + 1 < st.length - 1 ? st[pos.i + 1] : null;
+      remainHtml = `<div class="remain">
+          <div class="kicker">⏱ ${esc(t("remainLabel"))}</div>
+          <div class="rline"><span class="rbig">${esc(left < 60 ? t("nMin", { n: left }) : fmtDur(left))}</span>
+            <span class="rinfo">${esc(t("remainArr", { t: hhmm(arrRt), st: mine.stops?.[mine.stops.length - 1]?.name || R().to }))}${nextStop ? " · " + esc(t("nextStop", { st: nextStop.name, t: hhmm(new Date(stopArrMs(nextStop) ?? stopDepMs(nextStop))) })) : ""}</span></div>
+          <div class="rbar" role="progressbar" aria-valuenow="${Math.round(frac * 100)}" aria-valuemin="0" aria-valuemax="100"><i style="width:${(frac * 100).toFixed(1)}%"></i></div>
+        </div>`;
+    }
+    hero.className = `hero ${lv}`;
+    hero.innerHTML = `
+      <div>
+        <div class="kicker">${isPinned ? esc(t("yourTrain")) + (enRoute(mine, now) ? " · " + esc(t("onTheWay")) : "") : esc(t("nextTrain"))}</div>
+        <div class="times">${mine.depDelay ? `<s>${hhmm(dep)}</s>${hhmm(depRt)}` : hhmm(dep)} → ${mine.arrDelay ? `<s>${hhmm(arr)}</s>${hhmm(arrRt)}` : hhmm(arr)}</div>
+        <div class="meta">${mine.products.map(p => `<span class="prod">${esc(p)}</span>`).join("")} ${mine.headsign && !mine.transfers ? esc(t("towards", { x: mine.headsign })) + " · " : ""}${esc(transfersText(mine.transfers))}${plat ? " · " + plat : ""}${durationHtml(mine)}${occHtml(mine)}</div>
+        ${why ? `<div class="why">${esc(why)}</div>` : ""}
+      </div>
+      <div>
+        <div class="big">${esc(statusText(mine))}</div>
+        <div class="countdown">${mine.gone || onBoard ? "" : esc(mins > 0 ? t("departsIn", { n: mins }) : mins > -2 ? t("departingNow")
+          : t("arrivesIn", { n: Math.max(0, Math.round((arrRt - now) / 60000)) }))}</div>
+      </div>
+      ${remainHtml}
+      ${altHtml}
+      ${isPinned && !mine.gone ? stopsHtml(mine, now) : ""}`;
+    const sd = hero.querySelector("details.stops");
+    if (sd) sd.ontoggle = () => { stopsOpen = sd.open; };
+  }
+
+  const alerts = [];
+  if (lastFetch && Date.now() - lastFetch > (cfg.interval * 2 + 30) * 1000) {
+    alerts.push(`<div class="alert warn">${esc(t("stale", { n: Math.round((Date.now() - lastFetch) / 60000) }))}</div>`);
+  }
+  for (const c of all) {
+    const lv = level(c);
+    // trains already on their way: alert only for the one you pinned (the one you are on)
+    if (lv === "ok" || (departed(c, now) && c.key !== pinnedKey)) continue;
+    const alt = bestAlternative(c, all, now);
+    alerts.push(`<div class="alert ${lv}">${lv === "bad" ? "⛔" : "⚠️"} ${esc(`${hhmm(new Date(c.dep))} ${c.products.join(", ")}`)} — ${esc(explain(c))}${alt ? `<br>→ ${esc(t("takeInstead", { x: altText(alt, c) }))}` : ""}</div>`);
+  }
+  $("alerts").innerHTML = alerts.join("");
+
+  const rowHtml = c => {
+    const lv = level(c), dep = new Date(c.dep), arr = new Date(c.arr);
+    const rtCls = c.maxDelay >= bigDelay() ? "vlate" : "late";
+    const platChange = c.rtPlatform && c.rtPlatform !== c.platform;
+    const onWay = enRoute(c, now);
+    const platHtml = c.platform ? " · " + (platChange
+      ? `<b class="late">${esc(t("pl", { p: c.rtPlatform }))}</b> <s>${esc(c.platform)}</s>` : esc(t("pl", { p: c.platform }))) : "";
+    const changeHtml = c.change ? ` · <b class="${c.change.state === "missed" ? "vlate" : "late"}">${esc(t("changeAt", { at: c.change.at, x: c.change.state === "missed" ? t("missed") : t("nMin", { n: c.change.left }) }))}</b>` : "";
+    return `<div class="row ${departed(c, now) && c.key !== pinnedKey ? "past" : ""} ${c.gone ? "gone" : ""} ${c.key === pinnedKey ? "pinned" : ""}" data-key="${esc(c.key)}" title="${esc(explain(c) || t("pinTitle"))}">
+      <div class="pin">${c.key === pinnedKey ? "📌" : "○"}</div>
+      <div class="t">${hhmm(dep)} → ${hhmm(arr)}${c.maxDelay ? `<span class="rt ${rtCls}">${hhmm(addMin(c.dep, c.depDelay))} → ${hhmm(addMin(c.arr, c.arrDelay))}</span>` : ""}</div>
+      <div>${c.products.map(p => `<span class="prod">${esc(p)}</span>`).join("")}${occHtml(c)}
+        <div class="sub">${onWay ? `<b>${esc(t("rowOnWay", { t: hhmm(new Date(arrRtMs(c))) }))}</b> · ` : arrived(c, now) ? `<b>${esc(t("arrived"))}</b> · ` : ""}${esc(transfersText(c.transfers))}${platHtml}${durationHtml(c)}${changeHtml}</div></div>
+      <span class="chip ${lv}">${esc(statusText(c))}</span>
+    </div>`;
+  };
+  // other trains already on the way: folded at the top, highlighted when one of them has a problem
+  const onWayList = all.filter(c => departed(c, now) && c.key !== pinnedKey);
+  const mainList = all.filter(c => !onWayList.includes(c));
+  const troubled = onWayList.filter(c => level(c) !== "ok");
+  const worst = troubled.some(c => level(c) === "bad") ? "bad" : troubled.length ? "warn" : "";
+  const issueText = troubled.map(c => `${hhmm(new Date(c.dep))} ${statusText(c)}`).join(", ");
+  $("list").innerHTML = !all.length
+    ? `<div class="empty">${esc(inFlight || again || !lastFetch ? t("loadingConn") : t("noConn"))}</div>`
+    : (onWayList.length ? `<details class="onway ${worst}" ${onWayOpen ? "open" : ""}>
+          <summary>${esc(t("onWayHeader", { n: onWayList.length }))} · ${troubled.length ? `${worst === "bad" ? "⛔" : "⚠️"} ${esc(t("withIssues", { n: troubled.length, x: issueText }))}` : esc(t("allFine"))}</summary>
+          ${onWayList.map(rowHtml).join("")}</details>` : "")
+      + (mainList.length ? mainList.map(rowHtml).join("") : `<div class="empty">${esc(t("noMoreDep"))}</div>`)
+      + (hiddenLater.length ? `<div class="more">${esc(mainList.length
+            ? t("noDirectAfter", { t: hhmm(new Date(mainList[mainList.length - 1].dep)) })
+            : t("noDirectNow"))} ${esc(t("laterWithChange", { x: hiddenLater.slice(0, 3).map(c => hhmm(new Date(c.dep))).join(", ") }))}
+          <button id="showAllBtn">${esc(t("showWithChange"))}</button></div>` : "");
+  const sab = $("showAllBtn");
+  if (sab) sab.onclick = e => { e.stopPropagation(); cfg.maxTransfers = ""; saveCfg(); paintDirectBtn(); refresh(); };
+  const det = $("list").querySelector("details.onway");
+  if (det) det.ontoggle = () => { onWayOpen = det.open; };
+
+  updateStatusLine();
+}
+
+function paintDir() {
+  const labels = { out: `${cfg.from} → ${cfg.to}`, back: `${cfg.to} → ${cfg.from}` };
+  for (const b of $("dirToggle").querySelectorAll("button")) {
+    b.textContent = labels[b.dataset.dir];
+    b.setAttribute("aria-selected", String(b.dataset.dir === curDir));
+  }
+  const manual = override && Date.now() < override.until;
+  const nb = nextBoundary(), nextAuto = labels[autoDir(new Date(nb))];
+  $("routeLabel").textContent = (manual
+    ? t("manualUntil", { t: hhmm(new Date(override.until)) })
+    : t("autoSwitch", { r: nextAuto, t: hhmm(new Date(nb)) }));
+}
+function switchDir() {
+  curDir = dirNow();
+  pinnedKey = null; save("cff.pinned", null);
+  current = []; gone = []; hiddenLater = []; lastFetch = null; fetchErr = null;
+  render(); refresh();
+}
+$("dirToggle").onclick = e => {
+  const b = e.target.closest("button[data-dir]"); if (!b) return;
+  const d = b.dataset.dir;
+  // choosing what the clock would pick anyway = back to automatic
+  override = d === autoDir() ? null : { dir: d, until: nextBoundary() };
+  save("cff.dirOverride", override);
+  if (d !== curDir) switchDir(); else paintDir();
+};
+
+function updateStatusLine() {
+  const el = $("statusLine");
+  const secs = Math.max(0, Math.round((nextAt - Date.now()) / 1000));
+  const base = inFlight ? t("refreshing") : lastFetch ? t("updated", { t: `${hhmm(lastFetch)}:${pad(lastFetch.getSeconds())}`, n: secs }) : t("loading");
+  el.className = fetchErr ? "err" : "";
+  el.textContent = fetchErr ? `${t(fetchErr.key, { e: fetchErr.e })} ${t("lastKnown")} ${base}` : base;
+}
+
+// --- keep data fresh after sleep / background / network loss --------------------------
+setInterval(() => {
+  // timers are throttled in background tabs and frozen during sleep: catch up when overdue
+  if (dirNow() !== curDir) return switchDir(); // e.g. noon passed with the tab open
+  if (!inFlight && nextAt && Date.now() > nextAt + 5000) refresh();
+  updateStatusLine();
+}, 1000);
+// move the "where is my train" marker between two data refreshes
+setInterval(() => { if (pinnedKey && !inFlight) render(); }, 20000);
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible" && (!lastFetch || Date.now() - lastFetch > 20000)) refresh();
+});
+window.addEventListener("focus", () => { if (!lastFetch || Date.now() - lastFetch > 20000) refresh(); });
+window.addEventListener("online", refresh);
+window.addEventListener("offline", () => { fetchErr = { key: "offline" }; updateStatusLine(); });
+
+// --- notifications ---------------------------------------------------------------
+function beep() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    [0, 0.25].forEach(s => {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.frequency.value = 880; o.connect(g); g.connect(ctx.destination);
+      g.gain.setValueAtTime(0.2, ctx.currentTime + s); g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + s + 0.2);
+      o.start(ctx.currentTime + s); o.stop(ctx.currentTime + s + 0.2);
+    });
+  } catch {}
+}
+const appTitle = () => `${t("logo")} ${t("appName")}`;
+function maybeNotify() {
+  const now = Date.now();
+  const all = [...current, ...gone];
+  const targets = pinnedKey ? all.filter(c => c.key === pinnedKey && !arrived(c, new Date()))
+    : all.filter(c => { const d = new Date(c.dep).getTime(); return d > now - 5 * 60000 && d < now + 120 * 60000; });
+  document.title = (targets.some(c => level(c) !== "ok") ? "⚠️ " : "") + appTitle();
+  if (!notifyOn) return;
+  for (const c of targets) {
+    const lv = level(c);
+    if (lv === "ok") continue;
+    // notify again only when the situation gets worse
+    const tag = `${c.key}|${c.gone ? c.goneKind : ""}|${c.change?.state || ""}|${Math.floor(c.maxDelay / 5)}`;
+    if (notified.has(tag)) continue;
+    notified.add(tag); save("cff.notified", [...notified].slice(-200));
+    const title = `${lv === "bad" ? "⛔" : "⚠️"} ${hhmm(new Date(c.dep))} ${c.products.join(", ")}: ${statusText(c)}`;
+    beep();
+    if ("Notification" in window && Notification.permission === "granted") {
+      const alt = bestAlternative(c, all, new Date());
+      new Notification(title, { body: explain(c) + (alt ? `\n${t("takeInstead", { x: altText(alt, c) })}` : ""), tag: c.key, requireInteraction: lv === "bad" });
+    }
+  }
+}
+function paintNotifBtn() {
+  const desktop = "Notification" in window && Notification.permission === "granted";
+  $("notifBtn").textContent = t(!notifyOn ? "alertsOff" : desktop ? "alertsOn" : "alertsSound");
+  $("notifBtn").title = t(notifyOn && !desktop ? "alertsBlocked" : "alertsTitle");
+}
+function paintDirectBtn() {
+  const on = cfg.maxTransfers === "0";
+  $("directBtn").textContent = (on ? "✓ " : "") + t("directOnly");
+  $("directBtn").title = t("directTitle");
+  $("directBtn").classList.toggle("on", on);
+  $("sTransfers").value = cfg.maxTransfers;
+}
+// static texts + language buttons
+function applyLang() {
+  document.documentElement.lang = lang;
+  for (const el of document.querySelectorAll("[data-i18n]")) el.textContent = t(el.dataset.i18n);
+  for (const el of document.querySelectorAll("[data-i18n-ph]")) el.placeholder = t(el.dataset.i18nPh);
+  for (const el of document.querySelectorAll("[data-i18n-html]")) el.innerHTML = t(el.dataset.i18nHtml); // our own trusted strings
+  $("logo").textContent = t("logo");
+  $("appName").textContent = t("appName");
+  for (const b of $("langToggle").querySelectorAll("button")) b.setAttribute("aria-pressed", String(b.dataset.lang === lang));
+  paintNotifBtn(); paintDirectBtn(); render(); maybeNotify();
+}
+$("langToggle").onclick = e => {
+  const b = e.target.closest("button[data-lang]"); if (!b) return;
+  lang = b.dataset.lang; cfg.lang = lang; saveCfg(); applyLang();
+};
+$("directBtn").onclick = () => {
+  cfg.maxTransfers = cfg.maxTransfers === "0" ? "" : "0";
+  saveCfg(); paintDirectBtn(); refresh();
+};
+$("notifBtn").onclick = async () => {
+  notifyOn = !notifyOn;
+  if (notifyOn && "Notification" in window && Notification.permission === "default") {
+    try { await Notification.requestPermission(); } catch {}
+  }
+  if (notifyOn) beep();
+  save("cff.notify", notifyOn); paintNotifBtn(); maybeNotify();
+};
+
+// --- interactions --------------------------------------------------------------------
+$("refreshBtn").onclick = refresh;
+$("hero").onclick = e => {
+  if (e.target.closest("#stopsToggle")) { showAllStops = !showAllStops; render(); return; }
+  const b = e.target.closest("button[data-pin]"); if (!b) return;
+  pinnedKey = b.dataset.pin; save("cff.pinned", pinnedKey); render(); maybeNotify();
+};
+$("list").onclick = e => {
+  const row = e.target.closest(".row"); if (!row) return;
+  pinnedKey = pinnedKey === row.dataset.key ? null : row.dataset.key;
+  save("cff.pinned", pinnedKey); render(); maybeNotify();
+};
+const fields = { sSwitch: "switchAt", sMin: "minDelay", sChange: "minChange", sTransfers: "maxTransfers", sInterval: "interval" };
+const routeFields = ["from", "to", "switchAt"];
+for (const [id, k] of Object.entries(fields)) {
+  $(id).value = cfg[k];
+  $(id).onchange = () => {
+    let v = $(id).value;
+    if (k === "minDelay") v = Math.max(1, Number(v) || DEFAULTS.minDelay);
+    if (k === "minChange") v = v === "" || isNaN(Number(v)) ? DEFAULTS.minChange : Math.max(0, Number(v));
+    if (k === "interval") v = Math.max(30, Number(v) || DEFAULTS.interval);
+    if (routeFields.includes(k) && !v) v = DEFAULTS[k];
+    cfg[k] = v; saveCfg();
+    if (k === "maxTransfers") paintDirectBtn();
+    if (routeFields.includes(k)) switchDir(); else refresh();
+  };
+}
+
+// long-trip limits (amber and red), typed as h:mm (e.g. 1:45), stored in minutes
+const fmtHmm = m => `${Math.floor(m / 60)}:${pad(m % 60)}`;
+for (const [id, k] of [["sLong", "longTrip"], ["sVeryLong", "veryLongTrip"]]) {
+  $(id).value = fmtHmm(Number(cfg[k]));
+  $(id).onchange = () => {
+    const m = $(id).value.trim().match(/^(\d{1,2})(?::|h)?(\d{2})?$/);
+    const mins = m ? Number(m[1]) * 60 + Number(m[2] || 0) : NaN;
+    cfg[k] = mins >= 30 && mins <= 600 ? mins : DEFAULTS[k];
+    $(id).value = fmtHmm(cfg[k]);
+    saveCfg(); render();
+  };
+}
+
+// --- settings link: saving the settings = updating the page address ------------------------
+function settingsUrl() {
+  const q = new URLSearchParams();
+  for (const [param, k] of Object.entries(URL_KEYS)) {
+    if (cfg[k] === DEFAULTS[k] || cfg[k] == null) continue; // only what differs from the defaults
+    q.set(param, k === "longTrip" || k === "veryLongTrip" ? fmtHmm(Number(cfg[k])) : k === "maxTransfers" && cfg[k] === "" ? "any" : String(cfg[k]));
+  }
+  if (cfg.lang) q.set("lang", cfg.lang);
+  const base = location.href.split(/[?#]/)[0], qs = q.toString();
+  return qs ? `${base}?${qs}` : base;
+}
+function updateUrl() {
+  const url = settingsUrl();
+  $("linkOut").value = url;
+  try { if (url !== location.href) history.replaceState(null, "", url); } catch {} // not allowed for local files in some browsers
+}
+function saveCfg() { save("cff.cfg", cfg); updateUrl(); }
+$("copyLinkBtn").onclick = async () => {
+  const url = settingsUrl(), msg = (key, err) => { $("ioMsg").textContent = t(key); $("ioMsg").className = "io-msg" + (err ? " err" : ""); };
+  try { await navigator.clipboard.writeText(url); msg("copied"); }
+  catch {
+    $("linkOut").focus(); $("linkOut").select();
+    try { document.execCommand("copy") ? msg("copied") : msg("copyFail", true); } catch { msg("copyFail", true); }
+  }
+};
+$("linkOut").onfocus = () => $("linkOut").select();
+
+// --- station search with suggestions (transport.opendata.ch/v1/locations) -------------------
+const STATION_ICON = { train: "🚆", tram: "🚊", bus: "🚌", ship: "⛴️", cableway: "🚡" };
+function setupStationSearch(id, key) {
+  const input = $(id), list = $(id + "List");
+  let items = [], active = -1, seq = 0, debounce = null;
+  input.value = cfg[key];
+  const close = () => { list.hidden = true; active = -1; };
+  const paint = () => {
+    list.innerHTML = items.length
+      ? items.map((st, i) => `<li data-i="${i}" class="${i === active ? "on" : ""}"><span>${STATION_ICON[st.icon] || "📍"}</span>${esc(st.name)}</li>`).join("")
+      : `<li class="none">${esc(t(input.value.trim().length < 2 ? "searchHint" : "noStation"))}</li>`;
+    list.hidden = false;
+  };
+  const choose = st => {
+    close();
+    if (!st) { input.value = cfg[key]; return; }    // nothing chosen: keep the current station
+    input.value = st.name;
+    if (st.name === cfg[key]) return;
+    cfg[key] = st.name; saveCfg(); switchDir();
+  };
+  input.addEventListener("input", () => {
+    clearTimeout(debounce);
+    const q = input.value.trim();
+    if (q.length < 2) { items = []; paint(); return; }
+    debounce = setTimeout(async () => {
+      const my = ++seq;
+      try {
+        const res = await fetch(`${BASE}/locations?${new URLSearchParams({ query: q, type: "station" })}`);
+        const data = await res.json();
+        if (my !== seq) return; // an older answer arriving late
+        // smart order: train stations first, then tram, bus…, keeping the API's relevance order inside each group
+        const rank = { train: 0, tram: 1, bus: 2 };
+        items = (data.stations || []).filter(st => st.id && st.name)
+          .map((st, i) => ({ name: st.name, icon: st.icon, i }))
+          .sort((a, b) => (rank[a.icon] ?? 3) - (rank[b.icon] ?? 3) || a.i - b.i).slice(0, 8);
+        active = items.length ? 0 : -1; paint();
+      } catch { items = []; paint(); }
+    }, 250);
+  });
+  input.addEventListener("keydown", e => {
+    if (list.hidden) return;
+    if (e.key === "ArrowDown") { e.preventDefault(); active = Math.min(items.length - 1, active + 1); paint(); }
+    else if (e.key === "ArrowUp") { e.preventDefault(); active = Math.max(0, active - 1); paint(); }
+    else if (e.key === "Enter") { e.preventDefault(); choose(items[active] || items[0]); }
+    else if (e.key === "Escape") { e.preventDefault(); choose(null); }
+  });
+  list.addEventListener("mousedown", e => {
+    const li = e.target.closest("li[data-i]"); if (!li) return;
+    e.preventDefault(); choose(items[Number(li.dataset.i)]);
+  });
+  input.addEventListener("focus", () => input.select());
+  input.addEventListener("blur", () => setTimeout(() => { if (!list.hidden) choose(null); }, 150));
+}
+setupStationSearch("sFrom", "from");
+setupStationSearch("sTo", "to");
+
+applyLang();
+updateUrl();
+refresh();
+</script>
+</body>
+</html>

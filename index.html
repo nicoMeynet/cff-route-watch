@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CFF Route Watch</title>
+<!-- Sends visitors to the dashboard, keeping the settings in the link (?from=…&to=…) -->
+<script>location.replace("cff_dashboard.html" + location.search + location.hash);</script>
+<noscript><meta http-equiv="refresh" content="0; url=cff_dashboard.html"></noscript>
+<style>
+  :root { --bg: #f4f5f7; --text: #1c1f24; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #111317; --text: #e8eaed; } }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.5 system-ui, sans-serif; padding: 24px 16px; }
+  a { color: inherit; }
+</style>
+</head>
+<body>
+  <p><a href="cff_dashboard.html">CFF Route Watch</a></p>
+</body>
+</html>
