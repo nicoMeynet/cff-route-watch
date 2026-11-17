@@ -17,7 +17,7 @@ your trains while it is open. To use another route, add it to the address, for e
 in Settings and copy the link (see [Settings in the link](#settings-in-the-link)).
 
 You can also download `cff_dashboard.html` and double-click it. Opened as a local file, the
-browser may block desktop pop-up notifications: you still get a beep, the on-page alerts and a
+browser may block desktop pop-up notifications: you still get the on-page alerts and a
 ⚠️ in the tab title. The online version doesn't have this limit.
 
 The online page is published with GitHub Pages from the `main` branch of this repository: any
@@ -123,7 +123,7 @@ its own departure board or as SBB.
 
 ## Alerts and notifications
 
-Click **🔔 Alerts** to turn on the beep and desktop notifications. You're notified again only
+Click **🔔 Alerts** to turn on desktop notifications (there is no sound). You're notified again only
 when the situation gets worse (for example every extra 5 minutes of delay). Notifications
 include the suggested alternative. With a train pinned, only that train triggers alerts.
 Otherwise, any train leaving in the next 2 hours does.

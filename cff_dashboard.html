@@ -285,9 +285,9 @@ const I18N = {
   en: {
     logo: "SBB", appName: "Route Watch",
     directOnly: "Direct only", directTitle: "Show only trains without a change",
-    alertsOff: "🔕 Alerts off", alertsOn: "🔔 Alerts on", alertsSound: "🔔 Alerts on (sound only)",
-    alertsTitle: "Desktop notification + sound when your train is late or cancelled",
-    alertsBlocked: "Desktop notifications are blocked for this page (common when opened as a local file). You'll still get a beep and a ⚠️ in the tab title.",
+    alertsOff: "🔕 Alerts off", alertsOn: "🔔 Alerts on", alertsSound: "🔔 Alerts on (page only)",
+    alertsTitle: "Desktop notification when your train is late or cancelled",
+    alertsBlocked: "Desktop notifications are blocked for this page (common when opened as a local file). You'll still get the alerts on the page and a ⚠️ in the tab title.",
     refresh: "↻ Refresh", loading: "Loading…", loadingConn: "Loading connections…", refreshing: "Refreshing…",
     hint: "Click a connection to pin it as <b>your train</b>. Alerts then focus on that train, and it stays monitored after departure until it reaches your destination. Other trains already on the way are folded at the top of the list (highlighted if one has a problem). Bars show the expected occupancy per class (green low · amber medium · red high).",
     settings: "Settings", stA: "Station A (e.g. work)", stB: "Station B (e.g. home)",
@@ -325,9 +325,9 @@ const I18N = {
   fr: {
     logo: "CFF", appName: "Suivi de trajet",
     directOnly: "Directs uniquement", directTitle: "Afficher uniquement les trains sans changement",
-    alertsOff: "🔕 Alertes désactivées", alertsOn: "🔔 Alertes activées", alertsSound: "🔔 Alertes activées (son seul)",
-    alertsTitle: "Notification et son quand votre train est en retard ou supprimé",
-    alertsBlocked: "Les notifications sont bloquées pour cette page (fréquent quand elle est ouverte comme fichier local). Vous aurez quand même un bip et un ⚠️ dans le titre de l’onglet.",
+    alertsOff: "🔕 Alertes désactivées", alertsOn: "🔔 Alertes activées", alertsSound: "🔔 Alertes activées (page seule)",
+    alertsTitle: "Notification quand votre train est en retard ou supprimé",
+    alertsBlocked: "Les notifications sont bloquées pour cette page (fréquent quand elle est ouverte comme fichier local). Vous aurez quand même les alertes sur la page et un ⚠️ dans le titre de l’onglet.",
     refresh: "↻ Actualiser", loading: "Chargement…", loadingConn: "Chargement des trains…", refreshing: "Actualisation…",
     hint: "Cliquez sur un train pour l’épingler comme <b>votre train</b>. Les alertes se concentrent alors sur ce train, et il reste suivi après le départ jusqu’à votre destination. Les autres trains déjà en route sont regroupés en haut de la liste (mis en évidence en cas de problème). Les barres indiquent l’occupation prévue par classe (vert faible · orange moyenne · rouge forte).",
     settings: "Réglages", stA: "Gare A (p. ex. travail)", stB: "Gare B (p. ex. domicile)",
@@ -365,9 +365,9 @@ const I18N = {
   de: {
     logo: "SBB", appName: "Streckenwächter",
     directOnly: "Nur direkt", directTitle: "Nur Züge ohne Umsteigen anzeigen",
-    alertsOff: "🔕 Alarme aus", alertsOn: "🔔 Alarme an", alertsSound: "🔔 Alarme an (nur Ton)",
-    alertsTitle: "Benachrichtigung und Ton, wenn Ihr Zug verspätet ist oder ausfällt",
-    alertsBlocked: "Desktop-Benachrichtigungen sind für diese Seite blockiert (häufig bei lokal geöffneten Dateien). Sie erhalten trotzdem einen Signalton und ein ⚠️ im Tab-Titel.",
+    alertsOff: "🔕 Alarme aus", alertsOn: "🔔 Alarme an", alertsSound: "🔔 Alarme an (nur Seite)",
+    alertsTitle: "Benachrichtigung, wenn Ihr Zug verspätet ist oder ausfällt",
+    alertsBlocked: "Desktop-Benachrichtigungen sind für diese Seite blockiert (häufig bei lokal geöffneten Dateien). Sie erhalten trotzdem die Hinweise auf der Seite und ein ⚠️ im Tab-Titel.",
     refresh: "↻ Aktualisieren", loading: "Wird geladen…", loadingConn: "Verbindungen werden geladen…", refreshing: "Wird aktualisiert…",
     hint: "Klicken Sie auf eine Verbindung, um sie als <b>Ihren Zug</b> anzuheften. Die Alarme betreffen dann diesen Zug, und er wird nach der Abfahrt bis zum Ziel weiter überwacht. Andere bereits fahrende Züge sind oben in der Liste zusammengeklappt (hervorgehoben bei Problemen). Die Balken zeigen die erwartete Auslastung pro Klasse (grün gering · orange mittel · rot hoch).",
     settings: "Einstellungen", stA: "Bahnhof A (z. B. Arbeit)", stB: "Bahnhof B (z. B. Zuhause)",
@@ -1248,17 +1248,6 @@ window.addEventListener("online", refresh);
 window.addEventListener("offline", () => { fetchErr = { key: "offline" }; updateStatusLine(); });
 
 // --- notifications ---------------------------------------------------------------
-function beep() {
-  try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    [0, 0.25].forEach(s => {
-      const o = ctx.createOscillator(), g = ctx.createGain();
-      o.frequency.value = 880; o.connect(g); g.connect(ctx.destination);
-      g.gain.setValueAtTime(0.2, ctx.currentTime + s); g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + s + 0.2);
-      o.start(ctx.currentTime + s); o.stop(ctx.currentTime + s + 0.2);
-    });
-  } catch {}
-}
 const appTitle = () => `${t("logo")} ${t("appName")}`;
 function maybeNotify() {
   const now = Date.now();
@@ -1275,7 +1264,6 @@ function maybeNotify() {
     if (notified.has(tag)) continue;
     notified.add(tag); save("cff.notified", [...notified].slice(-200));
     const title = `${lv === "bad" ? "⛔" : "⚠️"} ${hhmm(new Date(c.dep))} ${c.products.join(", ")}: ${statusText(c)}`;
-    beep();
     if ("Notification" in window && Notification.permission === "granted") {
       const alt = bestAlternative(c, all, new Date());
       new Notification(title, { body: explain(c) + (alt ? `\n${t("takeInstead", { x: altText(alt, c) })}` : ""), tag: c.key, requireInteraction: lv === "bad" });
@@ -1318,7 +1306,6 @@ $("notifBtn").onclick = async () => {
   if (notifyOn && "Notification" in window && Notification.permission === "default") {
     try { await Notification.requestPermission(); } catch {}
   }
-  if (notifyOn) beep();
   save("cff.notify", notifyOn); paintNotifBtn(); maybeNotify();
 };
 
