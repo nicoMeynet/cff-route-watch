@@ -6,14 +6,22 @@ Watches the train connections between **Lancy-Pont-Rouge** and **Aigle** using t
 
 Everything is in one file, `cff_dashboard.html`: no install, no Python, no server.
 
+**Open it online: https://nicomeynet.github.io/cff-route-watch/**
+
 ## Getting started
 
-Double-click `cff_dashboard.html`. It opens in your browser, loads live SBB/CFF data and
-refreshes every 60 seconds. Keep the tab open: the page only checks your trains while it is open.
+Open **https://nicomeynet.github.io/cff-route-watch/** in your browser, on a computer or a phone.
+It loads live SBB/CFF data and refreshes every 60 seconds. Keep the tab open: the page only checks
+your trains while it is open. To use another route, add it to the address, for example
+`https://nicomeynet.github.io/cff-route-watch/?from=Genève&to=Lausanne`, or pick the stations
+in Settings and copy the link (see [Settings in the link](#settings-in-the-link)).
 
-Opened as a local file, the browser may block desktop pop-up notifications. You still get a
-beep, the on-page alerts and a ⚠️ in the tab title. For pop-up notifications (and to open it on
-your phone), put the file on any HTTPS web space, such as GitHub Pages or SharePoint.
+You can also download `cff_dashboard.html` and double-click it. Opened as a local file, the
+browser may block desktop pop-up notifications: you still get a beep, the on-page alerts and a
+⚠️ in the tab title. The online version doesn't have this limit.
+
+The online page is published with GitHub Pages from the `main` branch of this repository: any
+change pushed to `main` is online within a minute or two.
 
 ## What it shows
 
