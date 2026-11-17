@@ -1217,6 +1217,19 @@ document.addEventListener("click", e => {
 document.addEventListener("keydown", e => { if (e.key === "Escape") $("quip").hidden = true; });
 window.addEventListener("scroll", () => { $("quip").hidden = true; }, { passive: true });
 
+// Badge on the app icon in the taskbar (installed app only): the delay in minutes of your train
+// (the pinned one, or the next one), or a mark when it is cancelled, skips your stop or a change is
+// missed. Nothing when all is fine, or when alerts are off.
+let badgeShown = null;
+function updateBadge(c) {
+  if (!("setAppBadge" in navigator)) return;
+  let v = null; // null = no badge, 0 = a mark without number, n = minutes late
+  if (notifyOn && c && level(c) !== "ok") v = tripBroken(c) || c.noLive ? 0 : c.maxDelay || 0;
+  if (v === badgeShown) return;
+  badgeShown = v;
+  (v === null ? navigator.clearAppBadge() : v ? navigator.setAppBadge(v) : navigator.setAppBadge()).catch(() => {});
+}
+
 // --- rendering ------------------------------------------------------------------
 function render() {
   paintDir();
@@ -1228,6 +1241,7 @@ function render() {
   if (mine && arrived(mine, now, 2)) { mine = null; pinnedKey = null; save("cff.pinned", null); } // you're there: unpin
   const isPinned = !!mine;
   if (!mine) mine = all.find(c => !departed(c, now));
+  updateBadge(mine);
   const hero = $("hero");
   if (!mine) {
     hero.className = "hero";
@@ -1462,7 +1476,7 @@ $("sNotify").onchange = async () => {
   notifyOn = $("sNotify").checked;
   save("cff.alerts", notifyOn);
   await askNotifyPermission();
-  paintNotifBtn(); maybeNotify();
+  paintNotifBtn(); render(); maybeNotify();
 };
 
 // --- interactions --------------------------------------------------------------------

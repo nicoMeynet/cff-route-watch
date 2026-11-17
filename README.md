@@ -39,6 +39,11 @@ pushed online is used the next time it opens. Like the browser tab, it only chec
 while it is open (it can stay minimised). If the network is down, it still opens with the last
 saved copy of the page. Clicking a notification brings the app back to the front.
 
+**Badge on the app icon:** when the app is installed, its icon in the taskbar shows a badge for
+your train (the pinned one, or the next one): the **delay in minutes** (for example **7**), or a
+**mark** when it is cancelled, skips your stop, a change is missed or there is no live data.
+No badge when all is fine or when alerts are off.
+
 The online page is published with GitHub Pages from the `main` branch of this repository: any
 change pushed to `main` is online within a minute or two.
 
