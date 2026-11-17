@@ -43,6 +43,13 @@ change pushed to `main` is online within a minute or two.
   departed yet, at a station, or between two stations with a progress bar. The position is
   *estimated* from the timetable and live delays (the API has no GPS data) and moves every
   20 seconds.
+- **Trip line:** under each time in the list, the trip is drawn as a line, spaced by the
+  timetable, with a dot where you get on, **one dot per change of train** and one where you get
+  off. Each train is one coloured part of the line. Green: fine. Amber: late or tight change.
+  Red: a problem there (train cancelled, stop not served, change missed, very late). Grey: no
+  longer reachable. A thin grey part is the wait at a change, a dotted part a walk between two
+  stations, and 🚆 shows where a train on the way is now. Hover a dot to see the station, the
+  time and the time left to change.
 - **Already on the way:** other trains that have left but not arrived are folded at the top of
   the list. The folded header turns amber or red when one of them has a problem.
 - **Direct only** (on by default): hides trains with a change. When the last direct train of
