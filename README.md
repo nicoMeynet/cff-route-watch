@@ -69,7 +69,8 @@ change pushed to `main` is online within a minute or two.
   Red: a problem there (train cancelled, stop not served, change missed, very late). Grey: no
   longer reachable. Between two trains, a thin grey part with **⏱ 4′** is the wait at the
   station (amber when it is longer than 20 min, set in Settings), and a dotted part with **🚶 5′** a walk to another station (amber above 10 min), with the minutes left to
-  change (live). 🚆 shows where a train on the way is now. The top card has a small legend.
+  change (live). For a train on the way, the part already travelled is in full colour, the rest is
+  paler, and a glowing dot shows where the train is now. The top card has a small legend.
   Hover a dot or a ⏱/🚶 label for the station, the time and the details.
   In the list, each long wait or walk is also written in amber next to the trip details,
   for example "⏱ 25 min Bern".

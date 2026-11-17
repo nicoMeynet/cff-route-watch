@@ -101,7 +101,17 @@
   .track .dot.warn { border-color: var(--warn); }
   .track .dot.bad { border-color: var(--bad); background: var(--bad); }
   .track .dot.off { border-color: var(--line); }
-  .track .now { position: absolute; top: -9px; font-size: 13px; transform: translateX(-50%); pointer-events: none; }
+  .track .tl { position: absolute; inset: 0; pointer-events: none; }
+  .track .tl.todo { opacity: .35; }
+  /* the train: a white dot ringed with the trip colour, with a soft pulsing halo */
+  .track .now { position: absolute; z-index: 2; top: 3px; width: 11px; height: 11px; margin-left: -5.5px; border-radius: 50%;
+    background: #fff; border: 2.5px solid currentColor; color: var(--ok); animation: now-pulse 2s ease-out infinite; }
+  .track .now.warn { color: var(--warn); } .track .now.bad { color: var(--bad); }
+  @keyframes now-pulse {
+    0% { box-shadow: 0 0 0 0 color-mix(in srgb, currentColor 60%, transparent); }
+    70%, 100% { box-shadow: 0 0 0 8px transparent; }
+  }
+  @media (prefers-reduced-motion: reduce) { .track .now { animation: none; box-shadow: 0 0 0 3px color-mix(in srgb, currentColor 35%, transparent); } }
   .row.gone .track { text-decoration: none; }
   .track.labelled { height: 30px; } .track.low2 { height: 42px; }
   .track .slab.low { top: 28px; }
@@ -121,7 +131,7 @@
   .hero .hero-track .seg { top: 8px; height: 5px; border-radius: 3px; }
   .hero .hero-track .seg.wait, .hero .hero-track .seg.walk { top: 9.5px; height: 2px; }
   .hero .hero-track .dot.big { top: 2px; width: 16px; height: 16px; margin-left: -8px; }
-  .hero .hero-track .now { top: -10px; font-size: 16px; }
+  .hero .hero-track .now { top: 3.5px; width: 14px; height: 14px; margin-left: -7px; border-width: 3px; }
   .row.pinned .pin { color: var(--pin); }
   .row.pinned { box-shadow: inset 4px 0 0 var(--pin); }
   .t { font-variant-numeric: tabular-nums; font-weight: 600; font-size: 17px; }
@@ -189,14 +199,20 @@
   .stop.end .sname { font-weight: 700; }
   .stop.passed { color: var(--muted); }
   .stop.passed .dot { background: var(--muted); }
-  .stop.here .dot, .stop.moving .dot { width: 24px; height: 24px; border: 0; background: transparent; font-size: 18px; }
+  .stop.here .dot, .stop.moving .dot { width: 24px; height: 24px; border: 0; background: transparent; }
+  /* the train in the stops list: the same glowing dot as on the trip line */
+  .now-dot { display: block; width: 13px; height: 13px; border-radius: 50%; background: #fff; border: 3px solid currentColor;
+    color: var(--ok); animation: now-pulse 2s ease-out infinite; }
+  .hero.warn .now-dot { color: var(--warn); } .hero.bad .now-dot { color: var(--bad); }
+  @media (prefers-reduced-motion: reduce) { .now-dot { animation: none; } }
+  .hero.warn .stop .bar i { background: var(--warn); } .hero.bad .stop .bar i { background: var(--bad); }
   .stop.here .sname { font-weight: 700; }
   .stop .stime { white-space: nowrap; } .stop .splat { color: var(--muted); font-size: 12px; text-align: right; }
   .stop.earlier button { border: 0; background: none; padding: 0; color: var(--pin); font-size: 13px; font-weight: 600; cursor: pointer; }
   .stop.earlier .dot { border-style: dotted; }
   .stop .chg { font-size: 12px; font-weight: 600; color: var(--pin); margin-left: 4px; }
   .stop .bar { display: block; height: 4px; border-radius: 2px; background: var(--line); max-width: 220px; }
-  .stop .bar i { display: block; height: 100%; border-radius: 2px; background: var(--pin); }
+  .stop .bar i { display: block; height: 100%; border-radius: 2px; background: var(--ok); }
   .more { padding: 12px 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: 14px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
   .more button { font-size: 13px; padding: 4px 10px; }
   details.onway { border-bottom: 1px solid var(--line); }
@@ -695,11 +711,11 @@ function stopsHtml(c, now) {
     const plat = s.rtPlatform && s.rtPlatform !== s.platform
       ? `<b class="late">${esc(t("pl", { p: s.rtPlatform }))}</b>` : s.platform ? esc(t("pl", { p: s.platform })) : "";
     const row = `<li class="stop ${passed ? "passed" : ""} ${here ? "here" : ""} ${first || last ? "end" : ""}">
-        <span class="dot">${here ? "🚆" : ""}</span>
+        <span class="dot">${here ? '<i class="now-dot"></i>' : ""}</span>
         <span class="sname">${esc(s.name)}${s.changeTo ? ` <span class="chg">${esc(t("changeTo", { x: s.changeTo }))}</span>` : ""}</span>
         <span class="stime">${times}</span><span class="splat">${plat}</span></li>`;
     const between = pos && pos.kind === "between" && pos.i === i
-      ? `<li class="stop moving"><span class="dot">🚆</span><span class="sname"><span class="bar"><i style="width:${Math.round(pos.frac * 100)}%"></i></span></span><span class="stime"></span><span class="splat"></span></li>` : "";
+      ? `<li class="stop moving"><span class="dot"><i class="now-dot"></i></span><span class="sname"><span class="bar"><i style="width:${Math.round(pos.frac * 100)}%"></i></span></span><span class="stime"></span><span class="splat"></span></li>` : "";
     return row + between;
   }).join("");
   return `<details class="stops" ${stopsOpen ? "open" : ""}>
@@ -1095,16 +1111,19 @@ function trackHtml(c, now, big = false) {
     if (walk) dot(next.dep, lv, `${next.from} · ${info}`);
   });
   // where the train is now, for trains already on the way (estimated, see position())
-  let nowHtml = "";
+  // the part already travelled stays in full colour, what is left is paler, and a glowing dot shows the train
+  let lineHtml = parts.join(""), nowHtml = "";
   if (enRoute(c, now) && !c.gone) {
     const st = c.stops || [], pos = position(c, now);
     const sx = k => st[k] ? x(st[k].dep && k < st.length - 1 ? st[k].dep : st[k].arr) : 0;
     if (pos && pos.kind !== "before") {
-      const px = pos.kind === "between" ? sx(pos.i) + (sx(pos.i + 1) - sx(pos.i)) * pos.frac : sx(pos.i);
-      nowHtml = `<span class="now" style="left:${px.toFixed(2)}%">🚆</span>`;
+      const px = Math.min(100, Math.max(0, pos.kind === "between" ? sx(pos.i) + (sx(pos.i + 1) - sx(pos.i)) * pos.frac : sx(pos.i)));
+      lineHtml = `<div class="tl" style="clip-path:inset(0 ${(100 - px).toFixed(2)}% 0 0)">${lineHtml}</div>`
+        + `<div class="tl todo" style="clip-path:inset(0 0 0 ${px.toFixed(2)}%)">${lineHtml}</div>`;
+      nowHtml = `<span class="now ${level(c)}" style="left:${px.toFixed(2)}%" title="${esc(positionText(c, now))}"></span>`;
     }
   }
-  return `<div class="track${big ? " hero-track" : ""}${labels.length ? " labelled" : ""}${lowLabels ? " low2" : ""}">${parts.join("")}${dots.join("")}${labels.join("")}${nowHtml}</div>`
+  return `<div class="track${big ? " hero-track" : ""}${labels.length ? " labelled" : ""}${lowLabels ? " low2" : ""}">${lineHtml}${dots.join("")}${labels.join("")}${nowHtml}</div>`
     + (big ? `<div class="tlegend"><span><i class="lg-train"></i>${esc(t("lgTrain"))}</span><span><i class="lg-dot"></i>${esc(t("lgChange"))}</span><span>⏱ ${esc(t("lgWait"))}</span><span>🚶 ${esc(t("lgWalk"))}</span><span><i class="lg-train ok"></i>${esc(t("lgOk"))} <i class="lg-train warn"></i>${esc(t("lgLate"))} <i class="lg-train bad"></i>${esc(t("lgBad"))} <i class="lg-train off"></i>${esc(t("lgOff"))}</span></div>` : "");
 }
 
