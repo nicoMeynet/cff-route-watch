@@ -89,6 +89,7 @@
   .track .seg.warn { background: var(--warn); } .track .seg.bad { background: var(--bad); }
   .track .seg.off { background: var(--line); }
   .track .seg.wait { background: var(--line); height: 2px; top: 7.5px; }
+  .track .seg.wait.long { background: var(--warn); }
   .track .seg.walk { background: repeating-linear-gradient(90deg, var(--muted) 0 3px, transparent 3px 6px); height: 2px; top: 7.5px; }
   .track .dot { position: absolute; top: 4px; width: 9px; height: 9px; margin-left: -4.5px; border-radius: 50%;
     background: var(--card); border: 2px solid var(--ok); }
@@ -139,6 +140,7 @@
   .legs .leg.bad .lname b { color: var(--bad); }
   .legs .leg.off { color: var(--muted); } .legs .leg.off .lname { text-decoration: line-through; }
   .legs .lchg { padding: 0 0 0 26px; font-size: 12px; color: var(--muted); }
+  .legs .lchg.long { color: var(--warn); }
   .legs .lchg.missed { color: var(--bad); font-weight: 600; } .legs .lchg.risk { color: var(--warn); font-weight: 600; }
   .chip.ok { background: var(--ok-bg); color: var(--ok); }
   .chip.warn { background: var(--warn-bg); color: var(--warn); }
@@ -204,6 +206,8 @@
 
   details.settings { margin-top: 18px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 12px 16px; }
   details.settings summary { cursor: pointer; font-weight: 600; }
+  .alertfield { grid-column: 1 / -1; }
+  .alertfield .check { display: flex; align-items: center; gap: 6px; font-weight: 500; }
   .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-top: 12px; }
   label { display: grid; gap: 4px; font-size: 13px; color: var(--muted); }
   input, select { font: inherit; padding: 6px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--text); }
@@ -231,7 +235,6 @@
       <button data-lang="en">EN</button><button data-lang="fr">FR</button><button data-lang="de">DE</button>
     </div>
     <button id="directBtn"></button>
-    <button id="notifBtn"></button>
     <button id="refreshBtn" data-i18n="refresh"></button>
   </header>
   <div class="dir" id="dirToggle" role="tablist">
@@ -256,12 +259,16 @@
       <label><span data-i18n="switchAt"></span> <input id="sSwitch" type="time"></label>
       <label><span data-i18n="minDelay"></span> <input id="sMin" type="number" min="1" max="60"></label>
       <label><span data-i18n="minChange"></span> <input id="sChange" type="number" min="0" max="15"></label>
+      <label><span data-i18n="longWait"></span> <input id="sWait" type="number" min="1" max="240"></label>
       <label><span data-i18n="maxTransfers"></span>
         <select id="sTransfers"><option value="" data-i18n="any"></option><option>0</option><option>1</option><option>2</option></select>
       </label>
       <label><span data-i18n="longTrip"></span> <input id="sLong" type="text" inputmode="numeric" placeholder="1:45" pattern="\d{1,2}:\d{2}" size="5"></label>
       <label><span data-i18n="veryLongTrip"></span> <input id="sVeryLong" type="text" inputmode="numeric" placeholder="2:30" pattern="\d{1,2}:\d{2}" size="5"></label>
       <label><span data-i18n="interval"></span> <input id="sInterval" type="number" min="30" max="900" step="30"></label>
+      <div class="field alertfield"><span data-i18n="alertsLabel"></span>
+        <label class="check"><input id="sNotify" type="checkbox"> <span data-i18n="alertsCheck"></span></label>
+        <span id="notifState" class="io-msg" role="status"></span></div>
       <div class="field keyfield"><span data-i18n="ojpKey"></span>
         <span class="keyrow"><input id="sOjpKey" type="password" autocomplete="off" spellcheck="false" data-i18n-ph="ojpKeyPh">
           <button id="ojpTestBtn" type="button" data-i18n="ojpTest"></button></span>
@@ -285,13 +292,12 @@ const I18N = {
   en: {
     logo: "SBB", appName: "Route Watch",
     directOnly: "Direct only", directTitle: "Show only trains without a change",
-    alertsOff: "🔕 Alerts off", alertsOn: "🔔 Alerts on", alertsSound: "🔔 Alerts on (page only)",
-    alertsTitle: "Desktop notification when your train is late or cancelled",
+    alertsLabel: "Alerts", alertsCheck: "Notify me when my train is late or cancelled", alertsDesktop: "Desktop notifications are on.", alertsAsk: "Click anywhere on the page to allow desktop notifications.",
     alertsBlocked: "Desktop notifications are blocked for this page (common when opened as a local file). You'll still get the alerts on the page and a ⚠️ in the tab title.",
     refresh: "↻ Refresh", loading: "Loading…", loadingConn: "Loading connections…", refreshing: "Refreshing…",
     hint: "Click a connection to pin it as <b>your train</b>. Alerts then focus on that train, and it stays monitored after departure until it reaches your destination. Other trains already on the way are folded at the top of the list (highlighted if one has a problem). Bars show the expected occupancy per class (green low · amber medium · red high).",
     settings: "Settings", stA: "Station A (e.g. work)", stB: "Station B (e.g. home)",
-    switchAt: "Mornings B → A, switch to A → B at", minDelay: "Alert if late ≥ (min)", minChange: "Min. time to change trains (min)",
+    switchAt: "Mornings B → A, switch to A → B at", minDelay: "Alert if late ≥ (min)", minChange: "Min. time to change trains (min)", longWait: "Wait at a station in orange above (min)",
     maxTransfers: "Max changes", any: "Any", interval: "Refresh every (s)", longTrip: "Warn if trip longer than (h:mm)", veryLongTrip: "Red warning if longer than (h:mm)", linkLabel: "Link with these settings", copyLink: "🔗 Copy link", copied: "Link copied.", copyFail: "Select the link and copy it (Ctrl+C).", linkHint: "Your settings are saved in the link: bookmark it, or send it to someone so they get the same settings. The page address updates whenever you change a setting. For other people to open it, the page must be online (e.g. GitHub Pages); a link to a file on your computer only works for you.", searchPh: "Search a station…", searchHint: "Type at least 2 letters", noStation: "No station found", longTitle: "Long trip: more than {t} in total", stopsTitle: "Stops ({n})", remainLabel: "Time left", remainArr: "arrival in {st} at {t}", nextStop: "next stop: {st} at {t}", showEarlier: "⋯ show {n} earlier stops", showEarlier1: "⋯ show 1 earlier stop", hideEarlier: "⋯ hide earlier stops", posNotYet: "not departed yet: leaves {st} at {t}", posAt: "now at {st}", posBetween: "now between {a} and {b}", posArrived: "arrived at {st}", posEstimated: "Position estimated from the timetable and live delays (no GPS data).", changeTo: "change → {x}",
     dataHint: "Data: transport.opendata.ch (SBB realtime). The API has no explicit “cancelled” flag, so the page: (1) notices trains that disappear from the results, (2) remembers the trains that usually run on this route and flags one missing today, and (3) checks the departure board at your station to tell a <b>cancelled</b> train from a <b>connection that no longer works</b>.",
     ojpKey: "SBB key (OJP 2.0, optional)", ojpKeyPh: "Paste your key from api-manager.opentransportdata.swiss", ojpTest: "Test the key", ojpOk: "The key works: {n} trips, {m} SBB messages.", ojpBad: "Key refused by SBB (HTTP {c}).", ojpNet: "SBB data unreachable ({e}).", ojpNoKey: "Enter a key first.", ojpHint: "With your own free key, the page also shows official SBB data: live delays at every stop (often missing otherwise for regional trains), cancelled trains, stops that won’t be served, and SBB messages per train. <b>Get a key:</b> <a href='https://api-manager.opentransportdata.swiss/' target='_blank' rel='noopener'>API Manager of opentransportdata.swiss ↗</a>, create a free account, subscribe to <b>OJP 2.0</b> and create an API key. The key stays in this browser: it is never put in the link and is only sent to opentransportdata.swiss.", stNotServed: "Skips {st}", stNoLive: "No live data", exSbbCancelled: "SBB: this train is cancelled", exSbbSkips: "SBB: this train will not stop at {st}", exNoLive: "no live data for this train since it left, while the other trains have some: it may be disrupted. Check the announcements or the SBB app", sbbOk: "SBB data ✓", sbbErr: "SBB data unavailable", stCancelled: "Cancelled", stDropped: "Connection lost", stUnverified: "Likely cancelled", stEnroute: "Disrupted",
@@ -325,13 +331,12 @@ const I18N = {
   fr: {
     logo: "CFF", appName: "Suivi de trajet",
     directOnly: "Directs uniquement", directTitle: "Afficher uniquement les trains sans changement",
-    alertsOff: "🔕 Alertes désactivées", alertsOn: "🔔 Alertes activées", alertsSound: "🔔 Alertes activées (page seule)",
-    alertsTitle: "Notification quand votre train est en retard ou supprimé",
+    alertsLabel: "Alertes", alertsCheck: "Me prévenir si mon train est en retard ou supprimé", alertsDesktop: "Les notifications du bureau sont activées.", alertsAsk: "Cliquez n’importe où sur la page pour autoriser les notifications du bureau.",
     alertsBlocked: "Les notifications sont bloquées pour cette page (fréquent quand elle est ouverte comme fichier local). Vous aurez quand même les alertes sur la page et un ⚠️ dans le titre de l’onglet.",
     refresh: "↻ Actualiser", loading: "Chargement…", loadingConn: "Chargement des trains…", refreshing: "Actualisation…",
     hint: "Cliquez sur un train pour l’épingler comme <b>votre train</b>. Les alertes se concentrent alors sur ce train, et il reste suivi après le départ jusqu’à votre destination. Les autres trains déjà en route sont regroupés en haut de la liste (mis en évidence en cas de problème). Les barres indiquent l’occupation prévue par classe (vert faible · orange moyenne · rouge forte).",
     settings: "Réglages", stA: "Gare A (p. ex. travail)", stB: "Gare B (p. ex. domicile)",
-    switchAt: "Le matin B → A, passer à A → B à", minDelay: "Alerte si retard ≥ (min)", minChange: "Temps minimal de changement (min)",
+    switchAt: "Le matin B → A, passer à A → B à", minDelay: "Alerte si retard ≥ (min)", minChange: "Temps minimal de changement (min)", longWait: "Attente en gare en orange au-delà de (min)",
     maxTransfers: "Changements max.", any: "Indifférent", interval: "Actualiser toutes les (s)", longTrip: "Avertir si trajet plus long que (h:mm)", veryLongTrip: "Avertissement rouge si plus long que (h:mm)", linkLabel: "Lien avec ces réglages", copyLink: "🔗 Copier le lien", copied: "Lien copié.", copyFail: "Sélectionnez le lien et copiez-le (Ctrl+C).", linkHint: "Vos réglages sont enregistrés dans le lien : ajoutez-le à vos favoris ou envoyez-le à quelqu’un pour qu’il ait les mêmes réglages. L’adresse de la page se met à jour à chaque changement de réglage. Pour que d’autres personnes puissent l’ouvrir, la page doit être en ligne (p. ex. GitHub Pages) ; un lien vers un fichier de votre ordinateur ne fonctionne que pour vous.", searchPh: "Rechercher une gare…", searchHint: "Tapez au moins 2 lettres", noStation: "Aucune gare trouvée", longTitle: "Trajet long : plus de {t} au total", stopsTitle: "Arrêts ({n})", remainLabel: "Temps restant", remainArr: "arrivée à {st} à {t}", nextStop: "prochain arrêt : {st} à {t}", showEarlier: "⋯ afficher les {n} arrêts précédents", showEarlier1: "⋯ afficher l’arrêt précédent", hideEarlier: "⋯ masquer les arrêts précédents", posNotYet: "pas encore parti : départ de {st} à {t}", posAt: "actuellement à {st}", posBetween: "actuellement entre {a} et {b}", posArrived: "arrivé à {st}", posEstimated: "Position estimée d’après l’horaire et les retards en temps réel (pas de données GPS).", changeTo: "changement → {x}",
     dataHint: "Données : transport.opendata.ch (temps réel CFF). L’API n’indique pas explicitement les suppressions, donc la page : (1) repère les trains qui disparaissent des résultats, (2) mémorise les trains qui circulent habituellement sur ce trajet et signale celui qui manque aujourd’hui, et (3) consulte le tableau des départs de votre gare pour distinguer un train <b>supprimé</b> d’une <b>correspondance qui ne fonctionne plus</b>.",
     ojpKey: "Clé CFF (OJP 2.0, facultative)", ojpKeyPh: "Collez votre clé de api-manager.opentransportdata.swiss", ojpTest: "Tester la clé", ojpOk: "La clé fonctionne : {n} trajets, {m} messages CFF.", ojpBad: "Clé refusée par les CFF (HTTP {c}).", ojpNet: "Données CFF injoignables ({e}).", ojpNoKey: "Saisissez d’abord une clé.", ojpHint: "Avec votre propre clé gratuite, la page affiche aussi les données officielles des CFF : retards en temps réel à chaque arrêt (souvent absents sinon pour les trains régionaux), trains supprimés, arrêts qui ne seront pas desservis et messages CFF par train. <b>Obtenir une clé :</b> <a href='https://api-manager.opentransportdata.swiss/' target='_blank' rel='noopener'>API Manager d’opentransportdata.swiss ↗</a>, créez un compte gratuit, abonnez-vous à <b>OJP 2.0</b> et créez une clé API. La clé reste dans ce navigateur : elle n’est jamais mise dans le lien et n’est envoyée qu’à opentransportdata.swiss.", stNotServed: "Ne dessert pas {st}", stNoLive: "Pas de temps réel", exSbbCancelled: "CFF : ce train est supprimé", exSbbSkips: "CFF : ce train ne s’arrêtera pas à {st}", exNoLive: "aucune donnée en temps réel pour ce train depuis son départ, alors que les autres trains en ont : il est peut-être perturbé. Écoutez les annonces ou consultez l’app CFF", sbbOk: "données CFF ✓", sbbErr: "données CFF indisponibles", stCancelled: "Supprimé", stDropped: "Correspondance perdue", stUnverified: "Probablement supprimé", stEnroute: "Perturbé",
@@ -365,13 +370,12 @@ const I18N = {
   de: {
     logo: "SBB", appName: "Streckenwächter",
     directOnly: "Nur direkt", directTitle: "Nur Züge ohne Umsteigen anzeigen",
-    alertsOff: "🔕 Alarme aus", alertsOn: "🔔 Alarme an", alertsSound: "🔔 Alarme an (nur Seite)",
-    alertsTitle: "Benachrichtigung, wenn Ihr Zug verspätet ist oder ausfällt",
+    alertsLabel: "Alarme", alertsCheck: "Benachrichtigen, wenn mein Zug verspätet ist oder ausfällt", alertsDesktop: "Desktop-Benachrichtigungen sind an.", alertsAsk: "Klicken Sie irgendwo auf die Seite, um Desktop-Benachrichtigungen zu erlauben.",
     alertsBlocked: "Desktop-Benachrichtigungen sind für diese Seite blockiert (häufig bei lokal geöffneten Dateien). Sie erhalten trotzdem die Hinweise auf der Seite und ein ⚠️ im Tab-Titel.",
     refresh: "↻ Aktualisieren", loading: "Wird geladen…", loadingConn: "Verbindungen werden geladen…", refreshing: "Wird aktualisiert…",
     hint: "Klicken Sie auf eine Verbindung, um sie als <b>Ihren Zug</b> anzuheften. Die Alarme betreffen dann diesen Zug, und er wird nach der Abfahrt bis zum Ziel weiter überwacht. Andere bereits fahrende Züge sind oben in der Liste zusammengeklappt (hervorgehoben bei Problemen). Die Balken zeigen die erwartete Auslastung pro Klasse (grün gering · orange mittel · rot hoch).",
     settings: "Einstellungen", stA: "Bahnhof A (z. B. Arbeit)", stB: "Bahnhof B (z. B. Zuhause)",
-    switchAt: "Morgens B → A, Wechsel zu A → B um", minDelay: "Alarm ab Verspätung ≥ (Min.)", minChange: "Minimale Umsteigezeit (Min.)",
+    switchAt: "Morgens B → A, Wechsel zu A → B um", minDelay: "Alarm ab Verspätung ≥ (Min.)", minChange: "Minimale Umsteigezeit (Min.)", longWait: "Wartezeit im Bahnhof orange ab (Min.)",
     maxTransfers: "Max. Umstiege", any: "Beliebig", interval: "Aktualisieren alle (s)", longTrip: "Warnen, wenn Fahrt länger als (h:mm)", veryLongTrip: "Rote Warnung, wenn länger als (h:mm)", linkLabel: "Link mit diesen Einstellungen", copyLink: "🔗 Link kopieren", copied: "Link kopiert.", copyFail: "Link markieren und kopieren (Ctrl+C).", linkHint: "Ihre Einstellungen sind im Link gespeichert: Setzen Sie ein Lesezeichen oder senden Sie ihn jemandem, der dann dieselben Einstellungen hat. Die Adresse der Seite wird bei jeder Änderung aktualisiert. Damit andere ihn öffnen können, muss die Seite online sein (z. B. GitHub Pages); ein Link auf eine Datei auf Ihrem Computer funktioniert nur bei Ihnen.", searchPh: "Bahnhof suchen…", searchHint: "Mindestens 2 Buchstaben eingeben", noStation: "Keine Haltestelle gefunden", longTitle: "Lange Fahrt: mehr als {t} insgesamt", stopsTitle: "Halte ({n})", remainLabel: "Restzeit", remainArr: "Ankunft in {st} um {t}", nextStop: "nächster Halt: {st} um {t}", showEarlier: "⋯ {n} frühere Halte anzeigen", showEarlier1: "⋯ 1 früheren Halt anzeigen", hideEarlier: "⋯ frühere Halte ausblenden", posNotYet: "noch nicht abgefahren: Abfahrt in {st} um {t}", posAt: "jetzt in {st}", posBetween: "jetzt zwischen {a} und {b}", posArrived: "angekommen in {st}", posEstimated: "Position geschätzt aus Fahrplan und Echtzeit-Verspätungen (keine GPS-Daten).", changeTo: "umsteigen → {x}",
     dataHint: "Daten: transport.opendata.ch (SBB-Echtzeit). Die API kennzeichnet Ausfälle nicht ausdrücklich, daher (1) erkennt die Seite Züge, die aus den Ergebnissen verschwinden, (2) merkt sie sich die Züge, die auf dieser Strecke üblicherweise fahren, und meldet einen heute fehlenden, und (3) prüft sie die Abfahrtstafel Ihres Bahnhofs, um einen <b>ausgefallenen</b> Zug von einer <b>nicht mehr funktionierenden Verbindung</b> zu unterscheiden.",
     ojpKey: "SBB-Schlüssel (OJP 2.0, optional)", ojpKeyPh: "Schlüssel von api-manager.opentransportdata.swiss einfügen", ojpTest: "Schlüssel testen", ojpOk: "Der Schlüssel funktioniert: {n} Fahrten, {m} SBB-Meldungen.", ojpBad: "Schlüssel von der SBB abgelehnt (HTTP {c}).", ojpNet: "SBB-Daten nicht erreichbar ({e}).", ojpNoKey: "Zuerst einen Schlüssel eingeben.", ojpHint: "Mit Ihrem eigenen kostenlosen Schlüssel zeigt die Seite auch offizielle SBB-Daten: Echtzeit-Verspätungen an jedem Halt (bei Regionalzügen sonst oft nicht vorhanden), ausfallende Züge, nicht bediente Halte und SBB-Meldungen pro Zug. <b>Schlüssel erhalten:</b> <a href='https://api-manager.opentransportdata.swiss/' target='_blank' rel='noopener'>API Manager von opentransportdata.swiss ↗</a>, kostenloses Konto erstellen, <b>OJP 2.0</b> abonnieren und einen API-Schlüssel erstellen. Der Schlüssel bleibt in diesem Browser: Er kommt nie in den Link und wird nur an opentransportdata.swiss gesendet.", stNotServed: "Hält nicht in {st}", stNoLive: "Keine Echtzeit", exSbbCancelled: "SBB: Dieser Zug fällt aus", exSbbSkips: "SBB: Dieser Zug hält nicht in {st}", exNoLive: "seit der Abfahrt keine Echtzeitdaten für diesen Zug, während andere Züge welche haben: Er ist möglicherweise gestört. Achten Sie auf Durchsagen oder die SBB-App", sbbOk: "SBB-Daten ✓", sbbErr: "SBB-Daten nicht verfügbar", stCancelled: "Fällt aus", stDropped: "Verbindung verloren", stUnverified: "Fällt wohl aus", stEnroute: "Gestört",
@@ -416,7 +420,7 @@ const transfersText = n => n ? (n === 1 ? t("transfers1") : t("transfersN", { n 
 
 const BASE = "https://transport.opendata.ch/v1";
 const EN_ROUTE_LOOKBACK_MIN = 120; // also fetch trains that left up to 2 h ago, if not arrived yet
-const DEFAULTS = { from: "Lancy-Pont-Rouge", to: "Aigle", switchAt: "12:00", minDelay: 5, minChange: 2, maxTransfers: "0", interval: 60, longTrip: 105, veryLongTrip: 150 };
+const DEFAULTS = { from: "Lancy-Pont-Rouge", to: "Aigle", switchAt: "12:00", minDelay: 5, minChange: 2, maxTransfers: "0", interval: 60, longTrip: 105, veryLongTrip: 150, longWait: 20 };
 
 function load(key, fallback) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; } catch { return fallback; } }
 function save(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch {} }
@@ -425,7 +429,7 @@ let cfg = { ...DEFAULTS, ...load("cff.cfg", {}) };
 if ((cfg.v || 1) < 2) { cfg.maxTransfers = "0"; cfg.v = 2; save("cff.cfg", cfg); } // direct trains only is now the default
 // Settings can come from the page address (?from=…&to=…): such a link opens the page with exactly
 // those settings (missing ones = defaults), so it can be bookmarked or shared.
-const URL_KEYS = { from: "from", to: "to", switch: "switchAt", delay: "minDelay", change: "minChange", changes: "maxTransfers", refresh: "interval", long: "longTrip", vlong: "veryLongTrip" };
+const URL_KEYS = { from: "from", to: "to", switch: "switchAt", delay: "minDelay", change: "minChange", changes: "maxTransfers", refresh: "interval", long: "longTrip", vlong: "veryLongTrip", wait: "longWait" };
 function hmmToMin(v) { const m = String(v ?? "").trim().match(/^(\d{1,2})(?::|h)?(\d{2})?$/); return m ? Number(m[1]) * 60 + Number(m[2] || 0) : NaN; }
 function cleanSetting(k, raw) {
   const v = String(raw ?? "").trim(), n = Number(v);
@@ -433,6 +437,7 @@ function cleanSetting(k, raw) {
   if (k === "switchAt") { const m = v.match(/^(\d{1,2}):(\d{2})$/); return m && +m[1] < 24 && +m[2] < 60 ? `${m[1].padStart(2, "0")}:${m[2]}` : undefined; }
   if (k === "minDelay") return Number.isInteger(n) && n >= 1 && n <= 60 ? n : undefined;
   if (k === "minChange") return Number.isInteger(n) && n >= 0 && n <= 15 ? n : undefined;
+  if (k === "longWait") return Number.isInteger(n) && n >= 1 && n <= 240 ? n : undefined;
   if (k === "maxTransfers") return v === "any" || v === "" ? "" : ["0", "1", "2"].includes(v) ? v : undefined;
   if (k === "interval") return Number.isInteger(n) && n >= 30 && n <= 900 ? n : undefined;
   if (k === "longTrip" || k === "veryLongTrip") { const m = hmmToMin(v); return m >= 30 && m <= 600 ? m : undefined; }
@@ -451,7 +456,8 @@ try {
 } catch {}
 lang = I18N[cfg.lang] ? cfg.lang : detectLang();
 let pinnedKey = load("cff.pinned", null);
-let notifyOn = load("cff.notify", false);
+// alerts are on by default (a new storage key, so everyone starts with them on)
+let notifyOn = load("cff.alerts", true);
 let seen = {};    // today's connections already seen (key -> summary), per direction
 let usual = {};   // trains that usually run on this route (pattern -> history), per direction
 let again = false; // a refresh was requested while one was running
@@ -983,7 +989,7 @@ function legsHtml(c) {
   if (!(c.legs?.length > 1)) return "";
   const tm = (iso, d) => iso ? (d ? `<s>${hhmm(new Date(iso))}</s> <b class="${d >= bigDelay() ? "vlate" : "late"}">${hhmm(addMin(iso, d))}</b>` : hhmm(new Date(iso))) : "";
   const icon = { ok: "✅", warn: "⚠️", bad: "⛔", off: "✖" };
-  const rows = legStates(c).map(s => {
+  const rows = legStates(c).map((s, i) => {
     const lv = legLevel(s.state), l = s.leg;
     let row = `<li class="leg ${lv}"><span class="licon">${icon[lv]}</span>
         <span class="lname"><b>${esc(l.label)}</b> ${esc(l.from)} ${tm(l.dep, l.depD)} → ${esc(l.to)} ${tm(l.arr, l.arrD)}</span>
@@ -993,7 +999,8 @@ function legsHtml(c) {
       const txt = ch.state === "missed" ? t("legChangeMissed", { n: ch.left })
         : ch.state === "risk" ? t("legChangeTight", { n: ch.left, p: ch.planned })
         : t("legChangeLeft", { n: ch.left });
-      row += `<li class="lchg ${ch.state}">↳ ${esc(t("legChange", { at: ch.at }))} · ${esc(txt)}</li>`;
+      const longWait = ch.state === "ok" && normName(l.to) === normName(c.legs[i + 1]?.from) && ch.left > Number(cfg.longWait);
+      row += `<li class="lchg ${ch.state}${longWait ? " long" : ""}">↳ ${esc(t("legChange", { at: ch.at }))} · ${esc(txt)}</li>`;
     }
     return row;
   }).join("");
@@ -1047,14 +1054,15 @@ function trackHtml(c, now, big = false) {
     const mins = ch && ch.state !== "unreach" && s.state !== "unreach" ? ch.left : Math.round((new Date(next.dep) - new Date(l.arr)) / 60000);
     const gapTitle = t(walk ? "walkTitle" : "waitTitle", { a: l.to, b: next.from, n: mins });
     if (walk || new Date(next.dep) > new Date(l.arr)) {
-      seg(l.arr, next.dep, walk ? "walk" : "wait");
+      const longWait = !walk && mins > Number(cfg.longWait); // a long wait at the station: amber
+      seg(l.arr, next.dep, walk ? "walk" : longWait ? "wait long" : "wait");
       const mid = (x(l.arr) + x(next.dep)) / 2;
       // labels too close to the previous one go one line lower, so they don't overlap
       const low = lastLabel && !lastLabel.low && mid - lastLabel.x < (big ? 7 : 11);
       lastLabel = { x: mid, low };
       const txt = `${walk ? "🚶" : "⏱"} ${mins < 0 ? "✖" : mins >= 60 ? fmtDur(mins) : mins + "′"}`;
       const extra = ch && ch.state !== "ok" ? " · " + chText : "";
-      labels.push(`<span class="slab ${lv}${low ? " low" : ""}" style="left:${mid.toFixed(2)}%" title="${esc(gapTitle + extra)}">${esc(txt)}</span>`);
+      labels.push(`<span class="slab ${lv === "ok" && longWait ? "warn" : lv}${low ? " low" : ""}" style="left:${mid.toFixed(2)}%" title="${esc(gapTitle + extra)}">${esc(txt)}</span>`);
       if (low) lowLabels = true;
     }
     if (walk) dot(next.dep, lv, `${next.from} · ${info}`);
@@ -1271,10 +1279,18 @@ function maybeNotify() {
   }
 }
 function paintNotifBtn() {
-  const desktop = "Notification" in window && Notification.permission === "granted";
-  $("notifBtn").textContent = t(!notifyOn ? "alertsOff" : desktop ? "alertsOn" : "alertsSound");
-  $("notifBtn").title = t(notifyOn && !desktop ? "alertsBlocked" : "alertsTitle");
+  const perm = "Notification" in window ? Notification.permission : "denied";
+  $("sNotify").checked = notifyOn;
+  $("notifState").textContent = !notifyOn ? "" : t(perm === "granted" ? "alertsDesktop" : perm === "default" ? "alertsAsk" : "alertsBlocked");
+  $("notifState").className = "io-msg" + (notifyOn && perm === "denied" ? " err" : "");
 }
+// Browsers only show the "allow notifications?" prompt after a click: ask on the first click on the page.
+async function askNotifyPermission() {
+  if (!notifyOn || !("Notification" in window) || Notification.permission !== "default") return;
+  try { await Notification.requestPermission(); } catch {}
+  paintNotifBtn(); maybeNotify();
+}
+document.addEventListener("click", askNotifyPermission, { once: true });
 function paintDirectBtn() {
   const on = cfg.maxTransfers === "0";
   $("directBtn").textContent = (on ? "✓ " : "") + t("directOnly");
@@ -1301,12 +1317,11 @@ $("directBtn").onclick = () => {
   cfg.maxTransfers = cfg.maxTransfers === "0" ? "" : "0";
   saveCfg(); paintDirectBtn(); refresh();
 };
-$("notifBtn").onclick = async () => {
-  notifyOn = !notifyOn;
-  if (notifyOn && "Notification" in window && Notification.permission === "default") {
-    try { await Notification.requestPermission(); } catch {}
-  }
-  save("cff.notify", notifyOn); paintNotifBtn(); maybeNotify();
+$("sNotify").onchange = async () => {
+  notifyOn = $("sNotify").checked;
+  save("cff.alerts", notifyOn);
+  await askNotifyPermission();
+  paintNotifBtn(); maybeNotify();
 };
 
 // --- interactions --------------------------------------------------------------------
@@ -1321,7 +1336,7 @@ $("list").onclick = e => {
   pinnedKey = pinnedKey === row.dataset.key ? null : row.dataset.key;
   save("cff.pinned", pinnedKey); render(); maybeNotify();
 };
-const fields = { sSwitch: "switchAt", sMin: "minDelay", sChange: "minChange", sTransfers: "maxTransfers", sInterval: "interval" };
+const fields = { sSwitch: "switchAt", sMin: "minDelay", sChange: "minChange", sWait: "longWait", sTransfers: "maxTransfers", sInterval: "interval" };
 const routeFields = ["from", "to", "switchAt"];
 for (const [id, k] of Object.entries(fields)) {
   $(id).value = cfg[k];
@@ -1330,6 +1345,7 @@ for (const [id, k] of Object.entries(fields)) {
     if (k === "minDelay") v = Math.max(1, Number(v) || DEFAULTS.minDelay);
     if (k === "minChange") v = v === "" || isNaN(Number(v)) ? DEFAULTS.minChange : Math.max(0, Number(v));
     if (k === "interval") v = Math.max(30, Number(v) || DEFAULTS.interval);
+    if (k === "longWait") v = Math.min(240, Math.max(1, Math.round(Number(v)) || DEFAULTS.longWait));
     if (routeFields.includes(k) && !v) v = DEFAULTS[k];
     cfg[k] = v; saveCfg();
     if (k === "maxTransfers") paintDirectBtn();
