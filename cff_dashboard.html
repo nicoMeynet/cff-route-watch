@@ -90,6 +90,22 @@
   .sub { color: var(--muted); font-size: 13px; }
   .prod { display: inline-block; border: 1px solid var(--line); border-radius: 5px; padding: 0 6px; margin-right: 4px; font-size: 12px; font-weight: 600; color: var(--text); }
   .chip { border-radius: 999px; padding: 3px 10px; font-size: 13px; font-weight: 600; white-space: nowrap; }
+  .prod.warn { border-color: var(--warn); color: var(--warn); }
+  .prod.bad { border-color: var(--bad); color: var(--bad); background: var(--bad-bg); }
+  .prod.off { color: var(--muted); text-decoration: line-through; }
+  .hero .legs { grid-column: 1 / -1; list-style: none; margin: 0; padding: 8px 12px; border: 1px solid var(--line);
+    border-radius: 10px; background: var(--card); color: var(--text); font-size: 13px; }
+  .legs .ltitle { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin-bottom: 2px; }
+  .legs .leg { display: flex; gap: 8px; align-items: baseline; padding: 3px 0; }
+  .legs .licon { width: 18px; text-align: center; flex: none; }
+  .legs .lname { flex: 1; min-width: 0; }
+  .legs .lstate { font-weight: 600; white-space: nowrap; }
+  .legs .leg.ok .lstate { color: var(--ok); } .legs .leg.warn .lstate { color: var(--warn); }
+  .legs .leg.bad .lstate { color: var(--bad); }
+  .legs .leg.bad .lname b { color: var(--bad); }
+  .legs .leg.off { color: var(--muted); } .legs .leg.off .lname { text-decoration: line-through; }
+  .legs .lchg { padding: 0 0 0 26px; font-size: 12px; color: var(--muted); }
+  .legs .lchg.missed { color: var(--bad); font-weight: 600; } .legs .lchg.risk { color: var(--warn); font-weight: 600; }
   .chip.ok { background: var(--ok-bg); color: var(--ok); }
   .chip.warn { background: var(--warn-bg); color: var(--warn); }
   .chip.bad { background: var(--bad-bg); color: var(--bad); }
@@ -250,7 +266,7 @@ const I18N = {
     exDropped: "{why}; the first train still runs, but the connection to {to} no longer works (later train cancelled or change impossible)",
     exUnverified: "{why}: likely cancelled (departure board could not be checked)",
     exEnroute: "is no longer shown as reaching {to}: it may have been stopped or cancelled during the trip. Listen to the announcements on board or check the SBB app for onward options",
-    exMissed: "first train too late: the change at {at} for the {next} will be missed",
+    exMissed: "the {prev} is too late: the change at {at} for the {next} will be missed", stLegCancelled: "{x} cancelled", exLegGone: "{why}: the {x} is no longer on the departure board, it is cancelled", exStuck: "; the trains before it run, so you would be stuck at {at}", exSbbLegCancelled: "SBB: the {x} is cancelled", exSbbLegSkips: "SBB: the {x} will not stop at {st}", exUnreach: "no longer reachable: {x}", legsTitle: "Your trains", legUnreach: "Not reachable", legChange: "change at {at}", legChangeLeft: "{n} min to change", legChangeMissed: "change missed ({n} min)", legChangeTight: "tight: {n} min (planned {p})",
     exRisk: "only {left} min left to change at {at} for the {next} (planned {planned} min)",
     exLate: "{n} min late", exArrival: " (arrival {t})",
     altPlatform: ", platform {p}", altArrives: ", arrives {t}", altLost: " ({n} min later than planned)",
@@ -290,7 +306,7 @@ const I18N = {
     exDropped: "{why} ; le premier train circule, mais la correspondance vers {to} ne fonctionne plus (train suivant supprimé ou changement impossible)",
     exUnverified: "{why} : probablement supprimé (tableau des départs non vérifiable)",
     exEnroute: "n’est plus indiqué comme arrivant à {to} : il a peut-être été arrêté ou supprimé en cours de route. Écoutez les annonces à bord ou consultez l’app CFF pour la suite du trajet",
-    exMissed: "premier train trop en retard : le changement à {at} pour le {next} sera manqué",
+    exMissed: "le {prev} est trop en retard : le changement à {at} pour le {next} sera manqué", stLegCancelled: "{x} supprimé", exLegGone: "{why} : le {x} n’est plus au tableau des départs, il est supprimé", exStuck: " ; les trains d’avant circulent : vous resteriez bloqué à {at}", exSbbLegCancelled: "CFF : le {x} est supprimé", exSbbLegSkips: "CFF : le {x} ne s’arrêtera pas à {st}", exUnreach: "plus atteignables : {x}", legsTitle: "Vos trains", legUnreach: "Plus atteignable", legChange: "changement à {at}", legChangeLeft: "{n} min pour changer", legChangeMissed: "changement manqué ({n} min)", legChangeTight: "juste : {n} min (prévu {p})",
     exRisk: "plus que {left} min pour changer à {at} pour le {next} (prévu {planned} min)",
     exLate: "{n} min de retard", exArrival: " (arrivée {t})",
     altPlatform: ", voie {p}", altArrives: ", arrivée {t}", altLost: " ({n} min plus tard que prévu)",
@@ -330,7 +346,7 @@ const I18N = {
     exDropped: "{why}; der erste Zug fährt noch, aber die Verbindung nach {to} klappt nicht mehr (Anschlusszug fällt aus oder Umsteigen unmöglich)",
     exUnverified: "{why}: fällt wohl aus (Abfahrtstafel konnte nicht geprüft werden)",
     exEnroute: "wird nicht mehr mit Ankunft in {to} angezeigt: Er wurde möglicherweise unterwegs angehalten oder gestrichen. Achten Sie auf die Durchsagen im Zug oder prüfen Sie die SBB-App für die Weiterreise",
-    exMissed: "erster Zug zu spät: Der Anschluss in {at} auf den {next} wird verpasst",
+    exMissed: "der {prev} ist zu spät: Der Anschluss in {at} auf den {next} wird verpasst", stLegCancelled: "{x} fällt aus", exLegGone: "{why}: Der {x} steht nicht mehr auf der Abfahrtstafel, er fällt aus", exStuck: "; die Züge davor fahren, Sie würden in {at} festsitzen", exSbbLegCancelled: "SBB: Der {x} fällt aus", exSbbLegSkips: "SBB: Der {x} hält nicht in {st}", exUnreach: "nicht mehr erreichbar: {x}", legsTitle: "Ihre Züge", legUnreach: "Nicht erreichbar", legChange: "Umsteigen in {at}", legChangeLeft: "{n} Min. zum Umsteigen", legChangeMissed: "Anschluss verpasst ({n} Min.)", legChangeTight: "knapp: {n} Min. (geplant {p})",
     exRisk: "nur noch {left} Min. zum Umsteigen in {at} auf den {next} (geplant {planned} Min.)",
     exLate: "{n} Min. Verspätung", exArrival: " (Ankunft {t})",
     altPlatform: ", Gleis {p}", altArrives: ", Ankunft {t}", altLost: " ({n} Min. später als geplant)",
@@ -467,18 +483,13 @@ function normalize(c) {
   let legDelay = 0;
   for (const l of legs) legDelay = Math.max(legDelay, lateMin(l.dep, l.depRt), lateMin(l.arr, l.arrRt));
 
-  // transfers: how much time is left to change trains, given live delays?
-  let change = null;
-  for (let i = 0; i < legs.length - 1; i++) {
-    const a = legs[i], b = legs[i + 1];
-    if (!a.arr || !b.dep) continue;
-    const planned = Math.round((b.dep - a.arr) / 60000);
-    const aLate = lateMin(a.arr, a.arrRt) || lateMin(a.dep, a.depRt);
-    const bLate = lateMin(b.dep, b.depRt);
-    const left = planned - aLate + bLate;
-    const state = left < 0 ? "missed" : (left < cfg.minChange && left < planned) ? "risk" : "ok";
-    if (state !== "ok" && (!change || left < change.left)) change = { at: a.toName, next: b.label, planned, left, state };
-  }
+  // every train of the trip, with its own live delays (used to tell WHICH train or change is the problem)
+  const legInfo = legs.map(l => ({
+    label: l.label, line: l.label.replace(/\s+/g, ""), name: l.name, stationId: l.stationId, depRaw: l.depRaw,
+    from: l.fromName, to: l.toName, dep: l.dep?.toISOString() || null, arr: l.arr?.toISOString() || null,
+    depD: lateMin(l.dep, l.depRt), arrD: lateMin(l.arr, l.arrRt) || lateMin(l.dep, l.depRt),
+  }));
+  const { changes, change } = computeChanges(legInfo);
 
   // occupancy: worst value across legs (that is what you will feel)
   const worst = k => { const v = [c[k], ...legs.map(l => l[k === "capacity1st" ? "cap1" : "cap2"])].filter(x => x != null); return v.length ? Math.max(...v) : null; };
@@ -495,18 +506,58 @@ function normalize(c) {
     transfers: c.transfers ?? Math.max(legs.length - 1, 0),
     duration: c.duration,
     hasRealtime: !!(depRt || arrRt || c.from.delay != null),
-    change,
+    change, changes, legs: legInfo,
     cap1: worst("capacity1st"), cap2: worst("capacity2nd"),
     firstLeg: first ? { name: first.name, line: first.label.replace(/\s+/g, ""), stationId: first.stationId, depRaw: first.depRaw } : null,
     legNames: legs.map(l => l.name).filter(Boolean),
-    // train numbers from the connection search are not reliable (they can differ from the departure board
-    // and from SBB data), so trains are matched by line + boarding station + scheduled departure time
-    legKeys: legs.filter(l => l.dep).map(l => ({ line: l.label.replace(/\s+/g, ""), from: l.fromName, dep: l.dep.toISOString() })),
     fromId: c.from.station?.id || null, toId: c.to.station?.id || null,
     headsign: (c.sections || []).find(s => s.journey)?.journey?.to || "",
     stops: buildStops(c, depDelay),
   };
 }
+
+// Time left to change trains at each change station, given the live delays of both trains.
+// `change` is the worst one that is not fine (or null).
+function computeChanges(legs) {
+  const changes = [];
+  let change = null;
+  for (let i = 0; i < legs.length - 1; i++) {
+    const a = legs[i], b = legs[i + 1];
+    if (!a.arr || !b.dep) { changes.push(null); continue; }
+    const planned = Math.round((new Date(b.dep) - new Date(a.arr)) / 60000);
+    const left = planned - (a.arrD || 0) + (b.depD || 0);
+    const state = left < 0 ? "missed" : (left < cfg.minChange && left < planned) ? "risk" : "ok";
+    const ch = { at: a.to, prev: a.label, next: b.label, planned, left, state, i };
+    changes.push(ch);
+    if (state !== "ok" && (!change || left < change.left)) change = ch;
+  }
+  return { changes, change };
+}
+// State of each train of the trip, in order. Once a train is cancelled, skips the station where you
+// get on or off, or a change is missed, the trains after it can no longer be reached ("unreach").
+function legStates(c) {
+  const legs = c.legs || [];
+  if (!legs.length) return [];
+  let broken = false;
+  return legs.map((l, i) => {
+    let state = "ok", detail = "";
+    const skipOn = l.skips?.find(s => normName(s) === normName(l.from));
+    const skipOff = l.skips?.find(s => normName(s) === normName(l.to));
+    if (broken) state = "unreach";
+    else if (l.cancelled || (c.gone && c.goneLeg === i)) state = "cancelled";
+    else if (skipOn || skipOff) { state = "skips"; detail = skipOn || skipOff; }
+    else if (Math.max(l.depD || 0, l.arrD || 0) >= bigDelay()) state = "vlate";
+    else if (Math.max(l.depD || 0, l.arrD || 0) >= cfg.minDelay) state = "late";
+    if (state === "cancelled" || state === "skips") broken = true;
+    const ch = c.changes?.[i];
+    const chState = !ch ? null : broken ? "unreach" : ch.state;
+    if (chState === "missed") broken = true;
+    return { leg: l, state, detail, change: ch ? { ...ch, state: chState } : null };
+  });
+}
+const legLevel = s => ({ cancelled: "bad", skips: "bad", unreach: "off", vlate: "bad", late: "warn" }[s] || "ok");
+// the first train or change of the trip that breaks it, in words: "IR 90 Lausanne → Aigle (07:55)"
+function legName(l) { return `${l.label} ${l.from} → ${l.to}${l.dep ? ` (${hhmm(new Date(l.dep))})` : ""}`; }
 
 // All stops of the trip, in order, with live (estimated) times. A change station appears once,
 // with the arrival of one train and the departure of the next. Stations without live data take
@@ -601,28 +652,36 @@ function stopsHtml(c, now) {
     </details>`;
 }
 
-// Check the departure board at the first leg's station: is that train still listed?
-async function verifyGone(c) {
-  const hit = verifyCache[c.key];
-  if (hit && Date.now() - hit.at < 4 * 60000) return hit.kind;
-  let kind = "unverified";
-  if (c.firstLeg?.name && c.firstLeg.depRaw) {
-    try {
-      const tm = addMin(c.firstLeg.depRaw, -2);
-      const p = new URLSearchParams({ datetime: `${dayStr(tm)} ${hhmm(tm)}`, limit: 30 });
-      if (c.firstLeg.stationId) p.set("id", c.firstLeg.stationId); else p.set("station", R().from);
-      const res = await fetch(`${BASE}/stationboard?${p}`, { cache: "no-store" });
-      if (res.ok) {
-        const board = (await res.json()).stationboard || [];
-        const listed = board.some(e => e.stop?.departure === c.firstLeg.depRaw
-          && (e.name === c.firstLeg.name || (c.firstLeg.line && `${e.category || ""}${e.number || ""}`.replace(/\s+/g, "") === c.firstLeg.line)));
-        // listed = the train still runs, but this connection is no longer offered (a later leg or the change broke)
-        kind = listed ? "dropped" : "cancelled";
-      }
-    } catch {}
+// Is this train still on the departure board of the station where you get on it?
+// true / false, or null when the board could not be checked.
+async function onBoard(leg, fallbackStation) {
+  if (!leg?.depRaw || !(leg.name || leg.line)) return null;
+  try {
+    const tm = addMin(leg.depRaw, -2);
+    const p = new URLSearchParams({ datetime: `${dayStr(tm)} ${hhmm(tm)}`, limit: 30 });
+    if (leg.stationId) p.set("id", leg.stationId); else if (fallbackStation) p.set("station", fallbackStation); else return null;
+    const res = await fetch(`${BASE}/stationboard?${p}`, { cache: "no-store" });
+    if (!res.ok) return null;
+    const board = (await res.json()).stationboard || [];
+    return board.some(e => e.stop?.departure === leg.depRaw
+      && (e.name === leg.name || (leg.line && `${e.category || ""}${e.number || ""}`.replace(/\s+/g, "") === leg.line)));
+  } catch { return null; }
+}
+// A train that vanished: check the departure board of each train of the trip, in order, to find
+// which one is cancelled. All still listed = the connection no longer works (a change became impossible).
+async function verifyGone(c, startAt = 0) {
+  const hit = verifyCache[`${c.key}|${startAt}`];
+  if (hit && Date.now() - hit.at < 4 * 60000) return hit;
+  let res = { kind: "unverified", leg: null };
+  const legs = c.legs?.length ? c.legs : c.firstLeg ? [c.firstLeg] : [];
+  for (let i = startAt; i < legs.length; i++) {
+    const ok = await onBoard(legs[i], i === 0 ? R().from : null);
+    if (ok === null) break;
+    if (!ok) { res = { kind: "cancelled", leg: i }; break; }
+    res = { kind: "dropped", leg: null }; // this train runs: check the next one
   }
-  verifyCache[c.key] = { kind, at: Date.now() };
-  return kind;
+  verifyCache[`${c.key}|${startAt}`] = { ...res, at: Date.now() };
+  return res;
 }
 
 function patternOf(c) { const d = new Date(c.dep); return `${dayType(d)}|${hhmm(d)}|${c.products.join("|")}`; }
@@ -690,7 +749,17 @@ async function detectGone(list, now) {
   save(`cff.seen|${routeId()}`, seen); save(`cff.usual|${routeId()}`, usual);
 
   // a train already on its way is of course still on the departure board history: no point checking it
-  for (const c of candidates) c.goneKind = c.wasEnRoute ? "enroute" : await verifyGone(c);
+  for (const c of candidates) {
+    if (c.wasEnRoute) {
+      // already on the way: the trains of the trip that have not left yet can still be checked
+      const next = (c.legs || []).findIndex(l => l.dep && new Date(l.dep).getTime() + (l.depD || 0) * 60000 > now.getTime());
+      const v = next > 0 ? await verifyGone(c, next) : null;
+      c.goneKind = v?.kind === "cancelled" ? "cancelled" : "enroute"; c.goneLeg = v?.kind === "cancelled" ? v.leg : null;
+      continue;
+    }
+    const v = await verifyGone(c);
+    c.goneKind = v.kind; c.goneLeg = v.leg;
+  }
   // a "usually runs" train that is still on the departure board just isn't a good connection today: don't alarm
   gone = candidates.filter(c => !(c.source === "usual" && c.goneKind === "dropped"));
 }
@@ -756,13 +825,22 @@ async function refresh() {
 const bigDelay = () => Math.max(cfg.minDelay * 3, 15);
 function level(c) {
   if (c.gone || c.sbb?.cancelled || c.sbb?.skips?.length) return "bad";
+  if (legStates(c).some(s => s.state === "cancelled" || s.state === "skips")) return "bad";
   if (c.noLive) return "warn";
   if (c.change?.state === "missed" || c.maxDelay >= bigDelay()) return "bad";
   if (c.change?.state === "risk" || c.maxDelay >= cfg.minDelay) return "warn";
   return "ok";
 }
+// the trip cannot get you there: a train is cancelled or skips your stop, or a change is missed
+const tripBroken = c => !!(c.gone || c.change?.state === "missed" || c.sbb?.cancelled || c.sbb?.skips?.length || brokenLeg(c));
+// the train of a trip with changes that breaks it (cancelled or skipping your stop), if any
+const brokenLeg = c => (c.legs?.length > 1 ? legStates(c).find(s => s.state === "cancelled" || s.state === "skips") : null) || null;
 function statusText(c) {
+  const bl = brokenLeg(c);
+  if (c.gone && c.goneKind === "cancelled" && bl) return t("stLegCancelled", { x: bl.leg.label });
   if (c.gone) return t({ cancelled: "stCancelled", dropped: "stDropped", unverified: "stUnverified", enroute: "stEnroute" }[c.goneKind] || "stUnverified");
+  if (bl?.state === "cancelled") return t("stLegCancelled", { x: bl.leg.label });
+  if (bl?.state === "skips") return t("stNotServed", { st: bl.detail });
   if (c.sbb?.cancelled) return t("stCancelled");
   if (c.sbb?.skips?.length) return t("stNotServed", { st: c.sbb.skips[0] });
   if (c.change?.state === "missed") return t("stMissed");
@@ -772,19 +850,37 @@ function statusText(c) {
   return c.hasRealtime ? t("stOnTime") : t("stScheduled");
 }
 function explain(c) {
+  const multi = c.legs?.length > 1, states = legStates(c);
+  const unreach = states.filter(s => s.state === "unreach").map(s => s.leg.label);
+  const unreachText = unreach.length ? t("exUnreach", { x: unreach.join(", ") }) : "";
+  const stuck = i => i > 0 ? t("exStuck", { at: c.legs[i].from }) : "";
   if (c.gone) {
     const why = t(c.source === "usual" ? "whyUsual" : "whyVanished");
+    if (multi && c.goneKind === "cancelled" && c.goneLeg != null && c.legs[c.goneLeg]) {
+      return t("exLegGone", { why, x: legName(c.legs[c.goneLeg]) }) + stuck(c.goneLeg) + (unreachText ? " · " + unreachText : "");
+    }
     const key = { cancelled: "exCancelled", dropped: "exDropped", unverified: "exUnverified", enroute: "exEnroute" }[c.goneKind] || "exUnverified";
     return t(key, { why, to: R().to });
   }
   const parts = [];
-  if (c.sbb?.cancelled) parts.push(t("exSbbCancelled"));
-  if (c.sbb?.skips?.length) parts.push(t("exSbbSkips", { st: c.sbb.skips.join(", ") }));
-  if (c.noLive) parts.push(t("exNoLive"));
-  if (c.change) {
-    const v = { at: c.change.at, next: c.change.next, left: c.change.left, planned: c.change.planned };
-    parts.push(t(c.change.state === "missed" ? "exMissed" : "exRisk", v));
+  if (multi) {
+    // say which train of the trip is the problem
+    states.forEach((s, i) => {
+      if (s.state === "cancelled") parts.push(t("exSbbLegCancelled", { x: legName(s.leg) }) + stuck(i));
+      if (s.state === "skips") parts.push(t("exSbbLegSkips", { x: legName(s.leg), st: s.detail }) + stuck(normName(s.detail) === normName(s.leg.from) ? i : 0));
+    });
+  } else {
+    if (c.sbb?.cancelled) parts.push(t("exSbbCancelled"));
+    if (c.sbb?.skips?.length) parts.push(t("exSbbSkips", { st: c.sbb.skips.join(", ") }));
   }
+  if (c.noLive) parts.push(t("exNoLive"));
+  // the first change that goes wrong (missed, or at risk) among the ones you can still reach
+  const ch = states.map(s => s.change).find(x => x && (x.state === "missed" || x.state === "risk"));
+  if (ch) {
+    const v = { at: ch.at, prev: ch.prev, next: ch.next, left: ch.left, planned: ch.planned };
+    parts.push(t(ch.state === "missed" ? "exMissed" : "exRisk", v));
+  }
+  if (unreachText) parts.push(unreachText);
   if (c.maxDelay >= cfg.minDelay) parts.push(t("exLate", { n: c.maxDelay }) + (c.arrDelay ? t("exArrival", { t: hhmm(addMin(c.arr, c.arrDelay)) }) : ""));
   return parts.join(" · ");
 }
@@ -793,7 +889,7 @@ function explain(c) {
 function bestAlternative(c, all, now) {
   // once you are on board, other trains from your departure station are no help
   if (level(c) !== "bad" || departed(c, now)) return null;
-  const mineArr = c.gone || c.change?.state === "missed" ? Infinity : addMin(c.arr, c.arrDelay).getTime();
+  const mineArr = tripBroken(c) ? Infinity : addMin(c.arr, c.arrDelay).getTime();
   const options = all.filter(o => o.key !== c.key && !o.gone && level(o) !== "bad"
       && addMin(o.dep, o.depDelay).getTime() > now.getTime() + 60000
       && addMin(o.arr, o.arrDelay).getTime() < mineArr)
@@ -802,7 +898,7 @@ function bestAlternative(c, all, now) {
 }
 function altText(o, c) {
   const arr = addMin(o.arr, o.arrDelay);
-  const lost = c.gone || c.change?.state === "missed" ? Math.round((arr - new Date(c.arr)) / 60000) : null;
+  const lost = tripBroken(c) ? Math.round((arr - new Date(c.arr)) / 60000) : null;
   return `${hhmm(addMin(o.dep, o.depDelay))} ${o.products.join(" + ")}`
     + (o.platform ? t("altPlatform", { p: o.rtPlatform || o.platform }) : "")
     + t("altArrives", { t: hhmm(arr) })
@@ -831,6 +927,41 @@ function durationHtml(c) {
 function occHtml(c) {
   const one = (clsKey, v) => v ? `<span class="occ l${v}" title="${esc(t("occTitle", { cls: t(clsKey), lvl: t("occ" + v) }))}">${t(clsKey)}<span class="bars"><i></i><i></i><i></i></span></span>` : "";
   return one("cls1", c.cap1) + one("cls2", c.cap2);
+}
+
+// line badges: for a trip with changes, one per train, coloured by that train's state
+function prodsHtml(c) {
+  if (!(c.legs?.length > 1)) return c.products.map(p => `<span class="prod">${esc(p)}</span>`).join("");
+  return legStates(c).map(s => {
+    const lv = legLevel(s.state);
+    return `<span class="prod ${lv === "ok" ? "" : lv}" title="${esc(legName(s.leg) + " · " + legStateText(s))}">${esc(s.leg.label)}</span>`;
+  }).join("");
+}
+function legStateText(s) {
+  const d = Math.max(s.leg.depD || 0, s.leg.arrD || 0);
+  return { cancelled: t("stCancelled"), skips: t("stNotServed", { st: s.detail }), unreach: t("legUnreach") }[s.state]
+    || (d ? `+${t("nMin", { n: d })}` : t("stOnTime"));
+}
+// the trains of a trip with changes, one by one, and each change between them
+function legsHtml(c) {
+  if (!(c.legs?.length > 1)) return "";
+  const tm = (iso, d) => iso ? (d ? `<s>${hhmm(new Date(iso))}</s> <b class="${d >= bigDelay() ? "vlate" : "late"}">${hhmm(addMin(iso, d))}</b>` : hhmm(new Date(iso))) : "";
+  const icon = { ok: "✅", warn: "⚠️", bad: "⛔", off: "✖" };
+  const rows = legStates(c).map(s => {
+    const lv = legLevel(s.state), l = s.leg;
+    let row = `<li class="leg ${lv}"><span class="licon">${icon[lv]}</span>
+        <span class="lname"><b>${esc(l.label)}</b> ${esc(l.from)} ${tm(l.dep, l.depD)} → ${esc(l.to)} ${tm(l.arr, l.arrD)}</span>
+        <span class="lstate">${esc(legStateText(s))}</span></li>`;
+    const ch = s.change;
+    if (ch && ch.state !== "unreach") { // no point detailing changes you cannot reach any more
+      const txt = ch.state === "missed" ? t("legChangeMissed", { n: ch.left })
+        : ch.state === "risk" ? t("legChangeTight", { n: ch.left, p: ch.planned })
+        : t("legChangeLeft", { n: ch.left });
+      row += `<li class="lchg ${ch.state}">↳ ${esc(t("legChange", { at: ch.at }))} · ${esc(txt)}</li>`;
+    }
+    return row;
+  }).join("");
+  return `<ol class="legs"><li class="ltitle">${esc(t("legsTitle"))}</li>${rows}</ol>`;
 }
 
 // --- rendering ------------------------------------------------------------------
@@ -862,7 +993,7 @@ function render() {
         <div><div class="kicker">${esc(t("altKicker", { n: altMins }))}</div>
         <b>${esc(altText(alt, mine))}</b> ${occHtml(alt)}</div>
         <button data-pin="${esc(alt.key)}">${esc(t("altSwitch"))}</button></div>`
-      : lv === "bad" && !departed(mine, now) && (mine.gone || mine.change?.state === "missed") ? `<div class="alt none">${esc(t("altNone"))}</div>` : "";
+      : lv === "bad" && !departed(mine, now) && tripBroken(mine) ? `<div class="alt none">${esc(t("altNone"))}</div>` : "";
     // the train you are on: big "time left", live arrival, next stop and how far along the trip you are
     const onBoard = isPinned && enRoute(mine, now) && !mine.gone;
     let remainHtml = "";
@@ -883,7 +1014,7 @@ function render() {
       <div>
         <div class="kicker">${isPinned ? esc(t("yourTrain")) + (enRoute(mine, now) ? " · " + esc(t("onTheWay")) : "") : esc(t("nextTrain"))}</div>
         <div class="times">${mine.depDelay ? `<s>${hhmm(dep)}</s>${hhmm(depRt)}` : hhmm(dep)} → ${mine.arrDelay ? `<s>${hhmm(arr)}</s>${hhmm(arrRt)}` : hhmm(arr)}</div>
-        <div class="meta">${mine.products.map(p => `<span class="prod">${esc(p)}</span>`).join("")} ${mine.headsign && !mine.transfers ? esc(t("towards", { x: mine.headsign })) + " · " : ""}${esc(transfersText(mine.transfers))}${plat ? " · " + plat : ""}${durationHtml(mine)}${occHtml(mine)}</div>
+        <div class="meta">${prodsHtml(mine)} ${mine.headsign && !mine.transfers ? esc(t("towards", { x: mine.headsign })) + " · " : ""}${esc(transfersText(mine.transfers))}${plat ? " · " + plat : ""}${durationHtml(mine)}${occHtml(mine)}</div>
         ${why ? `<div class="why">${esc(why)}</div>` : ""}
         ${sbbMsgsHtml(mine)}
       </div>
@@ -892,6 +1023,7 @@ function render() {
         <div class="countdown">${mine.gone || onBoard ? "" : esc(mins > 0 ? t("departsIn", { n: mins }) : mins > -2 ? t("departingNow")
           : t("arrivesIn", { n: Math.max(0, Math.round((arrRt - now) / 60000)) }))}</div>
       </div>
+      ${legsHtml(mine)}
       ${remainHtml}
       ${altHtml}
       ${isPinned && !mine.gone ? stopsHtml(mine, now) : ""}`;
@@ -923,7 +1055,7 @@ function render() {
     return `<div class="row ${departed(c, now) && c.key !== pinnedKey ? "past" : ""} ${c.gone ? "gone" : ""} ${c.key === pinnedKey ? "pinned" : ""}" data-key="${esc(c.key)}" title="${esc(explain(c) || t("pinTitle"))}">
       <div class="pin">${c.key === pinnedKey ? "📌" : "○"}</div>
       <div class="t">${hhmm(dep)} → ${hhmm(arr)}${c.maxDelay ? `<span class="rt ${rtCls}">${hhmm(addMin(c.dep, c.depDelay))} → ${hhmm(addMin(c.arr, c.arrDelay))}</span>` : ""}</div>
-      <div>${c.products.map(p => `<span class="prod">${esc(p)}</span>`).join("")}${occHtml(c)}${c.sbb?.msgs?.length ? `<span class="sbb-ico" title="${esc(c.sbb.msgs.map(msgText).join("\n\n"))}">ℹ️</span>` : ""}
+      <div>${prodsHtml(c)}${occHtml(c)}${c.sbb?.msgs?.length ? `<span class="sbb-ico" title="${esc(c.sbb.msgs.map(msgText).join("\n\n"))}">ℹ️</span>` : ""}
         <div class="sub">${onWay ? `<b>${esc(t("rowOnWay", { t: hhmm(new Date(arrRtMs(c))) }))}</b> · ` : arrived(c, now) ? `<b>${esc(t("arrived"))}</b> · ` : ""}${esc(transfersText(c.transfers))}${platHtml}${durationHtml(c)}${changeHtml}</div></div>
       <span class="chip ${lv}">${esc(statusText(c))}</span>
     </div>`;
@@ -1287,7 +1419,7 @@ function parseOjp(xmlText) {
   }
   return { trains, index, sits, trips: doc.getElementsByTagNameNS(OJP_NS, "TripResult").length };
 }
-const normName = v => String(v || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").trim();
+function normName(v) { return String(v || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").trim(); }
 function msgText(byLang) {
   const own = byLang[lang];
   if (own) return own;
@@ -1308,8 +1440,21 @@ async function applyOjp(list, start) {
   const refs = Object.values(trains).flatMap(i => [...i.sits]);
   if (refs.some(n => !(n in sits))) ojpMsgsAt = 0; // a message we don't have the text of yet: get it next time
   for (const c of list) {
-    const infos = (c.legKeys || []).map(k => index[`${k.line}|${normName(k.from)}|${k.dep.slice(0, 16)}`]).filter(Boolean);
+    const legInfos = (c.legs || []).map(l => l.dep ? index[`${l.line}|${normName(l.from)}|${l.dep.slice(0, 16)}`] || null : null);
+    const infos = legInfos.filter(Boolean);
     if (!infos.length) { c.sbb = null; continue; }
+    // per train of the trip: cancelled? skips the station where you get on or off? live delays there?
+    const late = (tt, est) => lateMin(tt ? new Date(tt) : null, est ? new Date(est) : null);
+    (c.legs || []).forEach((l, i) => {
+      const info = legInfos[i];
+      if (!info) return;
+      l.cancelled = info.cancelled;
+      l.skips = [...info.notServed].filter(n => normName(n) === normName(l.from) || normName(n) === normName(l.to));
+      const on = info.calls.get(normName(l.from)), off = info.calls.get(normName(l.to));
+      if (on?.depE) l.depD = late(on.depT, on.depE);
+      if (off?.arrE) l.arrD = late(off.arrT, off.arrE);
+    });
+    Object.assign(c, computeChanges(c.legs || []));
     // stops that matter to you: where you get on, change trains and get off
     const keyStops = new Set((c.stops || []).filter((st, i, a) => i === 0 || i === a.length - 1 || st.changeTo).map(st => normName(st.name)));
     const notServed = [...new Set(infos.flatMap(i => [...i.notServed]))];
@@ -1317,7 +1462,6 @@ async function applyOjp(list, start) {
     c.sbb = { cancelled: infos.some(i => i.cancelled), skips: notServed.filter(n => keyStops.has(normName(n))), msgs,
       live: infos.length > 0 && infos.every(i => i.hasEst) };
     // live delays from SBB: transport.opendata.ch often has none for regional trains
-    const late = (tt, est) => lateMin(tt ? new Date(tt) : null, est ? new Date(est) : null);
     for (const st of c.stops || []) {
       for (const i of infos) {
         const cl = i.calls.get(normName(st.name));

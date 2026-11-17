@@ -67,7 +67,17 @@ change pushed to `main` is online within a minute or two.
      the cancellation. This needs at least two earlier days of use;
   3. it checks the **departure board** at your station to tell a **cancelled** train from a
      **connection that no longer works** (the first train runs, but a later one doesn't).
+- **Which train is the problem:** on a trip with changes (for example 3 trains one after the
+  other), the page says **which train** is cancelled or skips your stop, and **at which station** a
+  change is missed. The top card lists **Your trains** one by one (✅ fine, ⚠️ late, ⛔ cancelled,
+  skips the stop or change missed) with the time left at each change. The trains after the problem
+  are crossed out as **Not reachable**, and the text says where you would be stuck (for example
+  "you would be stuck at Genève"). In the list, each line badge is coloured the same way.
+  When a trip disappears, the departure board of each of its trains is checked in turn to find the
+  cancelled one.
 - **During the trip:** if your pinned train disappears while on the way, it shows **Disrupted**.
+  The trains of the trip that have not left yet are still checked, so a cancelled next train is
+  named.
 - **Best alternative:** when your train is cancelled, misses its change or is very late, the
   page suggests the train that gets you there soonest, with a **Switch to this train** button.
 
@@ -153,8 +163,8 @@ only: they are not part of the link.
 
 ## API usage
 
-The page sends two requests per refresh (one every 60 s), plus a departure-board check only when
-a train disappears. The API has no fixed limit per client, but asks apps not to repeat the same
+The page sends two requests per refresh (one every 60 s), plus departure-board checks only when
+a train disappears (one per train of that trip, at most). The API has no fixed limit per client, but asks apps not to repeat the same
 query every few seconds. Each open copy of the page sends its own requests.
 
 With an SBB key, it also sends **one OJP request per refresh** (about 60 per hour; the free plan
