@@ -83,7 +83,7 @@ change pushed to `main` is online within a minute or two.
   for example "⏱ 25 min Bern".
 - **Already on the way:** other trains that have left but not arrived are folded at the top of
   the list. The folded header turns amber or red when one of them has a problem.
-- **Direct only** (on by default, in Settings → Route → **Max changes** = 0): hides trains with a
+- **Direct only** (on by default, in Settings → Route → **Changes** = Direct only): hides trains with a
   change. The status line under the direction bar says "Direct only" while it is on. When the last direct train of
   the day has left, a note says so, with a button to show trains with a change.
 - **Long trips:** trips longer than 1:45 (live delays included) get a small amber ⏳ warning,
@@ -187,8 +187,8 @@ network returns, and warns you when the data is more than about 2 minutes old.
 Click **⚙️** at the top right to open Settings. On a computer it opens as a panel on the right,
 with the page still visible behind; on a phone it opens full screen. Close it with **✕**, the
 **Escape** key, a click beside it, or the phone's **back** button. Changes apply immediately: there
-is no Save button. The settings are grouped in sections: **Route**, **Alerts**, **Display**,
-**General** (language, refresh), **SBB data** (your key) and **Share** (the link).
+is no Save button. The settings are grouped in sections: **General** (language, refresh) at the top, then **Route**,
+**Alerts**, **Display**, **SBB data** (your key) and **Share** (the link).
 
 **Station A** and **Station B** are search fields: type 2 letters or more and pick a station from
 the suggestions (train stations first, then tram and bus stops), with the mouse or the arrow keys
@@ -203,7 +203,7 @@ and Enter. Escape keeps the current station.
 | Min. time to change trains (min) | 2 | `change=2` |
 | Wait at a station in orange above (min) | 20 | `wait=20` |
 | Walk between stations in orange above (min) | 10 | `walk=10` |
-| Max changes | 0 (Direct only) | `changes=0` (or `any`, `1`, `2`) |
+| Changes (right under the stations) | Direct only (or up to 1 change, up to 2 changes, any number) | `changes=0` (or `1`, `2`, `any`) |
 | Warn if trip longer than (h:mm) | 1:45 (amber) | `long=1:45` |
 | Red warning if longer than (h:mm) | 2:30 | `vlong=2:30` |
 | Refresh every (s) | 60 (minimum 30) | `refresh=60` |
