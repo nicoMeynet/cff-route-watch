@@ -55,12 +55,14 @@ change pushed to `main` is online within a minute or two.
   Lancy-Pont-Rouge → Aigle. The bar at the top shows the current direction once, with
   ☀️ Morning or 🌇 Afternoon. **⇄ Swap** shows the other direction until the next automatic
   switch (noon or midnight); the bar then says ✋ Manual. Swapping back returns to automatic.
-- **Direction from your location (optional):** in Settings → Route, tick **Direction from my
+- **Direction from your location (optional):** in Settings → Route, turn on **Direction from my
   location**. Near home (closer to your home station than to your work station), the page shows
   home → work; near work, work → home; the bar says 📍 Near home or 📍 Near work. Far from both
   (more than 30 km, e.g. on the train), or if the location is not allowed or not available, it falls
   back to the time of day. The location is checked when you open the page or come back to it, not
   continuously, and it stays on your device: only the distance to the two stations is computed.
+  Under the switch, a box shows what was found: the direction it gives, the distance to each
+  station, the accuracy and the time of the check, with a button to check again.
   On a computer, the location comes from Wi-Fi or the internet address and can be wrong, for
   example behind a company VPN; on Windows, location must be on in Settings → Privacy → Location.
 - **Top card:** your train, or the next one, with a big colour-coded status: green on time,
