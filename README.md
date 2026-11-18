@@ -58,9 +58,17 @@ change pushed to `main` is online within a minute or two.
 - **Direction from your location (optional):** in Settings → Route, turn on **Direction from my
   location**. Near home (closer to your home station than to your work station), the page shows
   home → work; near work, work → home; the bar says 📍 Near home or 📍 Near work. It then
-  **replaces the time-of-day switch**, which is greyed out in Settings. Far from both stations (more
-  than 30 km, e.g. on the train), or if the location is not allowed or not available, it keeps the
-  last direction found by location (📍 Last location). The location is checked when you open the page or come back to it, not
+  **replaces the time-of-day switch**, which is greyed out in Settings. "Near" means within 8 km of
+  the station. Further from both (e.g. on the train), or if the location is not allowed or not
+  available, it keeps the last direction found by location (📍 Last location). While your pinned
+  train is on its way, the direction never changes (🚆 On your train), even when you pass near a
+  station.
+- **Detect my train automatically** (on by default, needs the location option): the page compares
+  your position with the estimated position of each train on the way, or about to leave your
+  station, and asks "You seem to be on the RE 33 of 08:57. Is that right?". **✓ Yes** pins it as your
+  train, **✕ No** never asks again for that train. It needs a precise position (within about 1 km),
+  so it works best on a phone. While the app is open with the location on, the position is checked
+  about every 2 minutes. The location is checked when you open the page or come back to it, not
   continuously, and it stays on your device: only the distance to the two stations is computed.
   Under the switch, a box shows what was found: the direction it gives, the distance to each
   station, the accuracy and the time of the check, with a button to check again.
@@ -216,6 +224,7 @@ and Enter. Escape keeps the current station.
 | Home / Work | Aigle / Lancy-Pont-Rouge | `to=` / `from=` |
 | Direction switch (home → work before, work → home after) | 12:00 | `switch=12:00` |
 | Direction from my location | off | not in the link (kept in this browser) |
+| Detect my train automatically | on (when the location is on) | not in the link (kept in this browser) |
 | Alert if late ≥ (min) | 5 (red from 15) | `delay=5` |
 | Alerts (desktop notifications) | on, critical problems only | not in the link (kept in this browser) |
 | Min. time to change trains (min) | 2 | `change=2` |
