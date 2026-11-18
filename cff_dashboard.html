@@ -304,6 +304,9 @@
     header { gap: 8px; }
     header h1 { font-size: 18px; }
     #installBtn { order: 5; }
+    /* direction bar: the route may wrap rather than be cut */
+    .dir #dirRoute { white-space: normal; overflow: visible; }
+    .dir button { padding: 10px 10px; }
     /* stops list: arrival and departure on two lines */
     .stop .stime .ad { display: block; } .stop .stime .sep { display: none; }
     #refreshBtn .btxt { display: none; }
@@ -357,7 +360,7 @@
         <h3 data-i18n="secGeneral"></h3>
         <div class="srow"><span class="sl"><b data-i18n="langLabel"></b></span>
           <span class="sc"><span class="lang" id="langToggle" role="group" aria-label="Language">
-            <button data-lang="en">EN</button><button data-lang="fr">FR</button><button data-lang="de">DE</button><button data-lang="it">IT</button><button data-lang="es">ES</button>
+            <button data-lang="en">EN</button><button data-lang="fr">FR</button><button data-lang="de">DE</button><button data-lang="it">IT</button><button data-lang="es">ES</button><button data-lang="ja">JA</button>
           </span></span></div>
         <label class="srow"><span class="sl"><b data-i18n="interval"></b><small data-i18n="h_interval"></small></span><span class="sc"><input id="sInterval" type="number" min="60" max="900" step="30" inputmode="numeric"><em>s</em></span></label>
       </section>
@@ -608,6 +611,45 @@ const I18N = {
     updated: "Actualizado a las {t} · próxima actualización en {n} s", offline: "Estás sin conexión.", apiErr: "No se pudo acceder a la API de horarios ({e}).",
     lastKnown: "Últimos datos conocidos.",
     occ1: "baja", occ2: "media", occ3: "alta", occTitle: "{cls} clase: ocupación {lvl}", cls1: "1.ª", cls2: "2.ª",
+  },
+  ja: {
+    logo: "SBB", appName: "ルートウォッチ",
+    directOnly: "直通のみ", directTitle: "乗り換えなしの列車だけを表示",
+    alertsLabel: "アラート", alertsCheck: "列車の遅れや運休を知らせる", alertsDesktop: "デスクトップ通知はオンです。", alertsAsk: "ページのどこかをクリックすると、デスクトップ通知を許可できます。",
+    alertsBlocked: "このページではデスクトップ通知がブロックされています（ローカルファイルとして開いた場合によくあります）。ページ上のアラートとタブのタイトルの ⚠️ は引き続き表示されます。",
+    refresh: "↻ 更新", refreshTxt: "更新", loading: "読み込み中…", loadingConn: "接続を読み込み中…", refreshing: "更新中…",
+    hint: "接続をクリックすると<b>自分の列車</b>として固定できます。アラートはその列車に絞られ、出発後も到着まで監視が続きます。すでに走行中のほかの列車はリストの上にまとめて表示されます（問題があれば強調表示）。バーは等級ごとの予想混雑度です（緑：空いている・橙：普通・赤：混雑）。",
+    h_stA: "午後にここから出発", h_stB: "朝にここから出発", h_switchAt: "この時刻より前は自宅 → 職場、後は職場 → 自宅", h_maxTransfers: "", h_minChange: "これより短い乗り換えは「危うい」と表示", h_minDelay: "この値の3倍（最低15分）から大幅遅延", h_longTrip: "これを超えると橙色の警告", h_veryLongTrip: "これを超えると赤色の警告", h_longWait: "これを超えると橙色", h_longWalk: "これを超えると橙色", h_interval: "既定は2分（120秒）。間隔を短くすると時刻表APIへのリクエストが増えます。最短60秒。", secGeneral: "一般", dataMore: "運休の検出方法", opt0: "直通のみ", opt1: "乗り換え1回まで", opt2: "乗り換え2回まで", arrShort: "着", depShort: "発", schedTitle: "予定 {t}", settings: "設定", close: "閉じる", secRoute: "ルート", secAlerts: "アラート", secDisplay: "表示", secData: "SBBデータ", secShare: "共有", langLabel: "言語", stA: "職場", stB: "自宅",
+    switchAt: "方向の切り替え", minDelay: "遅延とみなす時間", minChange: "最低乗り換え時間", longWait: "駅での長い待ち時間", longWalk: "駅間の長い徒歩",
+    maxTransfers: "乗り換え", any: "制限なし", interval: "更新間隔", longTrip: "長い移動", veryLongTrip: "とても長い移動", linkLabel: "この設定のリンク", copyLink: "🔗 リンクをコピー", copied: "リンクをコピーしました。", copyFail: "リンクを選択してコピーしてください（Ctrl+C）。", linkHint: "設定はリンクに保存されます。ブックマークするか、同じ設定を使ってほしい人に送ってください。設定を変えるたびにページのアドレスが更新されます。ほかの人が開くには、ページがオンライン（GitHub Pages など）にある必要があります。パソコン上のファイルへのリンクは自分しか使えません。", searchPh: "駅を検索…", searchHint: "2文字以上入力してください", noStation: "駅が見つかりません", longTitle: "長い移動：合計 {t} 以上", stopsTitle: "停車駅（{n}）", remainLabel: "残り時間", remainArr: "{st} に {t} 着", nextStop: "次の停車駅：{st}（{t}）", showEarlier: "⋯ それ以前の停車駅を表示（{n}）", showEarlier1: "⋯ 前の停車駅を表示", hideEarlier: "⋯ それ以前の停車駅を隠す", posNotYet: "まだ出発していません：{st} を {t} に発車", posAt: "現在 {st}", posBetween: "現在 {a} と {b} の間", posArrived: "{st} に到着", posEstimated: "位置は時刻表とリアルタイムの遅れから推定しています（GPSデータなし）。", changeTo: "乗り換え → {x}",
+    dataHint: "データ：transport.opendata.ch（SBBリアルタイム）。このAPIには運休の明示的な表示がないため、ページは (1) 結果から消えた列車を検出し、(2) このルートでいつも走る列車を記憶して今日ない列車を示し、(3) 出発駅の発車案内を確認して<b>運休</b>と<b>成立しなくなった接続</b>を区別します。",
+    ojpKey: "SBBキー（OJP 2.0、任意）", ojpKeyPh: "api-manager.opentransportdata.swiss のキーを貼り付け", ojpTest: "キーをテスト", ojpOk: "キーは有効です：{n} 件の経路、SBBメッセージ {m} 件。", ojpBad: "SBBにキーが拒否されました（HTTP {c}）。", ojpNet: "SBBデータに接続できません（{e}）。", ojpNoKey: "先にキーを入力してください。", ojpHint: "無料の自分のキーがあれば、SBB公式データも表示されます：各停車駅のリアルタイムの遅れ（普通列車ではほかに情報がないことが多い）、運休、停車しない駅、列車ごとのSBBメッセージ。<b>キーの取得：</b><a href='https://api-manager.opentransportdata.swiss/' target='_blank' rel='noopener'>opentransportdata.swiss の API Manager ↗</a> で無料アカウントを作成し、<b>OJP 2.0</b> に登録して APIキーを作成します。キーはこのブラウザだけに保存され、リンクには入らず、opentransportdata.swiss にだけ送られます。", stNotServed: "{st} に停車しない", stNoLive: "リアルタイム情報なし", exSbbCancelled: "SBB：この列車は運休です", exSbbSkips: "SBB：この列車は {st} に停車しません", exNoLive: "出発後この列車のリアルタイム情報がありません。ほかの列車にはあるため、乱れている可能性があります。案内放送かSBBアプリを確認してください", sbbOk: "SBBデータ ✓", sbbErr: "SBBデータなし", stCancelled: "運休", stDropped: "接続なし", stUnverified: "運休の可能性", stEnroute: "乱れあり",
+    stMissed: "乗り換え不可", stRisk: "乗り換えが危うい", stOnTime: "定刻", stScheduled: "予定通り",
+    whyUsual: "いつもはこの時刻に走るのに今日はない", whyVanished: "時刻表から消えた",
+    exCancelled: "{why}、発車案内にもないため運休です",
+    exDropped: "{why}。最初の列車は走りますが、{to} への接続はもう成立しません（後の列車の運休または乗り換え不可）",
+    exUnverified: "{why}：運休の可能性があります（発車案内を確認できません）",
+    exEnroute: "{to} への到着が表示されなくなりました。途中で止まったか運休になった可能性があります。車内放送かSBBアプリでこの先の案内を確認してください",
+    exMissed: "{prev} の遅れが大きく、{at} での {next} への乗り換えができません", stLegCancelled: "{x} 運休", exLegGone: "{why}：{x} は発車案内にもなく、運休です", exStuck: "。その前の列車は走るため、{at} で足止めになります", exSbbLegCancelled: "SBB：{x} は運休です", exSbbLegSkips: "SBB：{x} は {st} に停車しません", exUnreach: "乗り継げない列車：{x}", walkTitle: "{a} から {b} まで徒歩：乗り換えまで {n} 分", waitTitle: "{a} で待ち：{n} 分", lgTrain: "列車", legend: "凡例", lgChange: "出発 / 乗り換え / 到着", lgWait: "駅で待ち", lgWalk: "別の駅へ徒歩", lgOk: "正常", lgLate: "遅れ", lgBad: "問題あり", lgOff: "乗り継げない", quipInfo: "量子情報", installApp: "📲 アプリをインストール", installTitle: "このページをアプリとしてインストール（スタートメニュー、タスクバー、専用ウィンドウ）", dirManual: "✋ 手動", dirMorning: "☀️ 朝", dirAfternoon: "🌇 午後", swapDir: "反対方向", swapTitle: "反対方向を表示：{r}", akCritical: "重要", ak_cancel: "運休、または自分の駅に停車しない", ak_missed: "乗り換え不可", ak_vlate: "大幅な遅れ（15分以上、またはしきい値の3倍）", ak_late: "遅れ（しきい値以上）", ak_risk: "乗り換えが危うい", ak_nolive: "リアルタイム情報なし", legsTitle: "あなたの列車", legUnreach: "乗り継げない", legChange: "{at} で乗り換え", legChangeLeft: "乗り換えまで {n} 分", legChangeMissed: "乗り換え不可（{n} 分）", legChangeTight: "ぎりぎり：{n} 分（予定 {p} 分）",
+    exRisk: "{at} での {next} への乗り換えまで残り {left} 分（予定 {planned} 分）",
+    exLate: "{n} 分遅れ", exArrival: "（到着 {t}）",
+    altPlatform: "、{p} 番線", altArrives: "、{t} 着", altLost: "（予定より {n} 分遅い）",
+    nextTrain: "次の列車", yourTrain: "📌 あなたの列車", onTheWay: "🚆 走行中",
+    noConn: "接続が見つかりません。", noDirectAfter: "{t} 以降の直通列車はありません。", noDirectNow: "今は直通列車がありません。", laterWithChange: "この後の列車は乗り換えが必要です（{x}…）。", showWithChange: "乗り換えありの列車を表示", noMoreDep: "この後の発車はありません。",
+    platform: "{p} 番線", platformWas: "（変更前 {p}）", towards: "{x} 行き",
+    transfers1: "乗り換え1回", transfersN: "乗り換え{n}回", direct: "直通",
+    altKicker: "おすすめの代替 · {n} 分後に発車", altSwitch: "📌 この列車に変更",
+    altNone: "リスト内に目的地へ行けるほかの接続はありません。更新するかSBBアプリを確認してください。",
+    departsIn: "{n} 分後に発車", departingNow: "まもなく発車", arrivesIn: "{n} 分後に到着",
+    stale: "⏱ データは {n} 分前のものです — 接続を確認するか更新してください。",
+    takeInstead: "代わりに：{x}", pinTitle: "クリックして自分の列車に固定",
+    rowOnWay: "🚆 走行中 · {t} 着", arrived: "到着", pl: "{p} 番線",
+    changeAt: "{at} で乗り換え：{x}", missed: "不可", nMin: "{n} 分",
+    onWayHeader: "🚆 走行中の列車（{n}）", withIssues: "問題あり {n} 本：{x}", allFine: "すべて正常",
+    manualUntil: "{t} まで手動選択、その後は自動", autoSwitch: "自動：{t} に {r} へ切り替え",
+    updated: "{t} 更新 · 次の更新まで {n} 秒", offline: "オフラインです。", apiErr: "時刻表APIに接続できません（{e}）。",
+    lastKnown: "最後に取得したデータを表示しています。",
+    occ1: "空いている", occ2: "普通", occ3: "混雑", occTitle: "{cls}等：混雑度 {lvl}", cls1: "1", cls2: "2",
   },
 };
 function detectLang() {
@@ -1397,6 +1439,21 @@ const QUIPS = {
     likely: ["El tren está probablemente en un universo paralelo.", "En la mayoría de los universos este tren circula. En este no."],
     dropped: ["Los trenes siguen existiendo, pero ya no están entrelazados entre sí.", "Tu conexión ha perdido su coherencia por el camino."],
   },
+  ja: {
+    ontime: ["波動関数が収縮しました：列車は予想どおりの場所にいます。", "観測完了：この列車に量子的な異常はありません。"],
+    scheduled: ["量子時刻表：定刻と遅延が同時に成り立っています。", "列車は定刻でもあり遅れてもいます…到着するまでは。🐱⚛️"],
+    late: ["量子遅延を検出しました。列車を観測しないでください。", "時刻表の時空に小さなゆらぎがあります。"],
+    vlate: ["到着時刻は現在、重ね合わせの状態です。", "到着時刻が高い励起状態に移りました。"],
+    risk: ["あなたの乗り換えは不確かなもつれ状態にあります。", "もつれが不安定です：乗り換えは成立するかもしれません。"],
+    missed: ["接続のデコヒーレンス：2本の列車はもうもつれていません。", "乗り換えは「次の列車」の状態に収縮しました。"],
+    cancelled: ["列車は量子跳躍をしました…行き先のないところへ。", "今日この列車が存在する確率：0。"],
+    skips: ["トンネル効果：列車はあなたの駅を止まらずに通り抜けます。", "あなたの駅はこの列車の確率の雲の外にあります。"],
+    nolive: ["列車は存在します。到着時刻は確率的です。", "測定値なし：列車は観測されていない状態です。"],
+    disrupted: ["シュレーディンガーの列車：ホームを確かめるまで、着いたとも着いていないとも言えます。", "誰かが箱を開けるまで、列車の状態はわかりません。"],
+    enroute: ["列車はハイゼンベルクに従います：位置が正確にわかるほど、到着時刻はわからなくなります。", "位置は推定、運動量は不確定。よい旅を。"],
+    likely: ["列車はおそらく並行宇宙にいます。", "ほとんどの宇宙ではこの列車は走っています。この宇宙を除いて。"],
+    dropped: ["列車はまだ存在しますが、互いにもつれてはいません。", "あなたの接続は途中でコヒーレンスを失いました。"],
+  },
 };
 // which fun line goes with this train's status (same logic as statusText)
 function quipKey(c, now = new Date()) {
@@ -1949,7 +2006,7 @@ function normName(v) { return String(v || "").toLowerCase().normalize("NFD").rep
 function msgText(byLang) {
   const own = byLang[lang];
   if (own) return own;
-  const pick = (lang === "es" ? ["en", "fr", "de"] : ["de"]).find(l => byLang[l]);
+  const pick = (["es", "ja"].includes(lang) ? ["en", "fr", "de"] : ["de"]).find(l => byLang[l]);
   const [l, v] = pick ? [pick, byLang[pick]] : Object.entries(byLang)[0];
   return `${v} (${l.toUpperCase()})`;
 }
