@@ -53,8 +53,9 @@ the Start menu and the taskbar, and Windows notifications.
   **CFF Route Watch** and choose **Start app when you sign in to your device**.
 - **Chrome:** the install icon at the right of the address bar, or menu **⋮ → Cast, save and
   share → Install page as app**.
-- **iPhone (Safari):** Share → **Add to Home Screen**. **Android (Chrome):** menu → **Install
-  app**.
+- **iPhone (Safari):** Share → **Add to Home Screen**, with **Open as Web App** turned on (otherwise
+  the icon opens Safari). The app on the home screen is separate from Safari: enter your SBB key
+  in its Settings again. **Android (Chrome):** menu → **Install app**.
 
 The app is the same page as the website: it keeps your settings and your SBB key, and each update
 pushed online is used the next time it opens. Like the browser tab, it only checks your trains
