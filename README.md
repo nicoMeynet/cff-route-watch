@@ -39,10 +39,12 @@ pushed online is used the next time it opens. Like the browser tab, it only chec
 while it is open (it can stay minimised). If the network is down, it still opens with the last
 saved copy of the page. Clicking a notification brings the app back to the front.
 
-**Badge on the app icon:** when the app is installed, its icon in the taskbar shows a badge for
-your train (the pinned one, or the next one): the **delay in minutes** (for example **7**), or a
-**mark** when it is cancelled, skips your stop, a change is missed or there is no live data.
-No badge when all is fine or when alerts are off.
+**Badge on the app icon:** when the app is installed, its icon in the taskbar shows **how many
+trains need your attention** in the current direction: your pinned train, or, without one, every
+train leaving in the next 2 hours. Only the problems ticked under **Alerts** count (by default the
+critical ones: cancelled or skipping your stop, change missed, very late). For example **2** = two
+trains are cancelled or very late. No badge when there is nothing to worry about, or when alerts
+are off.
 
 The online page is published with GitHub Pages from the `main` branch of this repository: any
 change pushed to `main` is online within a minute or two.
@@ -180,6 +182,12 @@ The page refreshes again as soon as you come back to the tab, the computer wakes
 network returns, and warns you when the data is more than about 2 minutes old.
 
 ## Settings
+
+Click **⚙️** at the top right to open Settings. On a computer it opens as a panel on the right,
+with the page still visible behind; on a phone it opens full screen. Close it with **✕**, the
+**Escape** key, a click beside it, or the phone's **back** button. Changes apply immediately: there
+is no Save button. The settings are grouped in sections: **Route**, **Alerts**, **Display**,
+**General** (language, refresh), **SBB data** (your key) and **Share** (the link).
 
 **Station A** and **Station B** are search fields: type 2 letters or more and pick a station from
 the suggestions (train stations first, then tram and bus stops), with the mouse or the arrow keys
