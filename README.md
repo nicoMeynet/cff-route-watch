@@ -233,7 +233,7 @@ and Enter. Escape keeps the current station.
 | Changes (right under the stations) | Direct only (or up to 1 change, up to 2 changes, any number) | `changes=0` (or `1`, `2`, `any`) |
 | Warn if trip longer than (h:mm) | 1:45 (amber) | `long=1:45` |
 | Red warning if longer than (h:mm) | 2:30 | `vlong=2:30` |
-| Refresh every (s) | 120 = 2 min (minimum 60) | `refresh=120` |
+| Refresh every (min) | 2 (from 1 to 15) | `refresh=120` (in seconds) |
 | Language | browser language | `lang=en` / `fr` / `de` / `it` / `es` / `ja` (or `jp`) |
 
 ## Settings in the link
