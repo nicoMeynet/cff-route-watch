@@ -42,7 +42,7 @@ saved copy of the page. Clicking a notification brings the app back to the front
 **Badge on the app icon:** when the app is installed, its icon in the taskbar shows **how many
 trains need your attention** in the current direction: your pinned train, or, without one, every
 train leaving in the next 2 hours. Only the problems ticked under **Alerts** count (by default the
-critical ones: cancelled or skipping your stop, change missed, very late; plus no live data). For example **2** = two
+critical ones: cancelled or skipping your stop, change missed, very late, no live data). For example **2** = two
 trains are cancelled or very late. No badge when there is nothing to worry about, or when alerts
 are off.
 
@@ -179,7 +179,7 @@ include the suggested alternative. With a train pinned, only that train triggers
 Otherwise, any train leaving in the next 2 hours does.
 
 **Which alerts:** under **Alerts** in Settings, tick the problems you want to be alerted about.
-The **critical** ones and **No live data** are on by default:
+The **critical** ones are on by default:
 
 | Alert | Default |
 |---|---|
@@ -188,7 +188,7 @@ The **critical** ones and **No live data** are on by default:
 | Very late (≥ 15 min, or 3× the alert delay) | on (critical) |
 | Late (≥ the alert delay) | off |
 | Change at risk | off |
-| No live data | on |
+| No live data | on (critical) |
 
 The choice applies to desktop notifications and to the badge on the app icon. The page itself
 still shows every problem (colours, status and the ⚠️ in the tab title).

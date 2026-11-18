@@ -732,10 +732,10 @@ lang = I18N[cfg.lang] ? cfg.lang : detectLang();
 let pinnedKey = load("cff.pinned", null);
 // alerts are on by default (a new storage key, so everyone starts with them on)
 let notifyOn = load("cff.alerts", true);
-// which problems send an alert: the critical ones and "no live data" by default
+// which problems send an alert: the critical ones are on by default
 const ALERT_KINDS = [
   { k: "cancel", crit: true, on: true }, { k: "missed", crit: true, on: true }, { k: "vlate", crit: true, on: true },
-  { k: "late", crit: false, on: false }, { k: "risk", crit: false, on: false }, { k: "nolive", crit: false, on: true },
+  { k: "nolive", crit: true, on: true }, { k: "late", crit: false, on: false }, { k: "risk", crit: false, on: false },
 ];
 let alertKinds = new Set(load("cff.alertKinds", ALERT_KINDS.filter(a => a.on).map(a => a.k)));
 let seen = {};    // today's connections already seen (key -> summary), per direction
@@ -2204,7 +2204,7 @@ window.addEventListener("focus", () => checkGeo());
 // --- version ---------------------------------------------------------------------------
 // APP_VERSION is set by hand at each release; the update date comes from the server (the date the
 // page was last published), so it is always right even if the version is not bumped.
-const APP_VERSION = "2026.11.18.2";
+const APP_VERSION = "2026.11.18.3";
 const REPO_URL = "https://github.com/nicoMeynet/cff-route-watch";
 function paintVersion() {
   const d = new Date(document.lastModified);
