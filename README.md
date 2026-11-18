@@ -55,6 +55,14 @@ change pushed to `main` is online within a minute or two.
   Lancy-Pont-Rouge → Aigle. The bar at the top shows the current direction once, with
   ☀️ Morning or 🌇 Afternoon. **⇄ Swap** shows the other direction until the next automatic
   switch (noon or midnight); the bar then says ✋ Manual. Swapping back returns to automatic.
+- **Direction from your location (optional):** in Settings → Route, tick **Direction from my
+  location**. Near home (closer to your home station than to your work station), the page shows
+  home → work; near work, work → home; the bar says 📍 Near home or 📍 Near work. Far from both
+  (more than 30 km, e.g. on the train), or if the location is not allowed or not available, it falls
+  back to the time of day. The location is checked when you open the page or come back to it, not
+  continuously, and it stays on your device: only the distance to the two stations is computed.
+  On a computer, the location comes from Wi-Fi or the internet address and can be wrong, for
+  example behind a company VPN; on Windows, location must be on in Settings → Privacy → Location.
 - **Top card:** your train, or the next one, with a big colour-coded status: green on time,
   amber late (≥ 5 min), red very late (≥ 15 min) or cancelled. It shows live times next to the
   crossed-out scheduled ones, platform changes and a countdown.
@@ -202,6 +210,7 @@ and Enter. Escape keeps the current station.
 |---|---|---|
 | Home / Work | Aigle / Lancy-Pont-Rouge | `to=` / `from=` |
 | Direction switch (home → work before, work → home after) | 12:00 | `switch=12:00` |
+| Direction from my location | off | not in the link (kept in this browser) |
 | Alert if late ≥ (min) | 5 (red from 15) | `delay=5` |
 | Alerts (desktop notifications) | on, critical problems only | not in the link (kept in this browser) |
 | Min. time to change trains (min) | 2 | `change=2` |
