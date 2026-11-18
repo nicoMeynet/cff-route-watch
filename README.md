@@ -9,6 +9,25 @@ files next to it make it an installable app: `manifest.webmanifest`, `sw.js` and
 
 **Open it online: https://nicomeynet.github.io/cff-route-watch/**
 
+## Why this app?
+
+The SBB app is made to plan any trip, anywhere. If you take **the same train every day**, it is not
+very practical: you search for your connection again each time, and you have to open it and look to
+find out whether your train is late or cancelled.
+
+This app does one thing: it shows **the status of your daily train** at a glance.
+
+- **Simple:** your two stations are set once. The page opens straight on the right direction
+  (morning or afternoon, or from your location) and on your next train, with a big green, amber or
+  red status.
+- **On your computer's desktop:** installed as an app, it sits in the taskbar like any other
+  program. A badge on its icon shows how many of your trains have a problem, so you see the status
+  without opening it.
+- **Alerts:** a desktop notification when your train is cancelled, very late, skips your stop or
+  makes you miss your change, with the best alternative.
+
+It also works in any browser and on a phone.
+
 ## Getting started
 
 Open **https://nicomeynet.github.io/cff-route-watch/** in your browser, on a computer or a phone.
