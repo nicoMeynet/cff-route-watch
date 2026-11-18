@@ -172,7 +172,7 @@ change pushed to `main` is online within a minute or two.
 - **Best alternative:** when your train is cancelled, misses its change or is very late, the
   page suggests the train that gets you there soonest, with a **Switch to this train** button.
 
-## Official SBB data (optional)
+## Official SBB data (free key, recommended)
 
 The data source above (transport.opendata.ch) has no cancellation flag, and often no live data at
 all for regional trains such as the RE33. With your own **free key** for the official SBB API
@@ -192,7 +192,11 @@ To set it up:
 
 1. Create a free account on the [API Manager](https://api-manager.opentransportdata.swiss/),
    subscribe to **OJP 2.0** and create an API key.
-2. In Settings, paste it in **SBB key (OJP 2.0, optional)** and click **Test the key**.
+2. In Settings, paste it in **SBB key (OJP 2.0, free, recommended)** and click **Test the key**.
+
+Without a key, an amber banner at the top of the page (and above the key field in Settings) says
+that delays and cancelled trains may be missing or wrong, and that the key is free.
+**Add a free key** opens Settings on the key field. The banner disappears once a key is entered.
 
 The key is **kept in this browser only**: it is never put in the settings link, never written in
 the page and only sent to opentransportdata.swiss. Everyone who uses the page enters their own
