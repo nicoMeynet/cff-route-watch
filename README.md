@@ -94,7 +94,7 @@ change pushed to `main` is online within a minute or two.
   that matches it, for example "Arrival time is currently in superposition." for a big delay, or
   "Schrödinger's train" for a train disrupted on the way. The status itself and the
   notifications stay serious.
-- **Languages:** English, French and German (EN · FR · DE switch). On first opening, the page
+- **Languages:** English, French, German, Italian and Spanish (EN · FR · DE · IT · ES, in Settings). On first opening, the page
   uses your browser's language.
 
 ## Delays and cancellations
@@ -190,14 +190,15 @@ with the page still visible behind; on a phone it opens full screen. Close it wi
 is no Save button. The settings are grouped in sections: **General** (language, refresh) at the top, then **Route**,
 **Alerts**, **Display**, **SBB data** (your key) and **Share** (the link).
 
-**Station A** and **Station B** are search fields: type 2 letters or more and pick a station from
+**Home** (where you leave from in the morning) and **Work** (where you leave from in the
+afternoon) are search fields, shown in that order: type 2 letters or more and pick a station from
 the suggestions (train stations first, then tram and bus stops), with the mouse or the arrow keys
 and Enter. Escape keeps the current station.
 
 | Setting | Default | In the link |
 |---|---|---|
-| Station A / Station B | Lancy-Pont-Rouge / Aigle | `from=` / `to=` |
-| Mornings B → A, switch to A → B at | 12:00 | `switch=12:00` |
+| Home / Work | Aigle / Lancy-Pont-Rouge | `to=` / `from=` |
+| Direction switch (home → work before, work → home after) | 12:00 | `switch=12:00` |
 | Alert if late ≥ (min) | 5 (red from 15) | `delay=5` |
 | Alerts (desktop notifications) | on, critical problems only | not in the link (kept in this browser) |
 | Min. time to change trains (min) | 2 | `change=2` |
@@ -207,7 +208,7 @@ and Enter. Escape keeps the current station.
 | Warn if trip longer than (h:mm) | 1:45 (amber) | `long=1:45` |
 | Red warning if longer than (h:mm) | 2:30 | `vlong=2:30` |
 | Refresh every (s) | 60 (minimum 30) | `refresh=60` |
-| Language | browser language | `lang=en` / `fr` / `de` |
+| Language | browser language | `lang=en` / `fr` / `de` / `it` / `es` |
 
 ## Settings in the link
 
