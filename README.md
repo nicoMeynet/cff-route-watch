@@ -202,6 +202,8 @@ with the page still visible behind; on a phone it opens full screen. Close it wi
 **Escape** key, a click beside it, or the phone's **back** button. Changes apply immediately: there
 is no Save button. The settings are grouped in sections: **General** (language, refresh) at the top, then **Route**,
 **Alerts**, **Display**, **SBB data** (your key) and **Share** (the link).
+At the bottom: the **version**, the date the page was last **updated** online, and a link to the
+list of changes.
 
 **Home** (where you leave from in the morning) and **Work** (where you leave from in the
 afternoon) are search fields, shown in that order: type 2 letters or more and pick a station from
