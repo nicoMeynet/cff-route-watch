@@ -83,7 +83,8 @@ change pushed to `main` is online within a minute or two.
   for example "⏱ 25 min Bern".
 - **Already on the way:** other trains that have left but not arrived are folded at the top of
   the list. The folded header turns amber or red when one of them has a problem.
-- **Direct only** (on by default): hides trains with a change. When the last direct train of
+- **Direct only** (on by default, in Settings → Route → **Max changes** = 0): hides trains with a
+  change. The status line under the direction bar says "Direct only" while it is on. When the last direct train of
   the day has left, a note says so, with a button to show trains with a change.
 - **Long trips:** trips longer than 1:45 (live delays included) get a small amber ⏳ warning,
   and trips longer than 2:30 a red one.

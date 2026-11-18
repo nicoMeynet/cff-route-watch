@@ -300,7 +300,7 @@
     /* phone header: title, ↻ and ⚙️ on the first line, "Direct only" below */
     header { gap: 8px; }
     header h1 { font-size: 18px; }
-    #directBtn, #installBtn { order: 5; }
+    #installBtn { order: 5; }
     #refreshBtn .btxt { display: none; }
     #refreshBtn, .gear { padding: 6px 11px; }
     /* phone: the scheduled time goes small above the live one, so the times fit on one line */
@@ -326,7 +326,6 @@
   <header>
     <h1><span class="logo" id="logo">CFF</span> <span id="appName">Route Watch</span></h1>
     <span class="spacer"></span>
-    <button id="directBtn"></button>
     <button id="installBtn" hidden></button>
     <button id="refreshBtn"><span aria-hidden="true">↻</span><span class="btxt" data-i18n="refreshTxt"></span></button>
     <button id="settingsBtn" class="gear" type="button" aria-haspopup="dialog" aria-controls="settingsPanel"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
@@ -1506,7 +1505,8 @@ function updateStatusLine() {
   const base = inFlight ? t("refreshing") : lastFetch ? t("updated", { t: `${hhmm(lastFetch)}:${pad(lastFetch.getSeconds())}`, n: secs }) : t("loading");
   el.className = fetchErr ? "err" : "";
   const sbbState = ojpState ? " · " + (ojpState.ok ? t("sbbOk") : t("sbbErr")) : "";
-  el.textContent = (fetchErr ? `${t(fetchErr.key, { e: fetchErr.e })} ${t("lastKnown")} ${base}` : base) + sbbState;
+  const filter = cfg.maxTransfers === "0" ? `${t("directOnly")} · ` : "";
+  el.textContent = filter + (fetchErr ? `${t(fetchErr.key, { e: fetchErr.e })} ${t("lastKnown")} ${base}` : base) + sbbState;
 }
 
 // --- keep data fresh after sleep / background / network loss --------------------------
@@ -1587,11 +1587,8 @@ async function askNotifyPermission() {
   paintNotifBtn(); maybeNotify();
 }
 document.addEventListener("click", askNotifyPermission, { once: true });
+// "Direct only" is set in Settings (Max changes = 0); the status line says when it is on
 function paintDirectBtn() {
-  const on = cfg.maxTransfers === "0";
-  $("directBtn").textContent = (on ? "✓ " : "") + t("directOnly");
-  $("directBtn").title = t("directTitle");
-  $("directBtn").classList.toggle("on", on);
   $("sTransfers").value = cfg.maxTransfers;
 }
 // static texts + language buttons
@@ -1610,10 +1607,6 @@ function applyLang() {
 $("langToggle").onclick = e => {
   const b = e.target.closest("button[data-lang]"); if (!b) return;
   lang = b.dataset.lang; cfg.lang = lang; saveCfg(); applyLang();
-};
-$("directBtn").onclick = () => {
-  cfg.maxTransfers = cfg.maxTransfers === "0" ? "" : "0";
-  saveCfg(); paintDirectBtn(); refresh();
 };
 $("sNotify").onchange = async () => {
   notifyOn = $("sNotify").checked;
