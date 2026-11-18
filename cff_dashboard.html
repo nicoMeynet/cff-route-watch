@@ -40,11 +40,17 @@
   button.on { background: var(--pin); color: #fff; border-color: var(--pin); }
   .status-line { font-size: 13px; color: var(--muted); }
   .status-line .err { color: var(--bad); }
-  .dir { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; margin-bottom: 10px;
+  /* the direction: shown once, with a button to swap it */
+  .dir { display: flex; align-items: center; gap: 4px; padding: 4px; margin-bottom: 10px;
     background: var(--card); border: 1px solid var(--line); border-radius: 12px; }
-  .dir button { border: 0; border-radius: 9px; padding: 10px 12px; font-weight: 600; font-size: 15px; background: transparent; color: var(--muted); }
-  .dir button[aria-selected="true"] { background: var(--accent); color: #fff; }
-  .dir button:hover:not([aria-selected="true"]) { color: var(--text); background: color-mix(in srgb, var(--line) 50%, transparent); }
+  .dir .dirroute { flex: 1; min-width: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; padding: 9px 14px; border-radius: 9px;
+    background: var(--accent); color: #fff; font-weight: 700; font-size: 16px; }
+  .dir .dirwhen { flex: none; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em;
+    background: rgba(255,255,255,.22); border-radius: 6px; padding: 2px 7px; }
+  .dir #dirRoute { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .dir button { flex: none; border: 0; border-radius: 9px; padding: 10px 14px; font-weight: 600; font-size: 15px;
+    background: transparent; color: var(--muted); white-space: nowrap; }
+  .dir button:hover { color: var(--text); background: color-mix(in srgb, var(--line) 50%, transparent); }
 
   .hero { border-radius: 14px; padding: 22px 24px; margin-bottom: 16px; background: var(--card);
     border: 2px solid var(--line); display: grid; grid-template-columns: 1fr auto; gap: 8px 20px; align-items: center; }
@@ -52,7 +58,9 @@
   .hero.warn { border-color: var(--warn); background: var(--warn-bg); }
   .hero.bad { border-color: var(--bad); background: var(--bad-bg); }
   .hero .kicker { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
-  .hero .times { font-size: 34px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .hero .times { font-size: 34px; font-weight: 700; font-variant-numeric: tabular-nums; display: flex; align-items: baseline; flex-wrap: wrap; gap: 0 10px; }
+  .hero .times .tm { white-space: nowrap; }
+  .hero .times b { font-weight: 700; }
   .hero .times s { color: var(--muted); font-weight: 400; font-size: 24px; margin-right: 6px; }
   .hero .meta { color: var(--muted); }
   .hero .why { margin-top: 6px; font-weight: 500; }
@@ -236,6 +244,10 @@
   details.settings summary { cursor: pointer; font-weight: 600; }
   .alertfield { grid-column: 1 / -1; }
   .alertfield .check { display: flex; align-items: center; gap: 6px; font-weight: 500; }
+  .alertfield .kinds { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 4px 16px; margin: 2px 0 2px 24px; }
+  .alertfield .kinds label { display: flex; align-items: center; gap: 6px; font-weight: 400; font-size: 14px; }
+  .alertfield .kinds.off { opacity: .5; }
+  .alertfield .kinds .crit { font-size: 11px; font-weight: 700; color: var(--bad); text-transform: uppercase; letter-spacing: .03em; }
   .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-top: 12px; }
   label { display: grid; gap: 4px; font-size: 13px; color: var(--muted); }
   input, select { font: inherit; padding: 6px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--text); }
@@ -243,10 +255,18 @@
   .copyright { margin-top: 24px; text-align: center; font-size: 12px; color: var(--muted); }
 
   @media (max-width: 560px) {
-    .hero { grid-template-columns: 1fr; }
+    .hero { grid-template-columns: 1fr; padding: 18px 16px; }
+    /* phone: the scheduled time goes small above the live one, so the times fit on one line */
+    .hero .times { font-size: 32px; flex-wrap: nowrap; align-items: flex-end; }
+    .hero .times .tm { display: inline-flex; flex-direction: column; line-height: 1.05; }
+    .hero .times s { font-size: 15px; margin: 0 0 2px; }
+    .hero .big { font-size: 24px; }
     .hero .big, .hero .countdown { text-align: left; }
-    .row { grid-template-columns: 18px 84px 1fr; }
-    .row .chip, .row .chipwrap { grid-column: 2 / -1; justify-self: start; }
+    /* phone: times and status on the first line, details below, then the trip line */
+    .row { grid-template-columns: 18px 1fr auto; grid-template-areas: "pin t chip" ". det det" ". track track"; gap: 4px 10px; }
+    .row .pin { grid-area: pin; } .row .t { grid-area: t; white-space: nowrap; }
+    .row .det { grid-area: det; } .row .chipwrap { grid-area: chip; justify-self: end; }
+    .row .track { grid-area: track; margin-top: 2px; }
   }
   .lang { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
   .lang button { border: 0; border-radius: 0; padding: 6px 9px; font-size: 13px; font-weight: 600; color: var(--muted); }
@@ -266,10 +286,9 @@
     <button id="installBtn" hidden></button>
     <button id="refreshBtn" data-i18n="refresh"></button>
   </header>
-  <div class="dir" id="dirToggle" role="tablist">
-    <!-- mornings on the left, afternoons on the right -->
-    <button data-dir="back" role="tab"></button>
-    <button data-dir="out" role="tab"></button>
+  <div class="dir" id="dirToggle">
+    <div class="dirroute"><span class="dirwhen" id="dirWhen"></span><span id="dirRoute"></span></div>
+    <button id="dirSwap" type="button" data-dir="out"></button>
   </div>
   <div class="status-line"><span class="route" id="routeLabel"></span> · <span id="statusLine"></span></div>
 
@@ -298,6 +317,7 @@
       <label><span data-i18n="interval"></span> <input id="sInterval" type="number" min="30" max="900" step="30"></label>
       <div class="field alertfield"><span data-i18n="alertsLabel"></span>
         <label class="check"><input id="sNotify" type="checkbox"> <span data-i18n="alertsCheck"></span></label>
+        <div class="kinds" id="alertKinds"></div>
         <span id="notifState" class="io-msg" role="status"></span></div>
       <div class="field keyfield"><span data-i18n="ojpKey"></span>
         <span class="keyrow"><input id="sOjpKey" type="password" autocomplete="off" spellcheck="false" data-i18n-ph="ojpKeyPh">
@@ -338,7 +358,7 @@ const I18N = {
     exDropped: "{why}; the first train still runs, but the connection to {to} no longer works (later train cancelled or change impossible)",
     exUnverified: "{why}: likely cancelled (departure board could not be checked)",
     exEnroute: "is no longer shown as reaching {to}: it may have been stopped or cancelled during the trip. Listen to the announcements on board or check the SBB app for onward options",
-    exMissed: "the {prev} is too late: the change at {at} for the {next} will be missed", stLegCancelled: "{x} cancelled", exLegGone: "{why}: the {x} is no longer on the departure board, it is cancelled", exStuck: "; the trains before it run, so you would be stuck at {at}", exSbbLegCancelled: "SBB: the {x} is cancelled", exSbbLegSkips: "SBB: the {x} will not stop at {st}", exUnreach: "no longer reachable: {x}", walkTitle: "walk from {a} to {b}: {n} min to change", waitTitle: "wait at {a}: {n} min", lgTrain: "train", lgChange: "get on / change / get off", lgWait: "wait at the station", lgWalk: "walk to another station", lgOk: "fine", lgLate: "late", lgBad: "problem", lgOff: "not reachable", quipInfo: "Quantum info", installApp: "📲 Install the app", installTitle: "Install this page as an app (Start menu, taskbar, own window)", legsTitle: "Your trains", legUnreach: "Not reachable", legChange: "change at {at}", legChangeLeft: "{n} min to change", legChangeMissed: "change missed ({n} min)", legChangeTight: "tight: {n} min (planned {p})",
+    exMissed: "the {prev} is too late: the change at {at} for the {next} will be missed", stLegCancelled: "{x} cancelled", exLegGone: "{why}: the {x} is no longer on the departure board, it is cancelled", exStuck: "; the trains before it run, so you would be stuck at {at}", exSbbLegCancelled: "SBB: the {x} is cancelled", exSbbLegSkips: "SBB: the {x} will not stop at {st}", exUnreach: "no longer reachable: {x}", walkTitle: "walk from {a} to {b}: {n} min to change", waitTitle: "wait at {a}: {n} min", lgTrain: "train", lgChange: "get on / change / get off", lgWait: "wait at the station", lgWalk: "walk to another station", lgOk: "fine", lgLate: "late", lgBad: "problem", lgOff: "not reachable", quipInfo: "Quantum info", installApp: "📲 Install the app", installTitle: "Install this page as an app (Start menu, taskbar, own window)", dirManual: "✋ Manual", dirMorning: "☀️ Morning", dirAfternoon: "🌇 Afternoon", swapDir: "Swap", swapTitle: "Show the other direction: {r}", akCritical: "critical", ak_cancel: "Train cancelled or skipping my stop", ak_missed: "Change missed", ak_vlate: "Very late (≥ 15 min, or 3× the alert delay)", ak_late: "Late (≥ the alert delay)", ak_risk: "Change at risk", ak_nolive: "No live data", legsTitle: "Your trains", legUnreach: "Not reachable", legChange: "change at {at}", legChangeLeft: "{n} min to change", legChangeMissed: "change missed ({n} min)", legChangeTight: "tight: {n} min (planned {p})",
     exRisk: "only {left} min left to change at {at} for the {next} (planned {planned} min)",
     exLate: "{n} min late", exArrival: " (arrival {t})",
     altPlatform: ", platform {p}", altArrives: ", arrives {t}", altLost: " ({n} min later than planned)",
@@ -377,7 +397,7 @@ const I18N = {
     exDropped: "{why} ; le premier train circule, mais la correspondance vers {to} ne fonctionne plus (train suivant supprimé ou changement impossible)",
     exUnverified: "{why} : probablement supprimé (tableau des départs non vérifiable)",
     exEnroute: "n’est plus indiqué comme arrivant à {to} : il a peut-être été arrêté ou supprimé en cours de route. Écoutez les annonces à bord ou consultez l’app CFF pour la suite du trajet",
-    exMissed: "le {prev} est trop en retard : le changement à {at} pour le {next} sera manqué", stLegCancelled: "{x} supprimé", exLegGone: "{why} : le {x} n’est plus au tableau des départs, il est supprimé", exStuck: " ; les trains d’avant circulent : vous resteriez bloqué à {at}", exSbbLegCancelled: "CFF : le {x} est supprimé", exSbbLegSkips: "CFF : le {x} ne s’arrêtera pas à {st}", exUnreach: "plus atteignables : {x}", walkTitle: "à pied de {a} à {b} : {n} min pour changer", waitTitle: "attente à {a} : {n} min", lgTrain: "train", lgChange: "départ / changement / arrivée", lgWait: "attente en gare", lgWalk: "à pied vers une autre gare", lgOk: "OK", lgLate: "retard", lgBad: "problème", lgOff: "plus atteignable", quipInfo: "Info quantique", installApp: "📲 Installer l’app", installTitle: "Installer cette page comme une application (menu Démarrer, barre des tâches, fenêtre à part)", legsTitle: "Vos trains", legUnreach: "Plus atteignable", legChange: "changement à {at}", legChangeLeft: "{n} min pour changer", legChangeMissed: "changement manqué ({n} min)", legChangeTight: "juste : {n} min (prévu {p})",
+    exMissed: "le {prev} est trop en retard : le changement à {at} pour le {next} sera manqué", stLegCancelled: "{x} supprimé", exLegGone: "{why} : le {x} n’est plus au tableau des départs, il est supprimé", exStuck: " ; les trains d’avant circulent : vous resteriez bloqué à {at}", exSbbLegCancelled: "CFF : le {x} est supprimé", exSbbLegSkips: "CFF : le {x} ne s’arrêtera pas à {st}", exUnreach: "plus atteignables : {x}", walkTitle: "à pied de {a} à {b} : {n} min pour changer", waitTitle: "attente à {a} : {n} min", lgTrain: "train", lgChange: "départ / changement / arrivée", lgWait: "attente en gare", lgWalk: "à pied vers une autre gare", lgOk: "OK", lgLate: "retard", lgBad: "problème", lgOff: "plus atteignable", quipInfo: "Info quantique", installApp: "📲 Installer l’app", installTitle: "Installer cette page comme une application (menu Démarrer, barre des tâches, fenêtre à part)", dirManual: "✋ Manuel", dirMorning: "☀️ Matin", dirAfternoon: "🌇 Après-midi", swapDir: "Inverser", swapTitle: "Afficher l’autre sens : {r}", akCritical: "critique", ak_cancel: "Train supprimé ou qui ne dessert pas mon arrêt", ak_missed: "Changement manqué", ak_vlate: "Gros retard (≥ 15 min, ou 3× le seuil d’alerte)", ak_late: "Retard (≥ le seuil d’alerte)", ak_risk: "Changement compromis", ak_nolive: "Pas de temps réel", legsTitle: "Vos trains", legUnreach: "Plus atteignable", legChange: "changement à {at}", legChangeLeft: "{n} min pour changer", legChangeMissed: "changement manqué ({n} min)", legChangeTight: "juste : {n} min (prévu {p})",
     exRisk: "plus que {left} min pour changer à {at} pour le {next} (prévu {planned} min)",
     exLate: "{n} min de retard", exArrival: " (arrivée {t})",
     altPlatform: ", voie {p}", altArrives: ", arrivée {t}", altLost: " ({n} min plus tard que prévu)",
@@ -416,7 +436,7 @@ const I18N = {
     exDropped: "{why}; der erste Zug fährt noch, aber die Verbindung nach {to} klappt nicht mehr (Anschlusszug fällt aus oder Umsteigen unmöglich)",
     exUnverified: "{why}: fällt wohl aus (Abfahrtstafel konnte nicht geprüft werden)",
     exEnroute: "wird nicht mehr mit Ankunft in {to} angezeigt: Er wurde möglicherweise unterwegs angehalten oder gestrichen. Achten Sie auf die Durchsagen im Zug oder prüfen Sie die SBB-App für die Weiterreise",
-    exMissed: "der {prev} ist zu spät: Der Anschluss in {at} auf den {next} wird verpasst", stLegCancelled: "{x} fällt aus", exLegGone: "{why}: Der {x} steht nicht mehr auf der Abfahrtstafel, er fällt aus", exStuck: "; die Züge davor fahren, Sie würden in {at} festsitzen", exSbbLegCancelled: "SBB: Der {x} fällt aus", exSbbLegSkips: "SBB: Der {x} hält nicht in {st}", exUnreach: "nicht mehr erreichbar: {x}", walkTitle: "zu Fuss von {a} nach {b}: {n} Min. zum Umsteigen", waitTitle: "Wartezeit in {a}: {n} Min.", lgTrain: "Zug", lgChange: "Abfahrt / Umsteigen / Ankunft", lgWait: "Wartezeit im Bahnhof", lgWalk: "zu Fuss zu einer anderen Haltestelle", lgOk: "OK", lgLate: "Verspätung", lgBad: "Problem", lgOff: "nicht erreichbar", quipInfo: "Quanten-Info", installApp: "📲 App installieren", installTitle: "Diese Seite als App installieren (Startmenü, Taskleiste, eigenes Fenster)", legsTitle: "Ihre Züge", legUnreach: "Nicht erreichbar", legChange: "Umsteigen in {at}", legChangeLeft: "{n} Min. zum Umsteigen", legChangeMissed: "Anschluss verpasst ({n} Min.)", legChangeTight: "knapp: {n} Min. (geplant {p})",
+    exMissed: "der {prev} ist zu spät: Der Anschluss in {at} auf den {next} wird verpasst", stLegCancelled: "{x} fällt aus", exLegGone: "{why}: Der {x} steht nicht mehr auf der Abfahrtstafel, er fällt aus", exStuck: "; die Züge davor fahren, Sie würden in {at} festsitzen", exSbbLegCancelled: "SBB: Der {x} fällt aus", exSbbLegSkips: "SBB: Der {x} hält nicht in {st}", exUnreach: "nicht mehr erreichbar: {x}", walkTitle: "zu Fuss von {a} nach {b}: {n} Min. zum Umsteigen", waitTitle: "Wartezeit in {a}: {n} Min.", lgTrain: "Zug", lgChange: "Abfahrt / Umsteigen / Ankunft", lgWait: "Wartezeit im Bahnhof", lgWalk: "zu Fuss zu einer anderen Haltestelle", lgOk: "OK", lgLate: "Verspätung", lgBad: "Problem", lgOff: "nicht erreichbar", quipInfo: "Quanten-Info", installApp: "📲 App installieren", installTitle: "Diese Seite als App installieren (Startmenü, Taskleiste, eigenes Fenster)", dirManual: "✋ Manuell", dirMorning: "☀️ Morgen", dirAfternoon: "🌇 Nachmittag", swapDir: "Umkehren", swapTitle: "Andere Richtung anzeigen: {r}", akCritical: "kritisch", ak_cancel: "Zug fällt aus oder hält nicht an meinem Halt", ak_missed: "Anschluss verpasst", ak_vlate: "Grosse Verspätung (≥ 15 Min. oder 3× die Alarmschwelle)", ak_late: "Verspätung (≥ Alarmschwelle)", ak_risk: "Anschluss gefährdet", ak_nolive: "Keine Echtzeitdaten", legsTitle: "Ihre Züge", legUnreach: "Nicht erreichbar", legChange: "Umsteigen in {at}", legChangeLeft: "{n} Min. zum Umsteigen", legChangeMissed: "Anschluss verpasst ({n} Min.)", legChangeTight: "knapp: {n} Min. (geplant {p})",
     exRisk: "nur noch {left} Min. zum Umsteigen in {at} auf den {next} (geplant {planned} Min.)",
     exLate: "{n} Min. Verspätung", exArrival: " (Ankunft {t})",
     altPlatform: ", Gleis {p}", altArrives: ", Ankunft {t}", altLost: " ({n} Min. später als geplant)",
@@ -489,6 +509,12 @@ lang = I18N[cfg.lang] ? cfg.lang : detectLang();
 let pinnedKey = load("cff.pinned", null);
 // alerts are on by default (a new storage key, so everyone starts with them on)
 let notifyOn = load("cff.alerts", true);
+// which problems send an alert: the critical ones by default
+const ALERT_KINDS = [
+  { k: "cancel", crit: true }, { k: "missed", crit: true }, { k: "vlate", crit: true },
+  { k: "late", crit: false }, { k: "risk", crit: false }, { k: "nolive", crit: false },
+];
+let alertKinds = new Set(load("cff.alertKinds", ALERT_KINDS.filter(a => a.crit).map(a => a.k)));
 let seen = {};    // today's connections already seen (key -> summary), per direction
 let usual = {};   // trains that usually run on this route (pattern -> history), per direction
 let again = false; // a refresh was requested while one was running
@@ -1224,11 +1250,15 @@ let badgeShown = null;
 function updateBadge(c) {
   if (!("setAppBadge" in navigator)) return;
   let v = null; // null = no badge, 0 = a mark without number, n = minutes late
-  if (notifyOn && c && level(c) !== "ok") v = tripBroken(c) || c.noLive ? 0 : c.maxDelay || 0;
+  if (notifyOn && c && level(c) !== "ok" && wantsAlert(c)) v = tripBroken(c) || c.noLive ? 0 : c.maxDelay || 0;
   if (v === badgeShown) return;
   badgeShown = v;
   (v === null ? navigator.clearAppBadge() : v ? navigator.setAppBadge(v) : navigator.setAppBadge()).catch(() => {});
 }
+
+// a time on the top card: the live time, with the scheduled one crossed out when it differs
+// (beside it on a wide screen, above it on a phone, so departure → arrival stays on one line)
+const heroTime = (sched, live, delay) => `<span class="tm">${delay ? `<s>${hhmm(sched)}</s>` : ""}<b>${hhmm(delay ? live : sched)}</b></span>`;
 
 // --- rendering ------------------------------------------------------------------
 function render() {
@@ -1280,7 +1310,7 @@ function render() {
     hero.innerHTML = `
       <div>
         <div class="kicker">${isPinned ? esc(t("yourTrain")) + (enRoute(mine, now) ? " · " + esc(t("onTheWay")) : "") : esc(t("nextTrain"))}</div>
-        <div class="times">${mine.depDelay ? `<s>${hhmm(dep)}</s>${hhmm(depRt)}` : hhmm(dep)} → ${mine.arrDelay ? `<s>${hhmm(arr)}</s>${hhmm(arrRt)}` : hhmm(arr)}</div>
+        <div class="times">${heroTime(dep, depRt, mine.depDelay)}<span class="tarrow">→</span>${heroTime(arr, arrRt, mine.arrDelay)}</div>
         <div class="meta">${prodsHtml(mine)} ${mine.headsign && !mine.transfers ? esc(t("towards", { x: mine.headsign })) + " · " : ""}${esc(transfersText(mine.transfers))}${plat ? " · " + plat : ""}${durationHtml(mine)}${occHtml(mine)}</div>
         ${why ? `<div class="why">${esc(why)}</div>` : ""}
         ${sbbMsgsHtml(mine)}
@@ -1324,7 +1354,7 @@ function render() {
     return `<div class="row ${departed(c, now) && c.key !== pinnedKey ? "past" : ""} ${c.gone ? "gone" : ""} ${c.key === pinnedKey ? "pinned" : ""}" data-key="${esc(c.key)}" title="${esc(explain(c) || t("pinTitle"))}">
       <div class="pin">${c.key === pinnedKey ? "📌" : "○"}</div>
       <div class="t">${hhmm(dep)} → ${hhmm(arr)}${c.maxDelay ? `<span class="rt ${rtCls}">${hhmm(addMin(c.dep, c.depDelay))} → ${hhmm(addMin(c.arr, c.arrDelay))}</span>` : ""}</div>
-      <div>${prodsHtml(c)}${occHtml(c)}${c.sbb?.msgs?.length ? `<span class="sbb-ico" title="${esc(c.sbb.msgs.map(msgText).join("\n\n"))}">ℹ️</span>` : ""}
+      <div class="det">${prodsHtml(c)}${occHtml(c)}${c.sbb?.msgs?.length ? `<span class="sbb-ico" title="${esc(c.sbb.msgs.map(msgText).join("\n\n"))}">ℹ️</span>` : ""}
         <div class="sub">${onWay ? `<b>${esc(t("rowOnWay", { t: hhmm(new Date(arrRtMs(c))) }))}</b> · ` : arrived(c, now) ? `<b>${esc(t("arrived"))}</b> · ` : ""}${esc(transfersText(c.transfers))}${platHtml}${durationHtml(c)}${changeHtml}${gapsHtml}</div></div>
       <span class="chipwrap">${quipBtn(c)}<span class="chip ${lv}">${esc(statusText(c))}</span></span>
       ${trackHtml(c, now)}
@@ -1356,10 +1386,14 @@ function render() {
 
 function paintDir() {
   const labels = { out: `${cfg.from} → ${cfg.to}`, back: `${cfg.to} → ${cfg.from}` };
-  for (const b of $("dirToggle").querySelectorAll("button")) {
-    b.textContent = labels[b.dataset.dir];
-    b.setAttribute("aria-selected", String(b.dataset.dir === curDir));
-  }
+  const other = curDir === "out" ? "back" : "out";
+  // B → A is the morning direction, A → B the afternoon one; "manual" when you swapped it yourself
+  const manualNow = override && Date.now() < override.until;
+  $("dirWhen").textContent = t(manualNow ? "dirManual" : curDir === "back" ? "dirMorning" : "dirAfternoon");
+  $("dirRoute").textContent = labels[curDir];
+  $("dirSwap").dataset.dir = other;
+  $("dirSwap").textContent = "⇄ " + t("swapDir");
+  $("dirSwap").title = t("swapTitle", { r: labels[other] });
   const manual = override && Date.now() < override.until;
   const nb = nextBoundary(), nextAuto = labels[autoDir(new Date(nb))];
   $("routeLabel").textContent = (manual
@@ -1408,6 +1442,29 @@ window.addEventListener("offline", () => { fetchErr = { key: "offline" }; update
 
 // --- notifications ---------------------------------------------------------------
 const appTitle = () => `${t("logo")} ${t("appName")}`;
+// the kinds of problem this train has (several at once is possible)
+function problemKinds(c) {
+  const k = [];
+  if (c.gone || c.sbb?.cancelled || c.sbb?.skips?.length || brokenLeg(c)) k.push("cancel");
+  if (c.change?.state === "missed") k.push("missed");
+  if (c.maxDelay >= bigDelay()) k.push("vlate");
+  else if (c.maxDelay >= cfg.minDelay) k.push("late");
+  if (c.change?.state === "risk") k.push("risk");
+  if (c.noLive) k.push("nolive");
+  return k;
+}
+const wantsAlert = c => problemKinds(c).some(k => alertKinds.has(k));
+function paintAlertKinds() {
+  $("alertKinds").innerHTML = ALERT_KINDS.map(a => `<label><input type="checkbox" data-kind="${a.k}" ${alertKinds.has(a.k) ? "checked" : ""} ${notifyOn ? "" : "disabled"}>
+      ${esc(t("ak_" + a.k))}${a.crit ? ` <span class="crit">${esc(t("akCritical"))}</span>` : ""}</label>`).join("");
+  $("alertKinds").classList.toggle("off", !notifyOn);
+}
+$("alertKinds").onchange = e => {
+  const b = e.target.closest("input[data-kind]"); if (!b) return;
+  if (b.checked) alertKinds.add(b.dataset.kind); else alertKinds.delete(b.dataset.kind);
+  save("cff.alertKinds", [...alertKinds]);
+  render(); maybeNotify();
+};
 function maybeNotify() {
   const now = Date.now();
   const all = [...current, ...gone];
@@ -1417,7 +1474,7 @@ function maybeNotify() {
   if (!notifyOn) return;
   for (const c of targets) {
     const lv = level(c);
-    if (lv === "ok") continue;
+    if (lv === "ok" || !wantsAlert(c)) continue;
     // notify again only when the situation gets worse
     const tag = `${c.key}|${c.gone ? c.goneKind : ""}|${c.change?.state || ""}|${Math.floor(c.maxDelay / 5)}|${c.sbb?.cancelled ? "X" : ""}${(c.sbb?.skips || []).join(",")}|${c.noLive ? "nl" : ""}`;
     if (notified.has(tag)) continue;
@@ -1435,6 +1492,7 @@ function maybeNotify() {
 function paintNotifBtn() {
   const perm = "Notification" in window ? Notification.permission : "denied";
   $("sNotify").checked = notifyOn;
+  paintAlertKinds();
   $("notifState").textContent = !notifyOn ? "" : t(perm === "granted" ? "alertsDesktop" : perm === "default" ? "alertsAsk" : "alertsBlocked");
   $("notifState").className = "io-msg" + (notifyOn && perm === "denied" ? " err" : "");
 }

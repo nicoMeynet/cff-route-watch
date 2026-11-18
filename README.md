@@ -50,9 +50,9 @@ change pushed to `main` is online within a minute or two.
 ## What it shows
 
 - **Direction chosen automatically:** before 12:00 Aigle → Lancy-Pont-Rouge, from 12:00
-  Lancy-Pont-Rouge → Aigle. Two buttons at the top, the morning direction on the left and the
-  afternoon one on the right, let you override it until the next automatic switch (noon or
-  midnight).
+  Lancy-Pont-Rouge → Aigle. The bar at the top shows the current direction once, with
+  ☀️ Morning or 🌇 Afternoon. **⇄ Swap** shows the other direction until the next automatic
+  switch (noon or midnight); the bar then says ✋ Manual. Swapping back returns to automatic.
 - **Top card:** your train, or the next one, with a big colour-coded status: green on time,
   amber late (≥ 5 min), red very late (≥ 15 min) or cancelled. It shows live times next to the
   crossed-out scheduled ones, platform changes and a countdown.
@@ -161,6 +161,21 @@ when the situation gets worse (for example every extra 5 minutes of delay). Noti
 include the suggested alternative. With a train pinned, only that train triggers alerts.
 Otherwise, any train leaving in the next 2 hours does.
 
+**Which alerts:** under **Alerts** in Settings, tick the problems you want to be alerted about.
+The **critical** ones are on by default:
+
+| Alert | Default |
+|---|---|
+| Train cancelled or skipping my stop | on (critical) |
+| Change missed | on (critical) |
+| Very late (≥ 15 min, or 3× the alert delay) | on (critical) |
+| Late (≥ the alert delay) | off |
+| Change at risk | off |
+| No live data | off |
+
+The choice applies to desktop notifications and to the badge on the app icon. The page itself
+still shows every problem (colours, status and the ⚠️ in the tab title).
+
 The page refreshes again as soon as you come back to the tab, the computer wakes up or the
 network returns, and warns you when the data is more than about 2 minutes old.
 
@@ -175,7 +190,7 @@ and Enter. Escape keeps the current station.
 | Station A / Station B | Lancy-Pont-Rouge / Aigle | `from=` / `to=` |
 | Mornings B → A, switch to A → B at | 12:00 | `switch=12:00` |
 | Alert if late ≥ (min) | 5 (red from 15) | `delay=5` |
-| Alerts (desktop notifications) | on | not in the link (kept in this browser) |
+| Alerts (desktop notifications) | on, critical problems only | not in the link (kept in this browser) |
 | Min. time to change trains (min) | 2 | `change=2` |
 | Wait at a station in orange above (min) | 20 | `wait=20` |
 | Walk between stations in orange above (min) | 10 | `walk=10` |
