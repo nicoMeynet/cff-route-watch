@@ -77,6 +77,8 @@ change pushed to `main` is online within a minute or two.
   Lancy-Pont-Rouge → Aigle. The bar at the top shows the current direction once, with
   ☀️ Morning or 🌇 Afternoon. **⇄ Swap** shows the other direction until the next automatic
   switch (noon or midnight); the bar then says ✋ Manual. Swapping back returns to automatic.
+  With the location on, a swap lasts until your location places you near the other station
+  (or near a station, if you swapped far from both), at the latest until midnight.
 - **Direction from your location (optional):** in Settings → Route, turn on **Direction from my
   location**. Near home (closer to your home station than to your work station), the page shows
   home → work; near work, work → home; the bar says 📍 Near home or 📍 Near work. It then

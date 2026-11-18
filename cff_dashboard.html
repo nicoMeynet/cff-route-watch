@@ -498,7 +498,7 @@ const I18N = {
     rowOnWay: "🚆 on the way · arrives {t}", arrived: "arrived", pl: "pl. {p}",
     changeAt: "change at {at}: {x}", missed: "missed", nMin: "{n} min",
     onWayHeader: "🚆 Already on the way ({n})", withIssues: "{n} with issues: {x}", allFine: "all fine",
-    manualUntil: "your choice until {t}, then automatic", autoSwitch: "automatic: switches to {r} at {t}",
+    manualGeo: "your choice until you are near the other station, then automatic (at the latest at midnight)", manualUntil: "your choice until {t}, then automatic", autoSwitch: "automatic: switches to {r} at {t}",
     updated: "Updated {t} · next refresh in {n}s", offline: "You are offline.", apiErr: "Could not reach the timetable API ({e}).",
     lastKnown: "Showing last known data.",
     occ1: "low", occ2: "medium", occ3: "high", occTitle: "{cls} class: {lvl} occupancy", cls1: "1st", cls2: "2nd",
@@ -537,7 +537,7 @@ const I18N = {
     rowOnWay: "🚆 en route · arrivée {t}", arrived: "arrivé", pl: "voie {p}",
     changeAt: "changement à {at} : {x}", missed: "manqué", nMin: "{n} min",
     onWayHeader: "🚆 Déjà en route ({n})", withIssues: "{n} avec problème : {x}", allFine: "tout va bien",
-    manualUntil: "votre choix jusqu’à {t}, puis automatique", autoSwitch: "automatique : passe à {r} à {t}",
+    manualGeo: "ton choix jusqu’à ce que tu sois près de l’autre gare, puis automatique (au plus tard à minuit)", manualUntil: "votre choix jusqu’à {t}, puis automatique", autoSwitch: "automatique : passe à {r} à {t}",
     updated: "Mis à jour à {t} · prochaine actualisation dans {n} s", offline: "Vous êtes hors ligne.", apiErr: "Impossible de joindre l’API des horaires ({e}).",
     lastKnown: "Affichage des dernières données connues.",
     occ1: "faible", occ2: "moyenne", occ3: "forte", occTitle: "{cls} classe : occupation {lvl}", cls1: "1re", cls2: "2e",
@@ -576,7 +576,7 @@ const I18N = {
     rowOnWay: "🚆 unterwegs · Ankunft {t}", arrived: "angekommen", pl: "Gl. {p}",
     changeAt: "Umsteigen in {at}: {x}", missed: "verpasst", nMin: "{n} Min.",
     onWayHeader: "🚆 Bereits unterwegs ({n})", withIssues: "{n} mit Problemen: {x}", allFine: "alles in Ordnung",
-    manualUntil: "Ihre Wahl bis {t}, dann automatisch", autoSwitch: "automatisch: wechselt um {t} zu {r}",
+    manualGeo: "Ihre Wahl, bis Sie in der Nähe des anderen Bahnhofs sind, dann automatisch (spätestens um Mitternacht)", manualUntil: "Ihre Wahl bis {t}, dann automatisch", autoSwitch: "automatisch: wechselt um {t} zu {r}",
     updated: "Aktualisiert {t} · nächste Aktualisierung in {n} s", offline: "Sie sind offline.", apiErr: "Fahrplan-API nicht erreichbar ({e}).",
     lastKnown: "Letzte bekannte Daten werden angezeigt.",
     occ1: "gering", occ2: "mittel", occ3: "hoch", occTitle: "{cls} Klasse: Auslastung {lvl}", cls1: "1.", cls2: "2.",
@@ -615,7 +615,7 @@ const I18N = {
     rowOnWay: "🚆 in viaggio · arrivo {t}", arrived: "arrivato", pl: "bin. {p}",
     changeAt: "cambio a {at}: {x}", missed: "perso", nMin: "{n} min",
     onWayHeader: "🚆 Già in viaggio ({n})", withIssues: "{n} con problemi: {x}", allFine: "tutto bene",
-    manualUntil: "tua scelta fino alle {t}, poi automatico", autoSwitch: "automatico: passa a {r} alle {t}",
+    manualGeo: "tua scelta finché non sei vicino all’altra stazione, poi automatico (al più tardi a mezzanotte)", manualUntil: "tua scelta fino alle {t}, poi automatico", autoSwitch: "automatico: passa a {r} alle {t}",
     updated: "Aggiornato alle {t} · prossimo aggiornamento tra {n} s", offline: "Sei offline.", apiErr: "Impossibile raggiungere l’API dell’orario ({e}).",
     lastKnown: "Ultimi dati noti.",
     occ1: "bassa", occ2: "media", occ3: "alta", occTitle: "{cls} classe: occupazione {lvl}", cls1: "1ª", cls2: "2ª",
@@ -654,7 +654,7 @@ const I18N = {
     rowOnWay: "🚆 en camino · llega {t}", arrived: "llegado", pl: "vía {p}",
     changeAt: "transbordo en {at}: {x}", missed: "perdido", nMin: "{n} min",
     onWayHeader: "🚆 Ya en camino ({n})", withIssues: "{n} con problemas: {x}", allFine: "todo bien",
-    manualUntil: "tu elección hasta las {t}, después automático", autoSwitch: "automático: cambia a {r} a las {t}",
+    manualGeo: "tu elección hasta que estés cerca de la otra estación, después automático (como tarde a medianoche)", manualUntil: "tu elección hasta las {t}, después automático", autoSwitch: "automático: cambia a {r} a las {t}",
     updated: "Actualizado a las {t} · próxima actualización en {n} s", offline: "Estás sin conexión.", apiErr: "No se pudo acceder a la API de horarios ({e}).",
     lastKnown: "Últimos datos conocidos.",
     occ1: "baja", occ2: "media", occ3: "alta", occTitle: "{cls} clase: ocupación {lvl}", cls1: "1.ª", cls2: "2.ª",
@@ -693,7 +693,7 @@ const I18N = {
     rowOnWay: "🚆 走行中 · {t} 着", arrived: "到着", pl: "{p} 番線",
     changeAt: "{at} で乗り換え：{x}", missed: "不可", nMin: "{n} 分",
     onWayHeader: "🚆 走行中の列車（{n}）", withIssues: "問題あり {n} 本：{x}", allFine: "すべて正常",
-    manualUntil: "{t} まで手動選択、その後は自動", autoSwitch: "自動：{t} に {r} へ切り替え",
+    manualGeo: "もう一方の駅に近づくまで手動選択、その後は自動（遅くとも深夜0時まで）", manualUntil: "{t} まで手動選択、その後は自動", autoSwitch: "自動：{t} に {r} へ切り替え",
     updated: "{t} 更新 · 次の更新まで {n} 秒", offline: "オフラインです。", apiErr: "時刻表APIに接続できません（{e}）。",
     lastKnown: "最後に取得したデータを表示しています。",
     occ1: "空いている", occ2: "普通", occ3: "混雑", occTitle: "{cls}等：混雑度 {lvl}", cls1: "1", cls2: "2",
@@ -1741,7 +1741,7 @@ function paintDir() {
   $("dirSwap").title = t("swapTitle", { r: labels[other] });
   const manual = override && Date.now() < override.until;
   const nb = nextBoundary(), nextAuto = labels[autoDir(new Date(nb))];
-  $("routeLabel").textContent = manual ? t("manualUntil", { t: hhmm(new Date(override.until)) })
+  $("routeLabel").textContent = manual ? ("geo" in override ? t("manualGeo") : t("manualUntil", { t: hhmm(new Date(override.until)) }))
     : onTrain ? t("geoKeptTrain")
     : byGeo ? t("geoAuto", { d: fmtKm(geo.km), st: geo.st })
     : geoOn ? (geo?.state ? t({ far: "geoFar", denied: "geoDenied", none: "geoNone" }[geo.state]) : t("geoChecking"))
@@ -1758,7 +1758,10 @@ $("dirToggle").onclick = e => {
   const b = e.target.closest("button[data-dir]"); if (!b) return;
   const d = b.dataset.dir;
   // choosing what the clock would pick anyway = back to automatic
-  override = d === autoNow() ? null : { dir: d, until: nextBoundary() };
+  const midnight = new Date(); midnight.setHours(24, 0, 0, 0);
+  override = d === autoNow() ? null : geoOn
+    ? { dir: d, until: midnight.getTime(), geo: geoDirection() } // ends when the location changes (see checkGeo)
+    : { dir: d, until: nextBoundary() };
   save("cff.dirOverride", override);
   if (d !== curDir) switchDir(); else paintDir();
 };
@@ -2213,6 +2216,8 @@ async function checkGeo(force = false) {
     geo = near > GEO_MAX_KM ? { state: "far", ...info }
       : { dir: dHome < dWork ? "back" : "out", km: near, st: dHome < dWork ? cfg.to : cfg.from, ...info };
     if (geo.dir) { lastGeoDir = geo.dir; save("cff.geoLastDir", lastGeoDir); }
+    // a manual choice made with the location on ends when you are near a station other than when you chose it
+    if (geo.dir && override && "geo" in override && geo.dir !== override.geo) { override = null; save("cff.dirOverride", null); }
   } catch (e) {
     geo = { state: e?.code === 1 ? "denied" : "none", at: Date.now() };
   }
@@ -2252,7 +2257,7 @@ window.addEventListener("focus", () => checkGeo());
 // --- version ---------------------------------------------------------------------------
 // APP_VERSION is set by hand at each release; the update date comes from the server (the date the
 // page was last published), so it is always right even if the version is not bumped.
-const APP_VERSION = "2026.11.18.10";
+const APP_VERSION = "2026.11.18.11";
 const REPO_URL = "https://github.com/nicoMeynet/cff-route-watch";
 function paintVersion() {
   const d = new Date(document.lastModified);
