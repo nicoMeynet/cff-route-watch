@@ -26,7 +26,10 @@ This app does one thing: it shows **the status of your daily train** at a glance
 - **Alerts:** a desktop notification when your train is cancelled, very late, skips your stop or
   makes you miss your change, with the best alternative.
 
-It also works in any browser and on a phone.
+It also works in any browser and on a phone. The same text is in the app, under Settings →
+**About**.
+
+🚆 Developed on the train, between Aigle and Lancy-Pont-Rouge. 🙂
 
 ## Getting started
 
@@ -230,7 +233,7 @@ with the page still visible behind; on a phone it opens full screen. Close it wi
 **Escape** key, a click beside it, or the phone's **back** button. Changes apply immediately: there
 is no Save button. The settings are grouped in sections: **General** (language, refresh) at the top, then **Route**,
 **Alerts**, **Display**, **SBB data** (your key) and **Share** (the link).
-At the bottom: the **version**, the date the page was last **updated** online, and a link to the
+At the bottom: **About** (why this app), the **version**, the date the page was last **updated** online, and a link to the
 list of changes.
 
 **Home** (where you leave from in the morning) and **Work** (where you leave from in the
