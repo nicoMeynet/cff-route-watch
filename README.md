@@ -12,7 +12,7 @@ files next to it make it an installable app: `manifest.webmanifest`, `sw.js` and
 ## Getting started
 
 Open **https://nicomeynet.github.io/cff-route-watch/** in your browser, on a computer or a phone.
-It loads live SBB/CFF data and refreshes every 60 seconds. Keep the tab open: the page only checks
+It loads live SBB/CFF data and refreshes every 2 minutes. Keep the tab open: the page only checks
 your trains while it is open. To use another route, add it to the address, for example
 `https://nicomeynet.github.io/cff-route-watch/?from=Genève&to=Lausanne`, or pick the stations
 in Settings and copy the link (see [Settings in the link](#settings-in-the-link)).
@@ -42,7 +42,7 @@ saved copy of the page. Clicking a notification brings the app back to the front
 **Badge on the app icon:** when the app is installed, its icon in the taskbar shows **how many
 trains need your attention** in the current direction: your pinned train, or, without one, every
 train leaving in the next 2 hours. Only the problems ticked under **Alerts** count (by default the
-critical ones: cancelled or skipping your stop, change missed, very late). For example **2** = two
+critical ones: cancelled or skipping your stop, change missed, very late; plus no live data). For example **2** = two
 trains are cancelled or very late. No badge when there is nothing to worry about, or when alerts
 are off.
 
@@ -65,8 +65,10 @@ change pushed to `main` is online within a minute or two.
   (e.g. 47 min, or 1h16), the live arrival time, the next stop and a progress bar of the trip.
   Delays are included, and it updates every 20 seconds.
 - **Stops and position:** the top card of your pinned train lists its next stops and the last
-  2 it passed (greyed out), with times, live delays, platforms and the station where you change
-  trains. "⋯ show earlier stops" unfolds the rest. It also shows **where the train is now**: not
+  2 it passed (greyed out), with platforms and the station where you change trains. Each stop
+  shows the **live time** (orange or red when late) and the delay as **+n**; the scheduled time is in
+  the tooltip. Where the train waits 2 min or more, or where you change, it shows **arr.** and
+  **dep.** times. "⋯ show earlier stops" unfolds the rest. It also shows **where the train is now**: not
   departed yet, at a station, or between two stations with a progress bar. The position is
   *estimated* from the timetable and live delays (the API has no GPS data) and moves every
   20 seconds.
@@ -165,7 +167,7 @@ include the suggested alternative. With a train pinned, only that train triggers
 Otherwise, any train leaving in the next 2 hours does.
 
 **Which alerts:** under **Alerts** in Settings, tick the problems you want to be alerted about.
-The **critical** ones are on by default:
+The **critical** ones and **No live data** are on by default:
 
 | Alert | Default |
 |---|---|
@@ -174,7 +176,7 @@ The **critical** ones are on by default:
 | Very late (≥ 15 min, or 3× the alert delay) | on (critical) |
 | Late (≥ the alert delay) | off |
 | Change at risk | off |
-| No live data | off |
+| No live data | on |
 
 The choice applies to desktop notifications and to the badge on the app icon. The page itself
 still shows every problem (colours, status and the ⚠️ in the tab title).
@@ -207,7 +209,7 @@ and Enter. Escape keeps the current station.
 | Changes (right under the stations) | Direct only (or up to 1 change, up to 2 changes, any number) | `changes=0` (or `1`, `2`, `any`) |
 | Warn if trip longer than (h:mm) | 1:45 (amber) | `long=1:45` |
 | Red warning if longer than (h:mm) | 2:30 | `vlong=2:30` |
-| Refresh every (s) | 60 (minimum 30) | `refresh=60` |
+| Refresh every (s) | 120 = 2 min (minimum 60) | `refresh=120` |
 | Language | browser language | `lang=en` / `fr` / `de` / `it` / `es` |
 
 ## Settings in the link
@@ -233,11 +235,11 @@ only: they are not part of the link.
 
 ## API usage
 
-The page sends two requests per refresh (one every 60 s), plus departure-board checks only when
+The page sends two requests per refresh (one every 2 min by default), plus departure-board checks only when
 a train disappears (one per train of that trip, at most). The API has no fixed limit per client, but asks apps not to repeat the same
 query every few seconds. Each open copy of the page sends its own requests.
 
-With an SBB key, it also sends **one OJP request per refresh** (about 60 per hour; the free plan
+With an SBB key, it also sends **one OJP request per refresh** (about 30 per hour with the default 2 min; the free plan
 allows about 50 per minute). SBB messages are large because they list every affected stop, so
 their texts are only downloaded every 10 minutes, or as soon as a new message appears. In
 between, a request weighs about 20 KB.
