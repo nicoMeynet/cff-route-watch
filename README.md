@@ -99,6 +99,8 @@ change pushed to `main` is online within a minute or two.
 - **Top card:** your train, or the next one, with a big colour-coded status: green on time,
   amber late (≥ 5 min), red very late (≥ 15 min) or cancelled. It shows live times next to the
   crossed-out scheduled ones, platform changes and a countdown.
+- **Next trains:** the list shows the next 4 trains. **Next trains ▾** adds 4 more (and loads
+  them from the timetable when needed); **Show fewer ▴** goes back to 4.
 - **Pin your train:** click a connection to make it *your train*. Alerts then focus on it, and it
   stays monitored **after departure until it reaches the destination**. It unpins itself on
   arrival.
