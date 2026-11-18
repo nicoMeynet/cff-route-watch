@@ -57,9 +57,10 @@ change pushed to `main` is online within a minute or two.
   switch (noon or midnight); the bar then says ✋ Manual. Swapping back returns to automatic.
 - **Direction from your location (optional):** in Settings → Route, turn on **Direction from my
   location**. Near home (closer to your home station than to your work station), the page shows
-  home → work; near work, work → home; the bar says 📍 Near home or 📍 Near work. Far from both
-  (more than 30 km, e.g. on the train), or if the location is not allowed or not available, it falls
-  back to the time of day. The location is checked when you open the page or come back to it, not
+  home → work; near work, work → home; the bar says 📍 Near home or 📍 Near work. It then
+  **replaces the time-of-day switch**, which is greyed out in Settings. Far from both stations (more
+  than 30 km, e.g. on the train), or if the location is not allowed or not available, it keeps the
+  last direction found by location (📍 Last location). The location is checked when you open the page or come back to it, not
   continuously, and it stays on your device: only the distance to the two stations is computed.
   Under the switch, a box shows what was found: the direction it gives, the distance to each
   station, the accuracy and the time of the check, with a button to check again.
