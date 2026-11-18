@@ -107,7 +107,7 @@ change pushed to `main` is online within a minute or two.
   that matches it, for example "Arrival time is currently in superposition." for a big delay, or
   "Schrödinger's train" for a train disrupted on the way. The status itself and the
   notifications stay serious.
-- **Languages:** English, French, German, Italian, Spanish and Japanese (EN · FR · DE · IT · ES · JA, in
+- **Languages:** English, French, German, Italian, Spanish and Japanese (EN · FR · DE · IT · ES · JP, in
   Settings). On first opening, the page
   uses your browser's language.
 
@@ -225,7 +225,7 @@ and Enter. Escape keeps the current station.
 | Warn if trip longer than (h:mm) | 1:45 (amber) | `long=1:45` |
 | Red warning if longer than (h:mm) | 2:30 | `vlong=2:30` |
 | Refresh every (s) | 120 = 2 min (minimum 60) | `refresh=120` |
-| Language | browser language | `lang=en` / `fr` / `de` / `it` / `es` / `ja` |
+| Language | browser language | `lang=en` / `fr` / `de` / `it` / `es` / `ja` (or `jp`) |
 
 ## Settings in the link
 

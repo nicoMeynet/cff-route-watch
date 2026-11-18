@@ -378,7 +378,7 @@
         <h3 data-i18n="secGeneral"></h3>
         <div class="srow"><span class="sl"><b data-i18n="langLabel"></b></span>
           <span class="sc"><span class="lang" id="langToggle" role="group" aria-label="Language">
-            <button data-lang="en">EN</button><button data-lang="fr">FR</button><button data-lang="de">DE</button><button data-lang="it">IT</button><button data-lang="es">ES</button><button data-lang="ja">JA</button>
+            <button data-lang="en">EN</button><button data-lang="fr">FR</button><button data-lang="de">DE</button><button data-lang="it">IT</button><button data-lang="es">ES</button><button data-lang="ja">JP</button>
           </span></span></div>
         <label class="srow"><span class="sl"><b data-i18n="interval"></b><small data-i18n="h_interval"></small></span><span class="sc"><input id="sInterval" type="number" min="60" max="900" step="30" inputmode="numeric"><em>s</em></span></label>
       </section>
@@ -724,7 +724,8 @@ try {
       const v = q.has(param) ? cleanSetting(k, q.get(param)) : undefined;
       if (v !== undefined) next[k] = v;
     }
-    if (I18N[q.get("lang")]) next.lang = q.get("lang");
+    const ql = q.get("lang") === "jp" ? "ja" : q.get("lang"); // "jp" is accepted too (the language code is "ja")
+    if (I18N[ql]) next.lang = ql;
     cfg = next; save("cff.cfg", cfg);
   }
 } catch {}
@@ -2204,7 +2205,7 @@ window.addEventListener("focus", () => checkGeo());
 // --- version ---------------------------------------------------------------------------
 // APP_VERSION is set by hand at each release; the update date comes from the server (the date the
 // page was last published), so it is always right even if the version is not bumped.
-const APP_VERSION = "2026.11.18.3";
+const APP_VERSION = "2026.11.18.4";
 const REPO_URL = "https://github.com/nicoMeynet/cff-route-watch";
 function paintVersion() {
   const d = new Date(document.lastModified);
