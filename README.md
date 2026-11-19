@@ -82,12 +82,18 @@ change pushed to `main` is online within a minute or two.
   (or near a station, if you swapped far from both), at the latest until midnight.
 - **Direction from your location (optional):** in Settings → Route, turn on **Direction from my
   location**. Near home (closer to your home station than to your work station), the page shows
-  home → work; near work, work → home; the bar says 📍 Near home or 📍 Near work. It then
-  **replaces the time-of-day switch**, which is greyed out in Settings. "Near" means within 8 km of
-  the station. Further from both (e.g. on the train), or if the location is not allowed or not
-  available, it keeps the last direction found by location (📍 Last location). While your pinned
-  train is on its way, the direction never changes (🚆 On your train), even when you pass near a
-  station.
+  home → work; near work, work → home; the bar says 📍 Near home or 📍 Near work. "Near" means
+  within 8 km of the station. **Location first, time of day when unsure:**
+
+  | Situation | Direction |
+  |---|---|
+  | Your pinned train is on its way | kept until it arrives (🚆 On your train) |
+  | Within 8 km of home or work (location checked in the last 10 min) | from the location |
+  | Far from both, but near a station less than 2 h ago | that last direction (📍 Last location) |
+  | Far from both for more than 2 h, location refused or unavailable | time of day (☀️ Morning / 🌇 Afternoon) |
+
+  So the **Direction switch** time in Settings stays in use: it is the fallback when the location
+  cannot decide, for example when you are away on a business trip.
 - **Detect my train automatically** (on by default, needs the location option): the page compares
   your position with the estimated position of each train on the way, or about to leave your
   station, and asks "You seem to be on the RE 33 of 08:57. Is that right?". **✓ Yes** pins it as your
