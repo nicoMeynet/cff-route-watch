@@ -135,8 +135,10 @@ change pushed to `main` is online within a minute or two.
   Hover a dot or a ⏱/🚶 label for the station, the time and the details.
   In the list, each long wait or walk is also written in amber next to the trip details,
   for example "⏱ 25 min Bern".
-- **Already on the way:** other trains that have left but not arrived are folded at the top of
-  the list. The folded header turns amber or red when one of them has a problem.
+- **Left, not arrived yet:** trains that have left stay followed until they arrive. The one that
+  left less than 15 min ago ("🚆 left 4 min ago · arrives 16:02") and any with a problem stay in
+  the list, just above the next departures. The others are folded under **🚆 Left, not arrived
+  yet: n**, with a **Show ▾ / Hide ▴** button.
 - **Direct only** (on by default, in Settings → Route → **Changes** = Direct only): hides trains with a
   change. The status line under the direction bar says "Direct only" while it is on. When the last direct train of
   the day has left, a note says so, with a button to show trains with a change.
