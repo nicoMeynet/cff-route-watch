@@ -110,6 +110,13 @@ change pushed to `main` is online within a minute or two.
   crossed-out scheduled ones, platform changes and a countdown.
 - **Next trains:** the list shows the next 4 trains. **Next trains ▾** adds 4 more (and loads
   them from the timetable when needed); **Show fewer ▴** goes back to 4.
+- **Share my arrival:** the top card has a **📤 Share my arrival** button. On a phone it opens the
+  share sheet (WhatsApp, SMS…); on a computer it copies a ready-made message, e.g. "🚆 I'm on the
+  RE 33, arriving in Aigle at 18:06 (+4 min)." It says when the train is cancelled or disrupted.
+- **Reliability of your train:** once the app has seen a train on at least 3 days, the top card
+  shows "📊 Last 30 days (12 days seen): 9× on time · 2× late · 1× cancelled". Late means at least
+  the alert delay at arrival. Only days when the app was open while the train ran are counted;
+  the history stays in this browser.
 - **Pin your train:** click a connection to make it *your train*. Alerts then focus on it, and it
   stays monitored **after departure until it reaches the destination**. It unpins itself on
   arrival.
@@ -236,7 +243,9 @@ The **critical** ones are on by default:
 | Late (≥ the alert delay) | off |
 | Change at risk | off |
 | No live data | on (critical) |
+| Platform change (before departure) | on (critical) |
 
+A platform change sends "🔀 07:31 RE33: Platform 3" even when the train is on time.
 The choice applies to desktop notifications and to the badge on the app icon. The page itself
 still shows every problem (colours, status and the ⚠️ in the tab title).
 
